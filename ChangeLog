@@ -1,5 +1,8 @@
 2005-03-31  johnsu01  <john@wjsullivan.net>
 
+	* delicious.el (delicious-load-posts-file): Fixed a problem that
+	was preventing save-excursion from working. 
+
 	* readme: Documented `delicious-load-posts' and
 	`delicious-save-posts'.
 	

@@ -470,10 +470,11 @@ Display the results in *delicious search results*."
   "Read posts from `delicious-posts-file-name' into DELICIOUS-POSTS-LIST."
   (interactive)
   (save-excursion
-    (let* ((home (getenv "HOME"))
-           (file (concat home "/" delicious-posts-file-name)))
-      (find-file file)
-      (setq delicious-posts-list (read (buffer-string)))))
+    (with-temp-buffer
+      (let* ((home (getenv "HOME"))
+             (file (concat home "/" delicious-posts-file-name)))
+        (insert-file-contents file)
+        (setq delicious-posts-list (read (buffer-string))))))
   (message "Done reading posts."))
   
 (provide 'delicious)
