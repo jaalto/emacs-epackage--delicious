@@ -188,12 +188,20 @@ The server uses the current date and time by default."
 
 (defun delicious-w3m-html (username count tag)
   "Visit the HTML feed page, in a new-session if a prefix is used, for the del.icio.us USERNAME showing COUNT most recent posts under TAG."
-  (interactive "sUsername (RET for yours): \nNumber of posts (RET for 15): \nsTag (RET for all): ")
+  (interactive "sUsername (RET for yours): \nnNumber of posts (RET for 15): \nsTag (RET for all): ")
   (w3m-browse-url 
    (format "http://%s%s%s" delicious-api-host delicious-api-html (delicious-api-html-uri username tag count))
    (not (null current-prefix-arg))))
 
-   
+(defun delicious-w3m-bookmark-recent (count tag section)
+  "Add your COUNT recent delicious posts under TAG to your w3m bookmarks file. They will be stored under SECTION."
+  (interactive "nNumber of recent posts to bookmark: \nsTag to filter by: \nsw3m bookmark section to use: ")
+  (let ((delicious-list (delicious-api-get-recent tag count)))
+    (loop for bookmark in delicious-list
+          for url = (nth 0 bookmark)
+          for title = (nth 1 bookmark)
+          do (w3m-bookmark-write-file url title section)
+          finally do (message "w3m bookmarks updated."))))
 
 (provide 'delicious)
 
