@@ -4,7 +4,7 @@
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;; Created 25 October 2004
-;; Version: 0.2 2005-02-10
+;; Version: 0.2 2005-03-31
 ;; Keywords: comm, hypermedia
 
 ;; This program is free software; you can redistribute it and/or
@@ -74,10 +74,7 @@
   "Face for timestamp in search results."
   :group 'delicious)
 
-(defvar delicious-posted-urls '()
-  "A running list of urls that have been posted since the last update of the list from the delicious server.")
-
-(defconst delicious-version  "delicious.el/0.2 2005-02-08"
+(defconst delicious-version  "delicious.el/0.2 2005-03-31"
   "The version string for this copy of delicious.el.")
 
 (defun delicious-post (url description &optional tags extended time)
@@ -91,22 +88,29 @@
                 (delicious-read-time-string)))
   (message "Waiting for server.")
   (delicious-api-post url description tags extended time)
-  (unless (and (boundp 'delicious-posted-urls)
-               (eq (type-of delicious-posted-urls) 'cons))
-    (setq delicious-posted-urls))
-  (setq delicious-posted-urls (cons `((href . ,url)
-                                      (description . ,description)
-                                      (tag . ,tags)
-                                      (extended . ,extended)
-                                      (time . ,time))
-                                    delicious-posted-urls))
-  (delicious-add-tags tags)
+  (loop with post = (list `("href" . ,url)
+                          `("description" . ,description)
+                          `("tag" . ,tags)
+                          `("extended" . ,extended)
+                          `("time" . ,time))
+        for cell in post
+        unless (equal (cdr cell) "")
+            collect cell into cells
+        finally do (add-to-list 'delicious-posts-list cells t)
+        finally do (delicious-add-tags tags))
   (message "URL posted."))
 
 (defun delicious-read-time-string ()
   "Read a date string from a prompt and format it properly for the server.
 The server uses the current date and time by default."
-  (read-string "(Optional) Date/Time [yyyy-mm-ddThh:mm:ssZ]: "))
+  (let ((date (read-string "(Optional) Date/Time [yyyy-mm-dd hh:mm:ss]: ")))
+    (unless (equal date "")
+      (unless (string-match "^\\([1-9][0-9][0-9][0-9]\\).\\([0-1][0-9]\\).\\([0-9][0-9]\\).\\([0-9][0-9]\\).\\([0-5][0-9]\\).\\([0-5][0-9]\\)" date)
+        (message "Incorrect time string format.")
+        (sleep-for 1)
+        (delicious-read-time-string))
+      (let ((time-string (replace-match "\\1-\\2-\\3T\\4:\\5:\\6Z" t nil date)))
+        time-string))))
 
 (defun delicious-read-url ()
   "Read a url from a prompt, suggesting an appropriate default.  Check the input to make sure it is valid and react if it is a duplicate."
@@ -133,8 +137,7 @@ The server uses the current date and time by default."
 (defun delicious-duplicate-url-p (url)
   "Check to see if URL is a duplicate."
   (delicious-build-posts-list-maybe)
-  (if (or (assoc `(href . ,url) delicious-posts-list)
-          (assoc `(href . ,url) delicious-posted-urls))
+  (if (assoc `(href . ,url) delicious-posts-list)
       (progn (let ((edit
                     (y-or-n-p "This URL is a duplicate.\nIf you post it again, the old tags will be replaced by the new ones.\nPost? ")))
                (if (eq edit t)
@@ -157,7 +160,8 @@ suggest any tags."
         for tag = (completing-read (format prompt suggested-tags tags)
                                    delicious-tags-list)
         until (equal tag "")
-        collect tag into tags
+        if (member tag tags) do (and (message "Duplicate tag ignored.") (sleep-for 1))
+        else collect tag into tags
         finally return (progn
                          (add-to-list 'delicious-tags-local tags)
                          (message "%s" tags)
@@ -170,7 +174,17 @@ suggest any tags."
                     collect (downcase (car cell)) into tags
                     finally return tags)))
     (loop for word in buffer-words
-          if (member word tags)
+          if (or (member word tags)
+                 (member (concat word "s") tags)
+                 (member (concat word "es") tags)
+                 (if (and (> (length word) 1)
+                          (or (member (substring word 0 -1) tags)
+                              (if (and (equal (substring word -1) "y")
+                                       (member (concat (substring word 0 -1) "ies") tags))
+                                  t)))
+                     t)
+                 (if (and (> (length word) 2)
+                          (member (substring word 0 -2) tags)) t))
           collect word into shared
           finally return shared)))
   
@@ -199,14 +213,13 @@ suggest any tags."
   (loop for tag in tags
         for tag-count = (cadar (last delicious-tags-list))
         unless (assoc tag delicious-tags-list)
-            do (add-to-list 'delicious-tags-list (list tag (1+ tag-count)) t)))
-
+          do (setq delicious-tags-list (setcdr (last delicious-tags-list) `(,tag ,(1+ tag-count))))))
+       
 (defun delicious-build-posts-list ()
   "Refresh or build the posts list from the server for use in duplicate checking."
   (interactive)
   (message "Refreshing delicious posts list from server.")
-  (setq delicious-posts-list (delicious-api-get-all)
-        delicious-posted-urls '()))
+  (setq delicious-posts-list (delicious-api-get-all)))
 
 (defun delicious-guess-description ()
   "Try some different things to get a default description."
@@ -438,6 +451,31 @@ Display the results in *delicious search results*."
                (not (null delicious-posts-list)))
     (delicious-build-posts-list)))
 
+(defun delicious-save-posts ()
+  "Write posts to `delicious-posts-file-name' in your $HOME directory."
+  (interactive)
+  (save-excursion
+    (let* ((home (getenv "HOME"))
+           (buffer delicious-posts-file-name)
+           (file (concat home "/" buffer)))
+      (set-buffer 
+       (get-buffer-create buffer))
+      (erase-buffer)
+      (prin1 delicious-posts-list (current-buffer))
+      (write-file file)
+      (kill-buffer buffer)
+      (message "del.icio.us posts successfully saved to %s" file))))
+
+(defun delicious-load-posts-file ()
+  "Read posts from `delicious-posts-file-name' into DELICIOUS-POSTS-LIST."
+  (interactive)
+  (save-excursion
+    (let* ((home (getenv "HOME"))
+           (file (concat home "/" delicious-posts-file-name)))
+      (find-file file)
+      (setq delicious-posts-list (read (buffer-string)))))
+  (message "Done reading posts."))
+  
 (provide 'delicious)
 
 ;;; delicious.el ends here

@@ -1,4 +1,41 @@
+2005-03-31  johnsu01  <john@wjsullivan.net>
+
+	* readme: Documented `delicious-load-posts' and
+	`delicious-save-posts'.
+	
+	* delicious.el (delicious-load-posts): Interactive command
+	which Reads the contents of the posts file into
+	`delicious-posts-list'.
+
+2005-03-30  johnsu01  <john@wjsullivan.net>
+
+	* delicious.el (delicious-save-posts): New interactive command to
+	save your posts to a file.
+
+	* delicioapi.el (delicious-posts-file-name): New option for
+	defining the file name in which your delicious posts will be saved.
+
+2005-02-13  John Sullivan  <john@wjsullivan.net>
+
+	* delicious.el (delicious-read-time-string): Corrected time-string
+	prompt format.
+	(delicious-suggest-tags): Added rudimentary handling of plurals,
+	so that matches are suggested even if they are off by an 's' or
+	'es'. More interesting stemming stuff to come, I hope. 
+	(delicious-post): Bugfix so that tags are really getting added to
+	the local tags list immediately after posting.
+
+2005-02-11  John Sullivan  <john@wjsullivan.net>
+
+	* delicious.el (delicious-read-time-string): Added check to make
+	sure that the format of the time time string is correct. Now you
+	can just enter the numbers separated by whatever you want, and
+	we'll fill in the -'s and :'- and T and Z for you. 
+
 2005-02-10  John Sullivan  <john@wjsullivan.net>
+
+	* README: Updated README to reflect the fact that there is no
+	longer a separate local posts list.
 
 	* delicious.el (delicious-complete-tags): Added duplicate checking
 	to prompt. If you enter a tag you've already entered, you'll get a
@@ -6,6 +43,12 @@
 	this a lot. This isn't actually necessary, because internally the
 	duplicate tag was ignored anyway, and the server probably ignores
 	it too, but anyway. I feel cleaner now. 
+	(delicious-post): Eliminated separate list of posted urls. Posts
+	are now added to delicious-posts-list, which means that posts you
+	have made in your current session are now searched when you do
+	search commands. In theory, the only time you should have to
+	refresh information from the server now is after you have posted
+	from an external interface or something has gone wrong.
 
 2005-02-09  John Sullivan  <john@wjsullivan.net>
 

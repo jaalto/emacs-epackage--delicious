@@ -4,7 +4,7 @@
 
 Author: John Sullivan <john@wjsullivan.net>
 Created 25 October 2004
-Version: 0.2 2005-02-08
+Version: 0.2 2005-03-31
 Keywords: comm, hypermedia
 
 This program is free software; you can redistribute it and/or modify it under
@@ -156,12 +156,10 @@ server!
 This command will refresh the local list of your posts from the server. You
 shouldn't use this often. The reason posts are cached locally is to avoid
 bothering the server too much. There isn't much reason to use this command,
-because a separate list of posts made during your current session is
-maintained, and is used for duplicate-checking (though currently they are not
-included in searching---that will change shortly). But if you suspect that
-something has gone wrong, you can use this command to refresh from the
-server. Or, if you add posts from an external interface like your non-emacs web
-browser, it would be useful to refresh the local list.
+because any posts made during your current session are recorded locally. But if
+you suspect that something has gone wrong, you can use this command to refresh
+from the server. Or, if you add posts from an external interface like your
+non-emacs web browser, it would be useful to refresh the local list.
 
 - M-x delicious-build-tags-list
 
@@ -171,6 +169,25 @@ locally is to avoid bothering the server too much. Any new tags you use while
 posting with delicious-post are added to the completion list, so the only
 reason to refresh the list is if something funny happens and the list gets
 corrupted, or if you add tags using another interface.
+
+- M-x delicious-save-posts
+
+This command will save whatever posts are currently cached (if everything is
+working properly, this is all of your posts) to a file in your home
+directory. This file is called `.delicious' by default, but you can change the
+name by altering the value of `delicious-posts-file-name'. Currently, this
+function does not make a backup copy before saving or warn you that there is
+already a file there. It just clobbers. I'll make it a little safer in the
+future, but since presumably you have all of your posts stored on the
+del.icio.us server, I don't foresee any real disasters. This command gives you
+a reasonable way to back up your del.icio.us posts. You can't recover them yet,
+but I will soon have the function written to create posts from a file like this
+one, and then you will be able to recover them.
+
+- M-x delicious-load-posts
+
+This command will load your posts from the file named by
+`delicious-posts-file-name' into the variable `delicious-posts-list'. 
 
 * Interactive search commands
 
