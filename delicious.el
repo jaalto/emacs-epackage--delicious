@@ -349,8 +349,23 @@ Display the results in *delicious search results*."
         if match do (delicious-search-insert-match post))
   (goto-char (point-min)))
 
+(defun delicious-search-link-regexp (search-string)
+  "Search the links in DELICIOUS-POSTS-LIST for SEARCH-STRING, a regular expression.
+Display the results in *delicious search results*."
+  (interactive "sEnter regexp search string: ")
+  (delicious-build-posts-list-maybe)
+  (switch-to-buffer-other-window (get-buffer-create "*delicious search results*"))
+  (delicious-search-mode 1)
+  (delete-region (point-min) (point-max))
+  (loop for post in delicious-posts-list
+        for match = (loop for field in post
+                          if (equal (car field) "href")
+                              when (string-match search-string (cdr field)) return post)
+        if match do (delicious-search-insert-match post))
+  (goto-char (point-min)))
+
 (defun delicious-search-tags (tags)
-  "Display all posts with TAGS."
+  "Display all posts with TAGS, which can include regular expression syntax."
   (interactive (list (delicious-complete-tags t)))
   (delicious-build-posts-list-maybe)
   (switch-to-buffer-other-window (get-buffer-create "*delicious search results*"))
