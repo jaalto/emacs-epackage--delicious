@@ -125,24 +125,24 @@
 (defun delicious-api-post (url &optional description tags extended time)
   "Post a URL to your del.icio.us account.  You must include a DESCRIPTION (string).  TAGS (space separated string), EXTENDED (extra description string) and TIME (in the format %C%y-%m-%dT%H:%M:%SZ) are optional additions."
   (let* ((description (url-hexify-string description))
-	 (tags (url-hexify-string tags))
-	 (extended (url-hexify-string extended))
-	 (time (url-hexify-string time))
-	 (post-url (format "posts/add?&url=%s&description=%s&tags=%s&extended=%s&dt=%s"
-			   url description tags extended time)))
+         (tags (url-hexify-string tags))
+         (extended (url-hexify-string extended))
+         (time (url-hexify-string time))
+         (post-url (format "posts/add?&url=%s&description=%s&tags=%s&extended=%s&dt=%s"
+                           url description tags extended time)))
     (delicious-send-request (delicious-build-request post-url))))
 
 (defun delicious-api-get-tags ()
   "Return a hash table of your tags and the number of your entries under each tag.  The keys are the tags."
   (let ((uri "tags/get?")
-	(search (delicious-build-search "count" "tag")))
+        (search (delicious-build-search "count" "tag")))
     (delicious-send-request (delicious-build-request uri))
     (delicious-do-search-hash (car search) 2)))
 
 ;; (defun delicious-api-get-subscriptions ()
 ;;   "Return a list of your inbox subscriptions. The list is tag and user."
 ;;   (let ((uri "inbox/subs?")
-;; 	(search (delicious-build-search "tag" "user")))
+;;      (search (delicious-build-search "tag" "user")))
 ;;     (delicious-send-request (delicious-build-request uri))
 ;;     (delicious-do-search-list (car search) (cdr search))))
 
@@ -151,7 +151,7 @@
 ;;   "Return a hash table of dates and their entry count in your inbox.
 ;; The keys are the dates."
 ;;   (let ((uri "inbox/dates?")
-;; 	(search (delicious-build-search "date" "count")))
+;;      (search (delicious-build-search "date" "count")))
 ;;     (delicious-send-request (delicious-build-request uri))
 ;;     (delicious-do-search-hash (car search) 1)))
 
@@ -161,10 +161,10 @@
 ;;  Filter this list by optional DATE.
 ;; The list is HREF, DESCRIPTION, TAGS, TIME, and USER."
 ;;   (let* ((date-filter (url-hexify-string date))
-;; 	 (uri (concat "inbox/get?"
-;; 	       (unless (null date)
-;; 		 (format "&dt=%s" date-filter))))
-;; 	 (search (delicious-build-search "href" "description" "tags" "time" "user")))
+;;       (uri (concat "inbox/get?"
+;;             (unless (null date)
+;;               (format "&dt=%s" date-filter))))
+;;       (search (delicious-build-search "href" "description" "tags" "time" "user")))
 ;;     (delicious-send-request (delicious-build-request uri))
 ;;     (delicious-do-search-list (car search) (cdr search))))
 
@@ -172,31 +172,31 @@
 (defun delicious-api-get-posts (&optional tag date)
    "Return a list of posts filtered by TAG on a given DATE.  If no date is supplied, the most recent date with posts will be used.  The list is HREF, DESCRIPTION, HASH, TAG, and TIME."
   (let* ((uri (concat "posts/get?"
-		      (unless (null tag)
-			(format "&tag=%s" tag))
-		      (unless (null date)
-			  (format "&dt=%s" date))))
-	 (search (delicious-build-search "href" "description" "hash" "tag" "time")))
+                      (unless (null tag)
+                        (format "&tag=%s" tag))
+                      (unless (null date)
+                          (format "&dt=%s" date))))
+         (search (delicious-build-search "href" "description" "hash" "tag" "time")))
     (delicious-send-request (delicious-build-request uri))
     (delicious-do-search-list (car search) (cdr search))))
 
 (defun delicious-api-get-recent (&optional tag count)
   "Return a list, optionally filtered by TAG, of the COUNT most recent posts.  The list is HREF, DESCRIPTION, HASH, TAG, and TIME.  This will max out at 100.  Use `delicious-api-get-all' if you want more than that."
    (let* ((tag (unless (null tag) (url-hexify-string tag)))
-	  (count (if (> count 100) 100) count)
-	 (uri (concat "posts/recent?"
-		      (unless (null tag)
-			(format "&tag=%s" tag))
-		      (unless (null count)
-			(format "&count=%s" count))))
-	 (search (delicious-build-search "href" "description" "hash" "tag" "time")))
+          (count (if (> count 100) 100) count)
+         (uri (concat "posts/recent?"
+                      (unless (null tag)
+                        (format "&tag=%s" tag))
+                      (unless (null count)
+                        (format "&count=%s" count))))
+         (search (delicious-build-search "href" "description" "hash" "tag" "time")))
      (delicious-send-request (delicious-build-request uri))
      (delicious-do-search-list (car search) (cdr search))))
 
 (defun delicious-api-get-all ()
   "Return a list of all posts from your account.  The list is HREF, DESCRIPTION, HASH, TAG, and TIME."
   (let ((uri "posts/all")
-	(search (delicious-build-search "href" "description" "hash" "tag" "time")))
+        (search (delicious-build-search "href" "description" "hash" "tag" "time")))
     (delicious-send-request (delicious-build-request uri))
     (delicious-do-search-list (car search) (cdr search))))
 
@@ -204,10 +204,10 @@
   "Return a hash table of dates with the number of posts at each date.
 TAG is a tag to filter by.  The dates are the keys."
   (let* ((tag (url-hexify-string tag))
-	 (uri (concat "posts/dates?"
-		      (unless (null tag)
-			(format "&tag=%s" tag))))
-	 (search (delicious-build-search "count" "date")))
+         (uri (concat "posts/dates?"
+                      (unless (null tag)
+                        (format "&tag=%s" tag))))
+         (search (delicious-build-search "count" "date")))
     (delicious-send-request (delicious-build-request uri))
     (delicious-do-search-hash (car search) 2)))
 
@@ -279,31 +279,31 @@ for EXTENDEDDIV."
                           (format "rssbutton=%s&" rssbutton))
                       (if (not (null extendeddiv))
                           (format "extendedclass=%s&" extendedclass)))
-			 0 -1)))
+                         0 -1)))
     (delicious-send-request (delicious-api-build-html-request uri)))
   (save-excursion
     (with-current-buffer delicious-api-buffer
       (let ((beginning (progn
-			 (goto-char (point-min))
-			 (re-search-forward "<div")
-			 (line-beginning-position)))
-	    (end (progn
-		   (goto-char (point-max))
-		   (re-search-backward "</a>")
-		   (line-end-position))))
-	(buffer-substring beginning end)))))
+                         (goto-char (point-min))
+                         (re-search-forward "<div")
+                         (line-beginning-position)))
+            (end (progn
+                   (goto-char (point-max))
+                   (re-search-backward "</a>")
+                   (line-end-position))))
+        (buffer-substring beginning end)))))
 
 (defun delicious-api-build-html-request (uri)
   "Return the proper HTTP request to get URI from the HTML feed."
   (let* ((uri (format "http://%s%s%s" delicious-api-host delicious-api-html uri)))
     (format "GET %s HTTP/1.0\nFrom: %s\nUser-Agent: %s\nAuthorization: Basic %s\n\n"
-	    uri delicious-api-from delicious-api-user-agent (delicious-auth))))
+            uri delicious-api-from delicious-api-user-agent (delicious-auth))))
 
 (defun delicious-api-build-tag-completion ()
   "Return a numbered list of current tags, to use in tab completion."
   (let ((tags-hash (delicious-api-get-tags))
-	(tags-list '())
-	(counter 1))
+        (tags-list '())
+        (counter 1))
     (maphash '(lambda (key value)
                 (setq tags-list (cons (list key counter) tags-list))
                 (setq counter (1+ counter)))
@@ -342,15 +342,15 @@ Output goes to `delicious-api-buffer'."
            (kill-process (get-process "delicious")))
           (error-check
            (error error-check)))))
-	   
+           
 (defun delicious-build-search (&rest fields)
   "Given list FIELDS, return a list with CAR as the search-string and CDR the number of search fields."
   (let ((search-string nil)
-	(count-fields (length fields)))
+        (count-fields (length fields)))
     (loop for field in fields do
- 	  (setq search-string
-		(concat search-string
-			field delicious-api-field-match ".*")))
+          (setq search-string
+                (concat search-string
+                        field delicious-api-field-match ".*")))
     (cons search-string count-fields)))
 
 (defun delicious-do-search-list (search-string fields)
@@ -359,13 +359,13 @@ Output goes to `delicious-api-buffer'."
     (with-current-buffer delicious-api-buffer
       (goto-char (point-min))
       (let ((results-list))
-	(while (re-search-forward search-string nil t)
-	  (setq results-list (cons (let ((result))
+        (while (re-search-forward search-string nil t)
+          (setq results-list (cons (let ((result))
                                      (loop for field from 1 to fields do
                                            (setq result (append result (list (match-string field)))))
                                      result)
                                    results-list)))
-	results-list))))
+        results-list))))
 
 (defun delicious-do-search-hash (search-string key)
   "Return a hash table of occurrences in `delicious-api-buffer' of SEARCH-STRING.  KEY is either 1 or 2. If it is 1, then the hash key will be the match for the first field in the search string.  If it is 2, then the key will be the match for the second field."
@@ -373,12 +373,12 @@ Output goes to `delicious-api-buffer'."
     (with-current-buffer delicious-api-buffer
       (goto-char (point-min))
       (let ((results-hash (make-hash-table :test 'equal)))
-	(while (re-search-forward search-string nil t)
-	  (if (equal key 1)
-	      (puthash (match-string 1) (match-string 2) results-hash)
-	    (puthash (match-string 2) (match-string 1) results-hash)))
-	results-hash))))
-	
+        (while (re-search-forward search-string nil t)
+          (if (equal key 1)
+              (puthash (match-string 1) (match-string 2) results-hash)
+            (puthash (match-string 2) (match-string 1) results-hash)))
+        results-hash))))
+        
 (defun delicious-auth ()
   "Return the authorization string using `delicious-api-user' and `delicious-api-password'."
   (base64-encode-string

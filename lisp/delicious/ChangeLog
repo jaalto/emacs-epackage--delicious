@@ -1,3 +1,4 @@
+
 2005-01-03  John Sullivan  <john@wjsullivan.net>
 
 	* delicioapi.el (delicious-api-html): Fixed a
@@ -5,6 +6,11 @@
 	from the DELICIOUS-API-BUFFER after contacting the server. I'm
 	doing this in a very primitive way, but it seems to work so
 	far. Function is not yet documented.
+
+2004-12-30  John Sullivan  <john@wjsullivan.net>
+
+                * delicioapi.el (delicious-api-html): Fixed up logic to construct
+                the URL for requesting the HTML tags list. 
 
 2004-12-25  John Sullivan  <john@wjsullivan.net>
 
