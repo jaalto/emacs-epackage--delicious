@@ -4,7 +4,7 @@
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;; Created 25 October 2004
-;; Version: 0.1 2005-02-04
+;; Version: 0.2 2005-02-05
 ;; Keywords: comm, hypermedia
 
 ;; This program is free software; you can redistribute it and/or
@@ -52,7 +52,7 @@
 (defvar delicious-posted-urls '()
   "A running list of urls that have been posted since the last update of the list from the delicious server.")
 
-(defconst delicious-version  "delicious.el/0.1 2005-02-04"
+(defconst delicious-version  "delicious.el/0.2 2005-02-05"
   "The version string for this copy of delicious.el.")
 
 (defun delicious-post (url description &optional tags extended time)
@@ -66,7 +66,15 @@
                 (delicious-read-time-string)))
   (message "Waiting for server.")
   (delicious-api-post url description tags extended time)
-  (add-to-list 'delicious-posted-urls url)
+  (unless (and (boundp 'delicious-posted-urls)
+               (eq (type-of delicious-posted-urls) 'cons))
+    (setq delicious-posted-urls))
+  (setq delicious-posted-urls (cons `((href . ,url)
+                                      (description . ,description)
+                                      (tag . ,tags)
+                                      (extended . ,extended)
+                                      (time . ,time))
+                                    delicious-posted-urls))
   (message "URL posted."))
 
 (defun delicious-read-time-string ()
@@ -99,8 +107,8 @@ The server uses the current date and time by default."
   (unless (and (boundp 'delicious-posts-list)
                (not (null delicious-posts-list)))
     (delicious-build-posts-list))
-  (if (or (assoc url delicious-posts-list)
-          (member url delicious-posted-urls))
+  (if (or (assoc `(href . ,url) delicious-posts-list)
+          (assoc `(href . ,url) delicious-posted-urls))
       (progn (let ((edit
                     (y-or-n-p "This URL is a duplicate.\nIf you post it again, the old tags will be replaced by the new ones.\nPost? ")))
                (if (eq edit t)
@@ -206,8 +214,8 @@ The server uses the current date and time by default."
   (interactive "nNumber of recent posts to bookmark: \nsTag to filter by: \nsw3m bookmark section to use: ")
   (let ((delicious-list (delicious-api-get-recent tag count)))
     (loop for bookmark in delicious-list
-          for url = (nth 0 bookmark)
-          for title = (nth 1 bookmark)
+          for url = (cdr (assoc "href" bookmark))
+          for title = (cdr (assoc "description" bookmark))
           do (w3m-bookmark-write-file url title section)
           finally do (message "w3m bookmarks updated."))))
 
@@ -258,11 +266,12 @@ The server uses the current date and time by default."
   (delete-region (point-min) (point-max))
   (loop for post in delicious-posts-list
         for match = (loop for field in post
-                          when (string-match search-string field) return post) 
-        if match do (loop for field in match 
-			  if (string-match thing-at-point-url-regexp field)
-			    do (insert (propertize field 'face 'delicious-result-link-face) "\n")
-			  else do (insert field "\n")
+                          when (string-match search-string (cdr field)) return post)
+        if match do (loop for field in post
+                          if (string-match thing-at-point-url-regexp (cdr field))
+                              do (insert (propertize (cdr field) 
+                                                     'face 'delicious-result-link-face) "\n")
+                          else do (insert (cdr field) "\n")
                           finally do (insert "\n"))))
 
 (provide 'delicious)

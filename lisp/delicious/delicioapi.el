@@ -4,7 +4,7 @@
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;; Created 25 October 2004
-;; Version: 0.1 2005-02-03
+;; Version: 0.2 2005-02-05
 ;; Keywords: comm, hypermedia
 
 ;; This program is free software; you can redistribute it and/or
@@ -58,7 +58,7 @@
 (defvar delicious-api-buffer "*delicious output*"
   "*The name of the buffer to direct output to.")
 
-(defvar delicious-api-user-agent "delicious.el/0.1"
+(defvar delicious-api-user-agent "delicioapi.el/0.2"
   "The User-Agent field that we will send to the server.")
 
 (defvar delicious-api-host "del.icio.us"
@@ -70,7 +70,7 @@
 (defvar delicious-api-html "/html/"
   "*The path to the del.icio.us HTML feed.  It should begin and end with a slash.")
 
-(defconst delicious-api-version "delicioapi.el/0.1 2005-02-03"
+(defconst delicious-api-version "delicioapi.el/0.2 2005-02-05"
 "The version string for this copy of delicioapi.el.")
 
 (defconst delicious-api-field-match "=\"\\(.*?\\)\""
@@ -259,10 +259,9 @@
                     (unless (null tag)
                       (format "&tag=%s" tag))
                     (unless (null date)
-                      (format "&dt=%s" date))))
-       (search (delicious-build-search "href" "description" "extended" "hash" "tag" "time")))
+                      (format "&dt=%s" date)))))
   (delicious-send-request (delicious-build-request uri))
-  (delicious-do-search-list (car search) (cdr search))))
+  (delicious-api-parse-posts)))
 
 (defun delicious-api-get-recent (&optional tag count)
 "Return a list, optionally filtered by TAG, of the COUNT most recent posts.  The list is HREF, DESCRIPTION, EXTENDED, HASH, TAG, and TIME.  This will max out at 100.  Use `delicious-api-get-all' if you want more than that."
@@ -275,17 +274,15 @@
        (uri (concat "posts/recent?"
                     (unless (null tag)
                       (format "&tag=%s" (url-hexify-string tag)))
-                    (format "&count=%s" count-fixed)))
-       (search (delicious-build-search "href" "description" "extended" "hash" "tag" "time")))
+                    (format "&count=%s" count-fixed))))
   (delicious-send-request (delicious-build-request uri))
-  (delicious-do-search-list (car search) (cdr search))))
+  (delicious-api-parse-posts)))
 
 (defun delicious-api-get-all ()
 "Return a list of all posts from your account.  The list is HREF, DESCRIPTION, EXTENDED, HASH, TAG, and TIME."
-(let ((uri "posts/all")
-      (search (delicious-build-search "href" "description" "extended" "hash" "tag" "time")))
+(let ((uri "posts/all"))
   (delicious-send-request (delicious-build-request uri))
-  (delicious-do-search-list (car search) (cdr search))))
+  (delicious-api-parse-posts)))
 
 (defun delicious-api-get-dates (&optional tag)
 "Return a hash table of dates with the number of posts at each date.
@@ -381,54 +378,54 @@ for EXTENDEDDIV."
          (uri (substring (concat (format "%s/?" user)
                                  (if (not (or (null tagname) (equal tagname "")))
                                      (format "%s?" tagname))
-				 (if (not (or (null count) (equal count "")))
+                                 (if (not (or (null count) (equal count "")))
                                      (format "count=%s&" count)
                                    (unless (null delicious-api-html-count)
-				     (format "count=%s&" delicious-api-html-count)))
+                                     (format "count=%s&" delicious-api-html-count)))
                                  (if (not (null extended))
                                      (format "extended=%s&" extended)
-				   (unless (null delicious-api-html-extended)
-				     (format "extended=%s&" delicious-api-html-extended)))
+                                   (unless (null delicious-api-html-extended)
+                                     (format "extended=%s&" delicious-api-html-extended)))
                                  (if (not (null divclass))
                                      (format "divclass=%s&" divclass)
-				   (unless (null delicious-api-html-divclass)
-				     (format "divclass=%s&" delicious-api-html-divclass)))
+                                   (unless (null delicious-api-html-divclass)
+                                     (format "divclass=%s&" delicious-api-html-divclass)))
                                  (if (not (null aclass))
                                      (format "aclass=%s&" aclass)
-				   (unless (null delicious-api-html-aclass)
-				     (format "aclass=%s&" delicious-api-html-aclass)))
+                                   (unless (null delicious-api-html-aclass)
+                                     (format "aclass=%s&" delicious-api-html-aclass)))
                                  (if (not (null tags))
                                      (format "tags=%s&" tags)
-				   (unless (null delicious-api-html-tags)
-				     (format "tags=%s&" delicious-api-html-tags)))
+                                   (unless (null delicious-api-html-tags)
+                                     (format "tags=%s&" delicious-api-html-tags)))
                                  (if (not (null tagclass))
                                      (format "tagclass=%s&" tagclass)
-				   (unless (null delicious-api-html-tagclass)
-				     (format "tagclass=%s&" delicious-api-html-tagclass)))
+                                   (unless (null delicious-api-html-tagclass)
+                                     (format "tagclass=%s&" delicious-api-html-tagclass)))
                                  (if (not (null tagsep))
                                      (format "tagsep=%s&" tagsep)
-				   (unless (null delicious-api-html-tagsep)
-				     (format "tagsep=%s&" delicious-api-html-tagsep)))
+                                   (unless (null delicious-api-html-tagsep)
+                                     (format "tagsep=%s&" delicious-api-html-tagsep)))
                                  (if (not (null tagsepclass))
                                      (format "tagsepclass=%s&" tagsepclass)
-				   (unless (null delicious-api-html-tagsepclass)
-				     (format "tagsepclass=%s&" delicious-api-html-tagsepclass)))
+                                   (unless (null delicious-api-html-tagsepclass)
+                                     (format "tagsepclass=%s&" delicious-api-html-tagsepclass)))
                                  (if (not (null bullet))
                                      (format "bullet=%s&" bullet)
-				   (unless (null delicious-api-html-bullet)
-				     (format "bullet=%s&" delicious-api-html-bullet)))
+                                   (unless (null delicious-api-html-bullet)
+                                     (format "bullet=%s&" delicious-api-html-bullet)))
                                  (if (not (null rssbutton))
                                      (format "rssbutton=%s&" rssbutton)
-				   (unless (null delicious-api-html-rssbutton)
-				     (format "rssbutton=%s&" delicious-api-html-rssbutton)))
+                                   (unless (null delicious-api-html-rssbutton)
+                                     (format "rssbutton=%s&" delicious-api-html-rssbutton)))
                                  (if (not (null extendeddiv))
                                      (format "extendeddiv=%s&" extendeddiv)
                                    (unless (null delicious-api-html-extendeddiv)
-				     (format "extendeddiv=%s&" delicious-api-html-extendeddiv)))
+                                     (format "extendeddiv=%s&" delicious-api-html-extendeddiv)))
                                  (if (not (null extendedclass))
                                      (format "extendedclass=%s&" extendedclass)
                                    (unless (null delicious-api-html-extendedclass)
-				     (format "extendedclass=%s&" delicious-api-html-extendedclass))))
+                                     (format "extendedclass=%s&" delicious-api-html-extendedclass))))
                          0 -1)))
     uri))
   
@@ -517,6 +514,25 @@ Output goes to `delicious-api-buffer'."
               (puthash (match-string 1) (match-string 2) results-hash)
             (puthash (match-string 2) (match-string 1) results-hash)))
         results-hash))))
+
+(defun delicious-api-parse-posts ()
+  "Parse the *delicious output* XML for posts into fields."
+  (save-excursion
+    (with-current-buffer delicious-api-buffer
+      (goto-char (point-min))
+      (let* ((posts
+              (loop while (re-search-forward "<post " nil t)
+                    for post = (buffer-substring (point)
+                                                 (- (re-search-forward "/>" nil t) 3))
+                    collect post))
+             (posts-parsed
+              (loop for post in posts
+                    with fields = '("href" "description" "extended" "hash" "tag" "time")
+                    collect (loop for field in fields
+                                  if (string-match 
+                                      (concat field "=\"\\(.*?\\)\"") post)
+                                  collect (cons field (match-string 1 post))))))
+        posts-parsed))))
         
 (defun delicious-auth ()
   "Return the authorization string using `delicious-api-user' and `delicious-api-password'."

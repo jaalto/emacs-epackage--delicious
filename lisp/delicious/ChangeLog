@@ -1,3 +1,25 @@
+2005-02-05  John Sullivan  <john@wjsullivan.net>
+
+	* delicious.el (delicious-w3m-bookmark-recent): Updated to work
+	with the new list format returned by delicious-api-get-recent.
+	(delicious-duplicate-url-p): Updated to check against the new list
+	format returned by delicious-build-posts-list.
+	(delicious-post): Updated to create an alist of posts created in
+	this session.
+	(delicious-version): Incremented version number to reflect use of
+	new alist post storage format, and lack of backward compatibility.
+	(delicious-search-posts-regexp): Updated to operate on new alist
+	format of posts.
+
+	* delicioapi.el (delicious-api-parse-posts): Added new function to
+	replace old parsing functions. This builds a proper list of cons
+	cells with the format "(field . value)".
+	(delicious-api-get-posts): Revised to use new parsing function.
+	(delicious-api-get-recent): Revised to use new parsing function.
+	(delicious-api-user-agent): Changed default to reflect new version.
+	(delicious-api-version): Incremented version to 0.2, because new
+	parsing function is a big change from previous handling.
+
 2005-02-04  John Sullivan  <john@wjsullivan.net>
 
 	* delicious.el (delicious-search-posts-regexp): Propertized link
