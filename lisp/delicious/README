@@ -4,7 +4,7 @@
 
 Author: John Sullivan <john@wjsullivan.net>
 Created 25 October 2004
-Version: 0.1
+Version: 0.1 2004-12-20
 Keywords: comm, hypermedia
 
 This program is free software; you can redistribute it and/or modify it under
@@ -110,10 +110,11 @@ posts to date. You will then be prompted for information for the new post. The
 only required information is the URL itself and a description. Everything else
 is optional.
 
-delicious-el will try to guess the URL that you want to enter. If there is a
-URL under the cursor, it will suggest that. If there is no URL under the cursor
-and you are in a w3m-el buffer, it will suggest the URL of the site you are
-looking at. If neither of these two things are true, it will just put an
+delicious-el will try to guess the URL that you want to enter. If you are in a
+w3m-el buffer, it will suggest the URL of the site you are looking at. If not,
+if there is a URL under the cursor, it will suggest that.  If neither of these
+two things are true, it will scan the current buffer for a URL. It will suggest
+the first one that it finds. If it doesn't find one, it will just put an
 "http://" in the input line for you.
 
 When prompted for tags, enter one at a time, hitting enter after each. You have

@@ -1,5 +1,9 @@
 2004-12-20  John Sullivan  <john@wjsullivan.net>
 
+	* README (Version): Added date to version line.
+	(Keywords): Corrected error in description of guessing order.
+	(Keywords): Added description of 'delicious-guess-url' change.
+
 	* delicious.el (delicious-guess-url): Switched to a better
 	matching mechanism for detecting urls. Also added buffer checking,
 	as a third guessing effort. If there is a url in the buffer, the
