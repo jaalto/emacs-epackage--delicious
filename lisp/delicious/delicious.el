@@ -89,7 +89,8 @@ The server uses the current date and time by default."
 (defun delicious-check-input (input &optional name)
   "Verify that INPUT has content.  NAME is the name of the field being checked."
   (if (equal input "")
-      (error "%s was a required field" name)))
+      (error "%s was a required field" name)
+    input))
 
 (defun delicious-read-extended-description ()
   "Read an extended description from a prompt."
