@@ -1,4 +1,3 @@
 
 cd /home/johnsu01/documents/cvs/code/lisp
-tar cvzf delicious-el.tar.gz ./delicious/delicious.el ./delicious/delicioapi.el ./delicious/README ./delicious/ChangeLog
-scp delicious-el.tar.gz freeshell.org:~/html/downloads/
+tar cvzf delicious-el.tar.gz ./delicious/delicious.el ./delicious/delicioapi.el
