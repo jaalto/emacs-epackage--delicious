@@ -1,5 +1,9 @@
 2005-02-04  John Sullivan  <john@wjsullivan.net>
 
+	* delicious.el (delicious-search-posts-regexp): Propertized link
+	in search results.
+	(delicious-result-link-face): Added face for the link in search results.
+
 	* README (commands): Added description of new
 	(delicious-search-posts-regexp) command.
 

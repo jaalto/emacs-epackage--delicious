@@ -44,6 +44,11 @@
 
 (require 'delicioapi)
 
+(defface delicious-result-link-face 
+  '((t (:underline t :foreground "yellow")))
+    "Face for links in search results."
+    :group 'delicious)
+
 (defvar delicious-posted-urls '()
   "A running list of urls that have been posted since the last update of the list from the delicious server.")
 
@@ -254,7 +259,10 @@ The server uses the current date and time by default."
   (loop for post in delicious-posts-list
         for match = (loop for field in post
                           when (string-match search-string field) return post) 
-        if match do (loop for field in match do (insert field "\n")
+        if match do (loop for field in match 
+			  if (string-match thing-at-point-url-regexp field)
+			    do (insert (propertize field 'face 'delicious-result-link-face) "\n")
+			  else do (insert field "\n")
                           finally do (insert "\n"))))
 
 (provide 'delicious)
