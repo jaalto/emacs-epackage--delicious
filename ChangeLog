@@ -1,4 +1,25 @@
+2005-02-09  John Sullivan  <john@wjsullivan.net>
+
+	* README: Updated explanation of delicious-build-tags-list to
+	account for improved tag completion handling. Also modified
+	explanation of delicious-build-posts-list for similar reasons.
+	Updated the copyright notice.
+
+	* delicious.el (delicious-complete-tags): Cosmetic fix to docstring.
+	(delicious-complete-tags): Deleted to-do comment.
+	(delicious-post): Added call to delicious-add-tags to modify the
+	local copy of the tags list for completion purposes.
+	(delicious-add-tags): New function that updates the local copy of the
+	tags table with the tags you just posted, so that refreshing it
+	periodically from the server is less necessary. They will now be
+	available for completion immediately.
+
 2005-02-08  John Sullivan  <john@wjsullivan.net>
+
+	* delicioapi.el (delicious-send-request): Added immediate check to
+	make sure we received an HTTP 200 header, and error out if we do
+	not. This replaces the previous faulty error checking.
+	(delicious-api-error-match): Removed this variable.
 
 	* delicious.el (delicious-search-mode-map): Moved keymap out of
 	delicious-search-mode macro and into its own variable.

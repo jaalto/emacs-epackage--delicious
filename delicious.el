@@ -4,7 +4,7 @@
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;; Created 25 October 2004
-;; Version: 0.2 2005-02-06
+;; Version: 0.2 2005-02-08
 ;; Keywords: comm, hypermedia
 
 ;; This program is free software; you can redistribute it and/or
@@ -77,7 +77,7 @@
 (defvar delicious-posted-urls '()
   "A running list of urls that have been posted since the last update of the list from the delicious server.")
 
-(defconst delicious-version  "delicious.el/0.2 2005-02-06"
+(defconst delicious-version  "delicious.el/0.2 2005-02-08"
   "The version string for this copy of delicious.el.")
 
 (defun delicious-post (url description &optional tags extended time)
@@ -100,6 +100,7 @@
                                       (extended . ,extended)
                                       (time . ,time))
                                     delicious-posted-urls))
+  (delicious-add-tags tags)
   (message "URL posted."))
 
 (defun delicious-read-time-string ()
@@ -142,8 +143,9 @@ The server uses the current date and time by default."
                duplicate))))
 
 (defun delicious-complete-tags (&optional nosuggest)
-  "Get tags table if needed, and do a completing read of tag input until a blank line is entered. If NOSUGGEST is non-nil, don't suggest any tags."
-  ;; add check. if tag was not part of the completion table, add it immediately.
+  "Get tags table if needed. Do a completing read of tag input.  
+Blank line at the prompt ends the input.  If NOSUGGEST is non-nil, don't 
+suggest any tags."
   (unless (and (boundp 'delicious-tags-list)
                (not (null delicious-tags-list)))
     (delicious-build-tags-list))
@@ -191,6 +193,13 @@ The server uses the current date and time by default."
   (message "Refreshing delicious tags list from server.")
   (setq delicious-tags-list (delicious-api-build-tag-completion)
         delicious-tags-local '()))
+
+(defun delicious-add-tags (tags)
+  "Add TAGS to the local copy of the tags list in DELICIOUS-TAGS-LIST."
+  (loop for tag in tags
+        for tag-count = (cadar (last delicious-tags-list))
+        unless (assoc tag delicious-tags-list)
+            do (add-to-list 'delicious-tags-list (list tag (1+ tag-count)) t)))
 
 (defun delicious-build-posts-list ()
   "Refresh or build the posts list from the server for use in duplicate checking."

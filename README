@@ -1,10 +1,10 @@
 * License and Copying Information
 
-`delicioapi.el' and `delicious.el' are Copyright (C) 2004 John Sullivan
+`delicioapi.el' and `delicious.el' are Copyright (C) 2004, 2005 John Sullivan
 
 Author: John Sullivan <john@wjsullivan.net>
 Created 25 October 2004
-Version: 0.2 2005-02-07
+Version: 0.2 2005-02-08
 Keywords: comm, hypermedia
 
 This program is free software; you can redistribute it and/or modify it under
@@ -157,20 +157,20 @@ This command will refresh the local list of your posts from the server. You
 shouldn't use this often. The reason posts are cached locally is to avoid
 bothering the server too much. There isn't much reason to use this command,
 because a separate list of posts made during your current session is
-maintained, and is used for duplicate-checking. But if you suspect that
-something has gone wrong, you can use this command to refresh from the server.
+maintained, and is used for duplicate-checking (though currently they are not
+included in searching---that will change shortly). But if you suspect that
+something has gone wrong, you can use this command to refresh from the
+server. Or, if you add posts from an external interface like your non-emacs web
+browser, it would be useful to refresh the local list.
 
 - M-x delicious-build-tags-list
 
 This command will refresh the local list of the tags you have used from the
 server. You shouldn't use this often, because the reason tags are cached
-locally is to avoid bothering the server too much. But it might be useful if
-you have had the same Emacs session open for a while, because normally the tags
-list is only fetched once, the first time you make a post. The tags list is
-used to enable tag completion for your new posts, and if you haven't fetched
-the list in a while, then tag completion won't be able to complete based on
-your more recent entries. Future versions of this program will include an
-improved cacheing mechanism that will make this command much less relevant. 
+locally is to avoid bothering the server too much. Any new tags you use while
+posting with delicious-post are added to the completion list, so the only
+reason to refresh the list is if something funny happens and the list gets
+corrupted, or if you add tags using another interface.
 
 * Interactive search commands
 
