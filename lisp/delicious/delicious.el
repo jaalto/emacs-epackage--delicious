@@ -1,10 +1,10 @@
-;;; deliciousi.el --- functions to make productive use of the http://del.icio.us API
+;;; delicious.el --- functions to make productive use of the http://del.icio.us API
 
 ;; Copyright (C) 2004 John Sullivan
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;; Created 25 October 2004
-;; Version: 0.1
+;; Version: 0.1 2004-12-20
 ;; Keywords: comm, hypermedia
 
 ;; This program is free software; you can redistribute it and/or
@@ -140,13 +140,24 @@ The server uses the current date and time by default."
        (aref gnus-current-headers 1))))
 
 (defun delicious-guess-url ()
-  "Try some different things to guess a url."
+  "Try some different things to guess a url.
+If we're in a w3m buffer, use the current url. If not, use the url under point. If
+not that, search through the buffer and see if there is a url to use in the buffer. 
+If not that, just insert http:// into the prompt."
   ;; if there is a prefix, maybe it should use the kill ring
   (or (if (and (boundp 'w3m-current-url)
                (not (null w3m-current-url))
                (eq major-mode 'w3m-mode))
           w3m-current-url)
-      (thing-at-point-url-at-point)
+      (if (thing-at-point-looking-at thing-at-point-url-regexp)
+          (thing-at-point-url-at-point))
+      (save-excursion
+        (goto-char (point-min))
+        (loop until (eobp)
+         if (thing-at-point-looking-at thing-at-point-url-regexp)
+              return (thing-at-point-url-at-point)
+                else
+              do (forward-char)))
       "http://"))
 
 (provide 'delicious)

@@ -1,3 +1,10 @@
+2004-12-20  John Sullivan  <john@wjsullivan.net>
+
+	* delicious.el (delicious-guess-url): Switched to a better
+	matching mechanism for detecting urls. Also added buffer checking,
+	as a third guessing effort. If there is a url in the buffer, the
+	first url will be inserted as the suggestion.
+
 2004-12-12  John Sullivan  <john@wjsullivan.net>
 
 	* README: Edited `Getting started' section in light of existence
