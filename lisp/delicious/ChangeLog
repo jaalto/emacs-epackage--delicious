@@ -1,3 +1,32 @@
+2005-01-10  John Sullivan  <john@wjsullivan.net>
+
+	* README (delicious-w3m-bookmark-recent): Documented new function.
+
+	* delicious.el (delicious-w3m-html): Made count require a number.
+	(delicious-w3m-bookmark-recent): This is the beginning of w3m
+	bookmark integration. Right now, it's dumb and doesn't even check
+	for duplicates or attempt to do any kind of synching, but it does
+	add bookmarks to your w3m bookmarks file.
+
+	* delicioapi.el: Fixed let binding error. 
+
+	* README (delicious-w3m-html): Documented prefix argument.
+
+	* delicious.el (delicious-w3m-html): Added prefix argument. Using
+	the prefix argument will browse the output in a new w3m session.
+
+	* delicioapi.el (delicious-api-html-extended): Explained
+	difference between `title' and `body' setting.
+
+	* delicious.el: Updated copyright notice for the new year.
+
+	* delicioapi.el: Updated copyright notice for the new year.
+
+	* README (Keywords): Updated copyright notice for new year. 
+	(delicious-api-html-extendeddiv): Explained what it is.
+	(Integration with other Emacs modes): New section, documented w3m
+	html command.
+
 2005-01-06  John Sullivan  <john@wjsullivan.net>
 
 	* delicioapi.el (delicious-api-html-uri): Parentheses oops.

@@ -1,10 +1,10 @@
 ;;; delicious.el --- functions to make productive use of the http://del.icio.us API
 
-;; Copyright (C) 2004 John Sullivan
+;; Copyright (C) 2004, 2005 John Sullivan
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;; Created 25 October 2004
-;; Version: 0.1 2005-01-05
+;; Version: 0.1 2005-01-10
 ;; Keywords: comm, hypermedia
 
 ;; This program is free software; you can redistribute it and/or
@@ -187,9 +187,13 @@ The server uses the current date and time by default."
       "http://"))
 
 (defun delicious-w3m-html (username count tag)
-  "Visit the HTML feed page for the del.icio.us USERNAME showing COUNT most recent posts under TAG."
-  (interactive "sUsername (RET for yours): \nsNumber of posts (RET for 15): \nsTag (RET for all): ")
-  (w3m-browse-url (format "http://%s%s%s" delicious-api-host delicious-api-html (delicious-api-html-uri username tag count))))
+  "Visit the HTML feed page, in a new-session if a prefix is used, for the del.icio.us USERNAME showing COUNT most recent posts under TAG."
+  (interactive "sUsername (RET for yours): \nNumber of posts (RET for 15): \nsTag (RET for all): ")
+  (w3m-browse-url 
+   (format "http://%s%s%s" delicious-api-host delicious-api-html (delicious-api-html-uri username tag count))
+   (not (null current-prefix-arg))))
+
+   
 
 (provide 'delicious)
 

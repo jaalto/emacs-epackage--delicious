@@ -4,7 +4,7 @@
 
 Author: John Sullivan <john@wjsullivan.net>
 Created 25 October 2004
-Version: 0.1 2005-01-04
+Version: 0.1 2005-01-10
 Keywords: comm, hypermedia
 
 This program is free software; you can redistribute it and/or modify it under
@@ -22,7 +22,7 @@ Place, Suite 330, Boston, MA 02111-1307 USA.
 
 * Documentation License
 
-This README is Copyright 2004 by John Sullivan <john@wjsullivan.net>.
+This README is Copyright 2004, 2005 by John Sullivan <john@wjsullivan.net>.
 
 Verbatim copying and distribution of this entire article are permitted
 worldwide, without royalty, in any medium, provided this notice is preserved.
@@ -219,7 +219,9 @@ Here is the list of parameters and a very brief description of each.
   The number of times to show by default when fetching an HTML del.icio.us feed. The server default is 15.
 
 + delicious-api-html-extended
-  Either 'title' or 'body'. The server default is `title'.
+  Either 'title' or 'body'. The server default is `title'. This means that the
+  extended description will just be displayed in the link's title attribute. If
+  you want the extended description to be displayed on its own, use `body'.
 
 + delicious-api-html-divclass
   Class to use for div. The server default is `delPost'.
@@ -246,10 +248,11 @@ Here is the list of parameters and a very brief description of each.
   Add an RSS feed button using CSS. Server default is to show a button with `yes'.
 
 + delicious-api-html-extendeddiv
-  Extended entry in its own div. Server default is `no'.
+  This is whether to put the extended description for the entry in its own
+  <div>. The server default is `no'.
 
 + delicious-api-html-extendedclass
-  Class to use for extendeddiv. Server default is empty.
+  This the class to use for the extendeddiv. The server default is empty.
 
 * Advanced use
 
@@ -258,6 +261,38 @@ Here is the list of parameters and a very brief description of each.
 The author uses this in his `.emacs' to bind `delicious-post' to <C-c p>. 
 
 (global-set-key "\C-cp" 'delicious-post)
+
+* Integration with other Emacs modes
+
+- w3m
+
+Integration with w3m is one of the things that I'm working on right
+now. So far, I've implemented these features:
+
+-- URL and description guessing. The program will use the current page in the
+   w3m buffer if you are using w3m as a suggestion for the link to post. It
+   will use the current page name as a suggestion for the description of the
+   link.
+
+-- delicious-w3m-html. This is an interactive command to visit the HTML feed of
+   a user's del.icio.us feed. If you call it with a prefix argument (C-u M-x
+   delicious-w3m-html), the feed will be displayed in a new session. The
+   default parameters are the same as the ones you set to use
+   `delicious-api-html'. You can configure them in the `delicious' customize
+   group, or individually (they all have the name delicious-api-html-*). After
+   issuing the command, you will be prompted for the username, number of posts,
+   and tag to filter by. Hitting return at these prompts will cause the
+   defaults to be used. The defaults are indicated in the prompts. After
+   collecting the information, w3m will then visit a page constructed according
+   to your parameters in a w3m buffer.
+
+-- delicious-w3m-bookmark-recent. This is the beginning of a larger effort at
+   integrating delicious with w3m bookmarks. It is an interactive command that
+   will add your delicious posts to your w3m bookmarks file. It operates based
+   on recent posts. You tell it how many posts to scan, what tag (or tag
+   intersection like "foo+bar" to filter by, and what w3m bookmark section to
+   put the posts in. It will deposit the matching posts in that section,
+   without checking for duplicates or making any effort at synching (yet).
 
 * Problems
 

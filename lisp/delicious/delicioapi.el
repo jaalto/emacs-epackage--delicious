@@ -1,10 +1,10 @@
 ;;; delicioapi.el --- functions to interact with the http://del.icio.us API
 
-;; Copyright (C) 2004 John Sullivan
+;; Copyright (C) 2004, 2005 John Sullivan
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;; Created 25 October 2004
-;; Version: 0.1 2005-01-05
+;; Version: 0.1 2005-01-10
 ;; Keywords: comm, hypermedia
 
 ;; This program is free software; you can redistribute it and/or
@@ -125,7 +125,7 @@
 :tag "HTML item count parameter")
 
 (defcustom delicious-api-html-extended "title"
-"*Either 'title' or 'body'. The server default is `title'."
+"*Either 'title' or 'body'. The server default is `title'. This means that the extended description will just be shown in the title attribute of the link tag. If you want it displayed on its own, use `body'."
 :version "21.3.1"
 :group 'delicious
 :type 'string
@@ -266,13 +266,16 @@
 
 (defun delicious-api-get-recent (&optional tag count)
 "Return a list, optionally filtered by TAG, of the COUNT most recent posts.  The list is HREF, DESCRIPTION, HASH, TAG, and TIME.  This will max out at 100.  Use `delicious-api-get-all' if you want more than that."
-(let* ((tag (unless (null tag) (url-hexify-string tag)))
-       (count (if (> count 100) 100) count)
+(let* ((tag-fixed (url-hexify-string tag))
+       (count-fixed (if 
+                        (> count 100) 
+                        100
+                      count))
        (uri (concat "posts/recent?"
-                    (unless (null tag)
-                      (format "&tag=%s" tag))
-                    (unless (null count)
-                      (format "&count=%s" count))))
+                    (unless (equal tag-fixed "")
+                      (format "&tag=%s" tag-fixed))
+                    (unless (null count-fixed)
+                      (format "&count=%s" count-fixed))))
        (search (delicious-build-search "href" "description" "hash" "tag" "time")))
   (delicious-send-request (delicious-build-request uri))
   (delicious-do-search-list (car search) (cdr search))))
