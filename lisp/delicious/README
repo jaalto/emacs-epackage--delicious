@@ -4,7 +4,7 @@
 
 Author: John Sullivan <john@wjsullivan.net>
 Created 25 October 2004
-Version: 0.1 2005-01-14
+Version: 0.1 2005-02-04
 Keywords: comm, hypermedia
 
 This program is free software; you can redistribute it and/or modify it under
@@ -166,6 +166,13 @@ used to enable tag completion for your new posts, and if you haven't fetched
 the list in a while, then tag completion won't be able to complete based on
 your more recent entries. Future versions of this program will include an
 improved cacheing mechanism that will make this command much less relevant. 
+
+- M-x delicious-search-posts-regexp
+
+This command will prompt you for a regular expression, search your posts for
+matches, and display the matches in a buffer "*delicious search results*". This
+buffer will be cleared with each new search. The default is for this to pop up
+a second window, or use the other window. 
 
 * Useful noninteractive functions
 
