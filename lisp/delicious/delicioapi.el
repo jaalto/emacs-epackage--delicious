@@ -4,7 +4,7 @@
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;; Created 25 October 2004
-;; Version: 0.1 2004-12-25
+;; Version: 0.1 2005-01-03
 ;; Keywords: comm, hypermedia
 
 ;; This program is free software; you can redistribute it and/or
@@ -70,7 +70,7 @@
 (defvar delicious-api-html "/html/"
   "*The path to the del.icio.us HTML feed.  It should begin and end with a slash.")
 
-(defconst delicious-api-version "delicious.el/0.1 2004-12-25"
+(defconst delicious-api-version "delicious.el/0.1 2005-01-03"
   "The version string for this copy of delicious-api.el.")
 
 (defconst delicious-api-field-match "=\"\\(.*?\\)\""
@@ -236,7 +236,8 @@ TAG is a tag to filter by.  The dates are the keys."
 ;; Note that I allow TAGS to be nil or nonnil, but the server has to
 ;; have a "yes" or a "no" sent to it.
 
-(defun delicious-api-html (&optional username tagname count extended divclass aclass tags tagclass tagsep tagsepclass bullet rssbutton extendeddiv extendedclass)
+(defun delicious-api-html 
+  (&optional username tagname count extended divclass aclass tags tagclass tagsep tagsepclass bullet rssbutton extendeddiv extendedclass)
   "Get results formatted in HTML, according to a long list of options.
 USERNAME is the name of the user whose links you want to fetch. If you don't
 specify a name, `delicious-api-user' will be used.  If TAGNAME is nil, then
@@ -257,7 +258,7 @@ button.  EXTENDEDDIV is an extended entry in its own div.  If it is nil, don't
 use it.  If it is non-nil, do something.  EXTENDEDCLASS is a CSS class to use
 for EXTENDEDDIV."
   (let* ((user (or username delicious-api-user))
-         (uri (concat (format "%s/?" user)
+         (uri (substring (concat (format "%s/?" user)
                       (if (not (null tagname))
                           (format "%s?" tagname))
                       (if (not (null count))
@@ -278,14 +279,25 @@ for EXTENDEDDIV."
                           (format "rssbutton=%s&" rssbutton))
                       (if (not (null extendeddiv))
                           (format "extendedclass=%s&" extendedclass)))
-              (substring uri 0 -1))) 
-    (delicious-send-request (delicious-api-build-html-request uri))))
+			 0 -1)))
+    (delicious-send-request (delicious-api-build-html-request uri)))
+  (save-excursion
+    (with-current-buffer delicious-api-buffer
+      (let ((beginning (progn
+			 (goto-char (point-min))
+			 (re-search-forward "<div")
+			 (line-beginning-position)))
+	    (end (progn
+		   (goto-char (point-max))
+		   (re-search-backward "</a>")
+		   (line-end-position))))
+	(buffer-substring beginning end)))))
 
 (defun delicious-api-build-html-request (uri)
   "Return the proper HTTP request to get URI from the HTML feed."
   (let* ((uri (format "http://%s%s%s" delicious-api-host delicious-api-html uri)))
     (format "GET %s HTTP/1.0\nFrom: %s\nUser-Agent: %s\nAuthorization: Basic %s\n\n"
-            uri delicious-api-from delicious-api-user-agent (delicious-auth))))
+	    uri delicious-api-from delicious-api-user-agent (delicious-auth))))
 
 (defun delicious-api-build-tag-completion ()
   "Return a numbered list of current tags, to use in tab completion."

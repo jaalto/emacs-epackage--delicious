@@ -1,3 +1,11 @@
+2005-01-03  John Sullivan  <john@wjsullivan.net>
+
+	* delicioapi.el (delicious-api-html): Fixed a
+	parentheses-oops. Added code to retrieve and return the HTML list
+	from the DELICIOUS-API-BUFFER after contacting the server. I'm
+	doing this in a very primitive way, but it seems to work so
+	far. Function is not yet documented.
+
 2004-12-25  John Sullivan  <john@wjsullivan.net>
 
 	* delicioapi.el (delicious-api-build-html-request): Added separate
