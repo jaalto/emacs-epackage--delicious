@@ -1,3 +1,14 @@
+2005-01-14  John Sullivan  <john@wjsullivan.net>
+
+	* README (w3m): Documented delicious-w3m-export.
+
+	* delicious.el (delicious-w3m-export): Added rudimentary export of
+	w3m bookmark sections.
+	(delicious-w3m-read-section): Added function to do completing
+	reads of w3m bookmark section names.
+	(delicious-complete-tags): Added `nosuggest' argument so that
+	completion can be done without suggesting any tags.
+
 2005-01-10  John Sullivan  <john@wjsullivan.net>
 
 	* delicioapi.el (delicious-api-html-uri): Fixed logic so that

@@ -4,7 +4,7 @@
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;; Created 25 October 2004
-;; Version: 0.1 2005-01-10
+;; Version: 0.1 2005-01-14
 ;; Keywords: comm, hypermedia
 
 ;; This program is free software; you can redistribute it and/or
@@ -95,7 +95,7 @@ The server uses the current date and time by default."
                (not (null delicious-posts-list)))
     (delicious-build-posts-list))
   (if (or (assoc url delicious-posts-list)
-	  (member url delicious-posted-urls))
+          (member url delicious-posted-urls))
       (progn (let ((edit
                     (y-or-n-p "This URL is a duplicate.\nIf you post it again, the old tags will be replaced by the new ones.\nPost? ")))
                (if (eq edit t)
@@ -103,46 +103,49 @@ The server uses the current date and time by default."
                  (error "Duplicate URL not posted"))
                duplicate))))
 
-(defun delicious-complete-tags ()
-  "Get tags table if needed, and do a completing read of tag input until a blank line is entered."
+(defun delicious-complete-tags (&optional nosuggest)
+  "Get tags table if needed, and do a completing read of tag input until a blank line is entered. If NOSUGGEST is non-nil, don't suggest any tags."
   ;; add check. if tag was not part of the completion table, add it immediately.
   (unless (and (boundp 'delicious-tags-list)
                (not (null delicious-tags-list)))
     (delicious-build-tags-list))
-  (loop with suggested-tags = (delicious-suggest-tags)
-	for tag = (completing-read
-		   (format "Suggested Tags: %s\nTags so far: %s\n(Optional. Enter one at a time, blank to end.) Tag: " suggested-tags tags)
-		   delicious-tags-list)
-	until (equal tag "")
-	collect tag into tags
-	finally return (progn
-			 (add-to-list 'delicious-tags-local tags)
-			 (message "%s" tags)
-			 (mapconcat 'identity tags " "))))
+  (loop with suggested-tags = (if nosuggest ""
+                               (delicious-suggest-tags))
+        with prompt = (if nosuggest 
+                         "%sTags so far: %s\n(Enter one at a time, blank to end.) Tag: "
+                       "Suggested Tags: %s\nTags so far: %s\n(Enter one at a time, blank to end.) Tag: ")
+        for tag = (completing-read (format prompt suggested-tags tags)
+                                   delicious-tags-list)
+        until (equal tag "")
+        collect tag into tags
+        finally return (progn
+                         (add-to-list 'delicious-tags-local tags)
+                         (message "%s" tags)
+                         (mapconcat 'identity tags " "))))
 
 (defun delicious-suggest-tags ()
   "Suggest tags based on the intersection of the contents of the current buffer and the current list of tags."
   (let ((buffer-words (delicious-buffer-words))
-	(tags (loop for cell in delicious-tags-list
-		    collect (downcase (car cell)) into tags
-		    finally return tags)))
+        (tags (loop for cell in delicious-tags-list
+                    collect (downcase (car cell)) into tags
+                    finally return tags)))
     (loop for word in buffer-words
-	  if (member word tags)
-	  collect word into shared
-	  finally return shared)))
+          if (member word tags)
+          collect word into shared
+          finally return shared)))
   
 (defun delicious-buffer-words ()
   "Break the current buffer into a list of lowercase unique words."
   (save-excursion
     (goto-char (point-min))
     (loop until (eobp)
-	  with words = '()
-	  for word = (downcase (current-word))
-	  if (not (member word words))
-  	    collect word into words
+          with words = '()
+          for word = (downcase (current-word))
+          if (not (member word words))
+            collect word into words
             end
-	  do (forward-word 1)
-	  finally return words)))
+          do (forward-word 1)
+          finally return words)))
 
 (defun delicious-build-tags-list ()
   "Refresh or build the tags table for use in completion."
@@ -202,6 +205,43 @@ The server uses the current date and time by default."
           for title = (nth 1 bookmark)
           do (w3m-bookmark-write-file url title section)
           finally do (message "w3m bookmarks updated."))))
+
+(defun delicious-w3m-export (section &optional tags extended time)
+  "Export your w3m bookmarks from SECTION to del.icio.us, assigning TAGS to each entry. Optionally enter an EXTENDED description and a TIME."
+  (interactive (list
+                (delicious-w3m-read-section)
+                (delicious-complete-tags t)
+                (delicious-read-extended-description)
+                (delicious-read-time-string)))
+  (let* ((section-string (format "<h2>%s</h2>" section))
+         (item-start "<li><a"))
+    (save-excursion
+      (with-temp-buffer
+        (insert-file-contents w3m-bookmark-file)
+        (goto-char (point-min))
+        (re-search-forward section-string)
+        (let* ((links (loop until (looking-at w3m-bookmark-section-delimiter)
+                            do (re-search-forward item-start)
+                            for link = (progn
+                                         (re-search-forward thing-at-point-url-regexp)
+                                         (match-string 0))
+                            do (re-search-forward ">")
+                            for title = (buffer-substring (point) (- (re-search-forward "</a>")  4))
+                            for link = (cons link title)
+                            collect link into links
+                            do (beginning-of-line 2)
+                            finally return links)))
+          (loop for cell in links
+                for link = (car cell)
+                for title = (cdr cell)
+                do (delicious-api-post link title tags extended time)
+                do (message "%s posted." title)
+                do (sleep-for 1)))))))
+
+(defun delicious-w3m-read-section ()
+  "Prompt for the name of a w3m bookmark section."
+  (let* ((completions (w3m-bookmark-sections)))
+    (completing-read "Section to export (required): " completions nil t)))
 
 (provide 'delicious)
 
