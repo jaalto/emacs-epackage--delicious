@@ -130,20 +130,21 @@ The server uses the current date and time by default."
         delicious-tags-local '()))
 
 (defun delicious-guess-description ()
-  ;; try w3m page title
   "Try some different things to get a default description."
   (or
    (if (and (boundp 'w3m-current-url)
-            (not (null 'w3m-current-url)))
+            (not (null w3m-current-url))
+            (eq major-mode 'w3m-mode))
        (w3m-current-title))
-   (if (equal (buffer-name) (or "*Article*" "*Summary*"))
+   (if (memq major-mode '(gnus-summary-mode gnus-article-mode))
        (aref gnus-current-headers 1))))
 
 (defun delicious-guess-url ()
   "Try some different things to guess a url."
   ;; if there is a prefix, maybe it should use the kill ring
   (or (if (and (boundp 'w3m-current-url)
-               (not (null 'w3m-current-url)))
+               (not (null w3m-current-url))
+               (eq major-mode 'w3m-mode))
           w3m-current-url)
       (thing-at-point-url-at-point)
       "http://"))
