@@ -292,7 +292,7 @@ When Delicious Search mode is enabled, the tab key
 advances to the next search result."
   nil
   " Delicious Search"
-  '([tab] . delicious-search-next-result))
+  '(([tab] . delicious-search-next-result)))
 
 (defun delicious-search-next-result ()
   "Goto the next search result in a delicious search results list."
