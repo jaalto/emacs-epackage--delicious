@@ -1,3 +1,17 @@
+Sun Feb  6 14:55:11 EST 2005  John Sullivan <john@wjsullivan.net>
+  * Improvements to delicious-search-insert-match
+  
+  * Changed name of face from delicious-result-link-face to
+    delicious-result-href-face.
+  
+  * Condensed delicious-search-insert-match, improving efficiency.
+
+    M ./delicious.el -26 +5
+
+Sun Feb  6 11:25:45 EST 2005  John Sullivan <john@wjsullivan.net>
+  * Replaced ChangeLog with darcs changes output.
+
+    M ./ChangeLog +279
 Sun Feb  6 11:13:45 EST 2005  John Sullivan <john@wjsullivan.net>
   * Fix delicious-search-mode keymap.
 

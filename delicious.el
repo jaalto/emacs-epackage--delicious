@@ -310,67 +310,58 @@ advances to the next search result."
 Display the results in *delicious search results*."
   (interactive "sEnter regexp search string: ")
   (delicious-build-posts-list-maybe)
-  (switch-to-buffer-other-window (get-buffer-create "*delicious search results*"))
-  (delicious-search-mode 1)
-  (delete-region (point-min) (point-max))
+  (delicious-search-buffer-prep)
   (loop for post in delicious-posts-list
         for match = (loop for field in post
-                          when (string-match search-string (cdr field)) return post)
+                          when (string-match search-string (cdr field)) 
+                              return post)
         if match do (delicious-search-insert-match post))
-  (goto-char (point-min)))
+  (delicious-search-buffer-finish))
 
 (defun delicious-search-description-regexp (search-string)
   "Search the descriptions in DELICIOUS-POSTS-LIST for SEARCH-STRING, a regular expression.
 Display the results in *delicious search results*."
   (interactive "sEnter regexp search string: ")
   (delicious-build-posts-list-maybe)
-  (switch-to-buffer-other-window (get-buffer-create "*delicious search results*"))
-  (delicious-search-mode 1)
-  (delete-region (point-min) (point-max))
-  (loop for post in delicious-posts-list
+  (delicious-search-buffer-prep)
+  (loop for post in delicious-posts-lnnist
         for match = (loop for field in post
                           if (equal (car field) "description")
-                             when (string-match search-string (cdr field)) return post)
+                          when (string-match search-string (cdr field)) return post)
         if match do (delicious-search-insert-match post))
-  (goto-char (point-min)))
+  (delicious-search-buffer-finish))
 
 (defun delicious-search-tags-regexp (search-string)
   "Search the tags in DELICIOUS-POSTS-LIST for SEARCH-STRING, a regular expression.
 Display the results in *delicious search results*."
   (interactive "sEnter regexp search string: ")
   (delicious-build-posts-list-maybe)
-  (switch-to-buffer-other-window (get-buffer-create "*delicious search results*"))
-  (delicious-search-mode 1)
-  (delete-region (point-min) (point-max))
+  (delicious-search-buffer-prep)
   (loop for post in delicious-posts-list
         for match = (loop for field in post
                           if (equal (car field) "tag")
-                              when (string-match search-string (cdr field)) return post)
+                          when (string-match search-string (cdr field)) return post)
         if match do (delicious-search-insert-match post))
-  (goto-char (point-min)))
+  (delicious-search-buffer-finish))
 
 (defun delicious-search-link-regexp (search-string)
   "Search the links in DELICIOUS-POSTS-LIST for SEARCH-STRING, a regular expression.
 Display the results in *delicious search results*."
   (interactive "sEnter regexp search string: ")
   (delicious-build-posts-list-maybe)
-  (switch-to-buffer-other-window (get-buffer-create "*delicious search results*"))
-  (delicious-search-mode 1)
-  (delete-region (point-min) (point-max))
+  (delicious-search-buffer-prep)
   (loop for post in delicious-posts-list
         for match = (loop for field in post
                           if (equal (car field) "href")
-                              when (string-match search-string (cdr field)) return post)
+                          when (string-match search-string (cdr field)) return post)
         if match do (delicious-search-insert-match post))
-  (goto-char (point-min)))
+  (delicious-search-buffer-finish))
 
 (defun delicious-search-tags (tags)
   "Display all posts with TAGS, which can include regular expression syntax."
   (interactive (list (delicious-complete-tags t)))
   (delicious-build-posts-list-maybe)
-  (switch-to-buffer-other-window (get-buffer-create "*delicious search results*"))
-  (delicious-search-mode 1)
-  (delete-region (point-min) (point-max))
+  (delicious-search-buffer-prep)
   (let ((tags (split-string tags " ")))
     (loop for post in delicious-posts-list
           for match = (loop for tag in tags
@@ -378,15 +369,31 @@ Display the results in *delicious search results*."
                             unless (string-match tag post-tags)
                             return 1)
           unless match do (delicious-search-insert-match post)))
-  (goto-char (point-min)))
-                 
+  (delicious-search-buffer-finish))
+
+(defun delicious-search-buffer-prep ()
+  "Prepare a *delicious search results* buffer for output."
+  (unless (equal (buffer-name) "*delicious search results*")
+    (switch-to-buffer-other-window
+     (get-buffer-create "*delicious search results*")))
+  (view-mode -1)
+  (delete-region (point-min) (point-max)))
+
+(defun delicious-search-buffer-finish ()
+  "Take care of post-search issues."
+  (with-current-buffer "*delicious search results*"
+    (goto-char (point-min))
+    (delicious-search-mode 1)
+    (view-mode 1)))
+
 (defun delicious-search-insert-match (post)
   "Insert POST with the fields propertized."
-  (loop for cell in post
-        do (insert (propertize (cdr cell) 'face 
-                               (intern (concat "delicious-result-" (car cell) "-face")))
-                   "\n")
-        finally do (insert "\n")))
+  (with-current-buffer "*delicious search results*"
+    (loop for cell in post
+          do (insert (propertize (cdr cell) 'face 
+                                 (intern (concat "delicious-result-" (car cell) "-face")))
+                     "\n")
+          finally do (insert "\n"))))
 
 (defun delicious-build-posts-list-maybe ()
   "Do the inital load of DELICIOUS-POSTS-LIST if needed."
