@@ -113,6 +113,14 @@
 (defconst delicious-api-error-match "\\(HTTP/1.0 503 Service Unavailable\\)"
   "Regular expression to match the various error messages.")
 
+;;; Customization
+
+(defgroup delicious nil
+  "Functions for interacting with the del.icio.us API, a web application for managing bookmarks."
+  :group 'applications
+  :version "21.3.1")
+
+
 ;;; Functions
 
 ;; All "inbox" function have been commented out because they have been temporarily disabled at the
