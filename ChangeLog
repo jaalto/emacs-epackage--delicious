@@ -1,3 +1,12 @@
+2005-02-10  John Sullivan  <john@wjsullivan.net>
+
+	* delicious.el (delicious-complete-tags): Added duplicate checking
+	to prompt. If you enter a tag you've already entered, you'll get a
+	quick message about the duplicate tag being ignored. Yes, I do
+	this a lot. This isn't actually necessary, because internally the
+	duplicate tag was ignored anyway, and the server probably ignores
+	it too, but anyway. I feel cleaner now. 
+
 2005-02-09  John Sullivan  <john@wjsullivan.net>
 
 	* README: Updated explanation of delicious-build-tags-list to
