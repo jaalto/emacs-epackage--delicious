@@ -4,7 +4,7 @@
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;; Created 25 October 2004
-;; Version: 0.1 2005-01-03
+;; Version: 0.1 2005-01-05
 ;; Keywords: comm, hypermedia
 
 ;; This program is free software; you can redistribute it and/or
@@ -46,6 +46,9 @@
 
 (defvar delicious-posted-urls '()
   "A running list of urls that have been posted since the last update of the list from the delicious server.")
+
+(defconst delicious-version  "delicious.el/0.1 2005-01-05"
+  "The version string for this copy of delicious.el.")
 
 (defun delicious-post (url description &optional tags extended time)
   ;; figure out how to get right time-string format
@@ -182,7 +185,12 @@ The server uses the current date and time by default."
                 else
               do (forward-char)))
       "http://"))
-  
+
+(defun delicious-w3m-html (username count tag)
+  "Visit the HTML feed page for the del.icio.us USERNAME showing COUNT most recent posts under TAG."
+  (interactive "sUsername (RET for yours): \nsNumber of posts (RET for 15): \nsTag (RET for all): ")
+  (w3m-browse-url (format "http://%s%s%s" delicious-api-host delicious-api-html (delicious-api-html-uri username tag count))))
+
 (provide 'delicious)
 
 ;;; delicious.el ends here
