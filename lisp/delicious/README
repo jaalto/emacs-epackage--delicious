@@ -18,52 +18,107 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License along with
 this program; if not, write to the Free Software Foundation, Inc., 59 Temple
-Place, Suite 330, Boston, MA 02111-1307 USA
+Place, Suite 330, Boston, MA 02111-1307 USA.
+
+* Contents of the archive
+
+- delicioapi.el
+- delicious.el
+- ChangeLog
+- README
+- COPYING
 
 * Overview
 
-This is a complete set of functions for interacting with the REST API at
-http://del.icio.us, a "social bookmarking" project.  None of these are
-interactive commands. There is a separate program, `delicious.el', which
-includes the interactive commands that put these functions to work in various
-ways. These functions are provided separately to make it convenient for people
-to write their own front-end interactive commands.
+This is a complete set of functions for interacting with <http://del.icio.us>,
+a "social bookmarking" project written and maintained by Joshua Shachter.
+
+'delicioapi.el' contains the back-end functions that interact with the API,
+behind the scenes.
+
+'delicious.el' contains the front-end interactive functions and commands for
+putting the API functions to productive use, via Emacs. 'delicioapi.el' must be
+loaded for these functions to work. 
 
 The API does go through frequent changes; I've made an effort here to structure
 things so that these changes can easily be accommodated. That's part of why
 some things are done in separate functions that could probably be done together
 in one.
 
-del.icio.us was written and is maintained by Joshua Shachter.
-
 Information about the API is at http://del.icio.us/doc/api.
 
-* Getting Started
+* Getting started
+
+First, you need to set up an account at del.icio.us, by visiting that site and
+following the instructions there.
 
 To use these functions, you will need to put something like the following in
 your `.emacs'.
 
+(add-to-list 'load-path "/path/to/delicious-el/files")
+(require 'delicioapi)
+(require 'delicious)
 (setq delicious-api-user "johnsu01"
-delicious-api-password "mypassword"
-delicious-api-from "john@wjsullivan.net")
+      delicious-api-password "mypassword"
+      delicious-api-from "my@email.net")
 
 There are some other options as well, but these are the variables that you have
-to set for the program to work. I suggest using your e-mail address in
+to set for the program to work. You should use your e-mail address in
 `delicious-api-from', because it is a polite thing to do. That way if your
 programs ever start doing anything bonkers, del.icio.us will be able to contact
 you and let you know of the problem.
 
 Speaking of programs and bonkers, del.icio.us has requested that you limit your
-hits to the API to an extent. Please read the documentation for it and keep up
-with the restrictions. In particular, it is requested that you do not do
-anything that will trigger one hit to del.icio.us for every hit to your web
-site.
+hits to the API to a reasonable amount. In particular, it is requested that you
+do not do anything that will trigger one hit to del.icio.us for every hit to
+your web site. In order to respect that request, this program will only fetch
+your list of tags (for use in tag completion) and your list of posts (for
+duplicate checking) once, the first time you use the delicious-post
+function.
 
 Depending on the speed of your connection and of the del.icio.us server, you
 might want to use a higher number for `delicious-api-timeout'. The default is
 60 seconds.
 
 * Commands to Use and What to Expect
+
+- M-x delicious-post
+
+Post a URL to your del.icio.us account. (write about refresh) You will be
+prompted for all of the necessary information. The only required information is
+the URL itself. delicious-el will try to guess the URL that you want to
+enter. If there is a URL under the cursor, it will suggest that. If there is no
+URL under the cursor and you are in a w3m-el buffer, it will suggest the URL of
+the site you are looking at. If neither of these two things are true, it will
+just put an "http://" in the input line for you.
+
+When prompted for tags, enter one at a time. You have tab-completion available
+in typical Emacs style, based on all of the tags you have used in the
+past. When you are done entering tags, just hit enter at the
+prompt. delicious-el will attempt to guess an appropriate description. If you
+are in a w3m-el buffer, delicious-el will suggest the title of the page being
+viewed as a description. If you are looking at an article in gnus, it will
+suggest the title of the article as a description. If you like the suggestion,
+hit enter. If you don't, just erase it and type your own.  
+
+(write about rest of input steps, including note about the date format).
+
+* Advanced use
+
+If you really want to force a refresh of your tags list and posts list so that
+newer tags are available for completion, evaluate:
+
+(setq delicious-tags-list nil)
+
+and/or:
+
+(setq delicious-posts-list nil)
+
+You should only do this if you have had your Emacs session open for a few hours
+or more. Otherwise you are placing an unreasonable burden on the server. There
+isn't much reason to refresh your post list anyway, because a list of new posts
+is maintained locally for purposes of duplicate checking. Future improvements
+will do this for tags as well.
 
 * Bugs
 
