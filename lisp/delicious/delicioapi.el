@@ -25,7 +25,7 @@
 ;; Commentary
 
 ;; This is a complete set of functions for interacting with the REST
-;; API at http://del.icio.us, a "social bookmarking" project.  None of
+;; API at <http://del.icio.us>, a "social bookmarking" project.  None of
 ;; these are interactive commands. There is a separate program,
 ;; `delicious.el', which includes the interactive commands that put
 ;; these functions to work in various ways. These functions are
@@ -39,35 +39,11 @@
 ;;
 ;; del.icio.us was written and is maintained by Joshua Shachter.
 ;;
-;; Information about the API is at http://del.icio.us/doc/api.
-;; 
-;; To use these functions, you will need to put something like the
-;; following in your `.emacs'. 
-;; 
-;; (setq delicious-api-user "johnsu01"
-;;       delicious-api-password "mypassword"
-;;       delicious-api-from "john@wjsullivan.net")
-;;
-;; There are some other options as well, but these are the variables
-;; that you have to set for the program to work. I suggest using your
-;; e-mail address in `delicious-api-from', because it is a polite
-;; thing to do. That way if your programs ever start doing anything
-;; bonkers, del.icio.us will be able to contact you and let you know
-;; of the problem.
-;;
-;; Speaking of programs and bonkers, del.icio.us has requested that
-;; you limit your hits to the API to an extent. Please read the
-;; documentation for it and keep up with the restrictions. In
-;; particular, it is requested that you do not do anything that will
-;; trigger one hit to del.icio.us for every hit to your web site. 
-;;
-;; Depending on the speed of your connection and of the del.icio.us
-;; server, you might want to use a higher number for
-;; `delicious-api-timeout'. The default is 60 seconds.
+;; Information about the API is at <http://del.icio.us/doc/api>.
 ;;
 ;; Please report any bugs or suggestions to me at
-;; john@wjsullivan.net. If enough people are interested, perhaps we
-;; will open an area at http://www.emacswiki.org.
+;; <john@wjsullivan.net>. If enough people are interested, perhaps we
+;; will open an area at <http://www.emacswiki.org>.
 
 ;;; Dependcies
 
@@ -80,15 +56,6 @@
 (defvar delicious-api-buffer "*delicious output*"
   "*The name of the buffer to direct output to.")
 
-(defvar delicious-api-user nil
-  "*Your del.icio.us username.")
-
-(defvar delicious-api-password nil
-  "*Your del.icio.us password.")
-
-(defvar delicious-api-from nil
-  "*Sent to the server to identify the request sender. Use your email address.")
-
 (defvar delicious-api-user-agent "delicious.el/0.1"
   "The User-Agent field that we will send to the server.")
 
@@ -98,10 +65,7 @@
 (defvar delicious-api "/api/"
   "*The path to the del.ici.ous api. It should begin and end in a slash.")
 
-(defvar delicious-api-timeout 60
-  "*The number of seconds to wait for output before timing out. The default is 60.")
-
-(defvar delicious-api-version "delicious.el/0.1"
+(defconst delicious-api-version "delicious.el/0.1 2004-12-12"
   "The version string for this copy of delicious-api.el.")
 
 (defconst delicious-api-field-match "=\"\\(.*?\\)\""
@@ -120,6 +84,33 @@
   :group 'applications
   :version "21.3.1")
 
+(defcustom delicious-api-user nil
+  "*Your del.icio.us username."
+  :version "21.3.1"
+  :group 'delicious
+  :type 'string
+  :tag "del.icio.us user name")
+
+(defcustom delicious-api-password nil
+  "*Your del.icio.us password."
+  :version "21.3.1"
+  :group 'delicious
+  :type 'string
+  :tag "del.icio.us password")
+
+(defcustom delicious-api-from nil
+  "*Sent to the server to identify the request sender. Use your email address."
+  :version "21.3.1"
+  :group 'delicious
+  :type 'string
+  :tag "del.icio.us 'From' header")
+
+(defcustom delicious-api-timeout 60
+  "*The number of seconds to wait for output before timing out. The default is 60."
+  :version "21.3.1"
+  :group 'delicious
+  :type 'integer
+  :tag "del.icio.us timeout wait")
 
 ;;; Functions
 

@@ -59,17 +59,31 @@ The specifications for the API are at <http://del.icio.us/doc/api>.
 First, you need to set up an account at del.icio.us, by visiting that site and
 following the instructions there.
 
-Then, you will need to put something like the following in your `.emacs'.
+Second, load the delicious-el files. Either put them in a directory that is
+already in your load-path (M-x describe-variable <ret> load-path <ret> to see
+what that is) or evaluate:
 
-;; You don't need this first line if you just put both of the `.el' files in a
-;; directory that is already in your load-path. C-h v <ret>load-path<ret> will
-;; show you what directories are currently in your load-path.
+  (add-to-list 'load-path "/path/to/delicious-el/files")
+  
+Then, you need to set a few required options. You can do this either through
+Customize, with:
 
-(add-to-list 'load-path "/path/to/delicious-el/files")
-(require 'delicious)
-(setq delicious-api-user "myusername"
-      delicious-api-password "mypassword"
-      delicious-api-from "my@email.net")
+  M-x customize-group <ret> delicious <ret>
+
+or by evaluating something like the following:
+
+  (setq delicious-api-user "myusername"
+        delicious-api-password "mypassword"
+        delicious-api-from "my@email.net")
+
+If you decide you want to have the delicious-el functions available to you
+automatically when you start Emacs, add:
+
+  (require 'delicious)
+
+to your `.emacs' file, making sure that both `delicious.el' and `delicioapi.el'
+are somewhere in your load path. You will also need to either add the above
+option definitions to the file, or save your changes via Customization.
 
 There are some other options as well, but these three have to be set for the
 program to work. You should use your e-mail address in `delicious-api-from',
@@ -151,7 +165,8 @@ You should only do this if you have had your Emacs session open for a few hours
 or more. Otherwise you are placing an unreasonable burden on the server. There
 isn't much reason to refresh your post list anyway, because a list of new posts
 is maintained locally for purposes of duplicate checking. Future improvements
-will do this for tags as well.
+will do this for tags as well. After setting these two variables to nil, the
+next time you do `M-x delicious-post', both lists will be refreshed.
 
 * Problems
 

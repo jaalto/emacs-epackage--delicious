@@ -1,3 +1,14 @@
+2004-12-12  John Sullivan  <john@wjsullivan.net>
+
+	* README: Edited `Getting started' section in light of existence
+	of Customization group.
+
+	* delicioapi.el (delicious-api-version): Changed to defconst.
+	(delicious): Created a delicious customization group and moved the
+	appropriate user options into it.
+
+	Removed comments that are too redundant with the README file.
+
 2004-12-11  John Sullivan  <john@wjsullivan.net>
 
 	* README: Finished writing the README file. Put it under a
