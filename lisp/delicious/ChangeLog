@@ -1,6 +1,9 @@
 2005-01-04  John Sullivan  <john@wjsullivan.net>
 
 	* README: Added brief blurb about delicious-api-html.
+	Added noninteractive functions section. Fleshed out description of
+	parameters for the HTML feed.
+
 
 	* delicioapi.el (delicious-api-html): Removed extraneous comments.
 	(delicious-api-html-count): Added defcustom statements for all of

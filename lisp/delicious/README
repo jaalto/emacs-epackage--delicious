@@ -97,7 +97,7 @@ do not do anything that will trigger one hit to del.icio.us for every hit to
 your web site. In order to respect that, this program does a number of things
 (and will do more in the future) to cache information locally.
 
-* Commands to Use and What to Expect
+* Interactive commands to use and what to expect
 
 - M-x delicious-post
 
@@ -167,14 +167,89 @@ the list in a while, then tag completion won't be able to complete based on
 your more recent entries. Future versions of this program will include an
 improved cacheing mechanism that will make this command much less relevant. 
 
+* Useful noninteractive functions
+
+Noninteractive functions can't be called directly with M-x in Emacs. You can
+call them in a variety of ways, including M-: (function-here), or by typing
+(function-here) in the *scratch* buffer, moving to after the closing
+parenthesis, and typing C-x C-e. Or you can call them from within your own
+Emacs Lisp programs.
+
 - (delicious-api-html)
 
 This is a noninteractive function you can use to fetch an HTML feed of posts
-from del.icio.us according to a long list of arguments. Please see the
-docstring and the customization group for all of the parameters. It's very
-rough at the moment, but it seems to work. An interactive frontend is
-forthcoming. Note that if you do not give it a user name to fetch posts from,
-it will default to using your delicious-api-user name.
+from del.icio.us according to a long list of arguments. It's very rough at the
+moment, but it seems to work. An interactive frontend is forthcoming. Note that
+if you do not give it a user name to fetch posts from, it will default to using
+your `delicious-api-user' name.
+
+You can use this function, for example, to track the recent posts from users
+whose interests you think overlap with yours, or you can use it to include your
+own most recent delicious postings in your blog, especially if you blog using
+emacs-wiki.el.
+
+You can read the documentation on the server for the HTML feed parameters at
+<http://del.icio.us/doc/html>.
+
+You can set defaults for all of the parameters in the delicious customize
+group, or by setting any of the variables in the following list. When you call
+(delicious-api-html), you have to have the many arguments in order. If you want
+to use your default for one of the arguments, just put `nil' in the function
+call in the spot for that argument. That will cause your default to be used. If
+you have a value other than nil for an argument in the function call, that
+value will be used rather than the default. So, if you want to call
+(delicious-api-html) to get the 20 most recent links from johnsu01's
+del.icio.us account, but your default is set at 15, you would do this:
+
+(delicious-api-html "johnsu01" nil 20)
+
+If you usually want an RSS button to be included with your list, and you have
+your default set accordingly, but want in this case not to have the RSS button,
+you would do:
+
+(delicious-api-html "johnsu01" nil 20 nil nil nil nil nil nil nil nil "no")
+
+Note that both of these examples specify `nil' for the TAGNAME argument. This
+means that the most recent posts, regardless of tag, will be
+returned. Specifying a TAGNAME will return only posts with that tag. 
+
+Here is the list of parameters and a very brief description of each.
+
++ delicious-api-html-count
+  The number of times to show by default when fetching an HTML del.icio.us feed. The server default is 15.
+
++ delicious-api-html-extended
+  Either 'title' or 'body'. The server default is `title'.
+
++ delicious-api-html-divclass
+  Class to use for div. The server default is `delPost'.
+
++ delicious-api-html-aclass
+  Class to use for a link. The server default is `delLink'.
+
++ delicious-api-html-tags 
+  Show tags or not. Server default is to show tags. Set this to true if you do NOT want tags.
+
++ delicious-api-html-tagclass
+  Class to use for tags. Server default is `delTag'.
+
++ delicious-api-html-tagsep
+  String to use for separator. Server default is `delTagSep'.
+
++ delicious-api-html-tagsepclass
+  Class to use for separator. Server default is `delTagSep'.
+
++ delicious-api-html-bullet
+  HTML entity to use for bullet. Set it to empty for no bullet. Server default is `raquo'.
+
++ delicious-api-html-rssbutton
+  Add an RSS feed button using CSS. Server default is to show a button with `yes'.
+
++ delicious-api-html-extendeddiv
+  Extended entry in its own div. Server default is `no'.
+
++ delicious-api-html-extendedclass
+  Class to use for extendeddiv. Server default is empty.
 
 * Advanced use
 
