@@ -4,7 +4,7 @@
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;; Created 25 October 2004
-;; Version: 0.1 2004-12-23
+;; Version: 0.1 2004-12-24
 ;; Keywords: comm, hypermedia
 
 ;; This program is free software; you can redistribute it and/or
@@ -133,8 +133,8 @@ The server uses the current date and time by default."
 
 (defun delicious-suggest-tags ()
   "Suggest tags based on the intersection of the contents of the current buffer and the current list of tags."
-  (let ((buffer-words (delicious-buffer-words))
-	(tags (loop for cell in delicious-tags-list
+  (let ((buffer-words (downcase (delicious-buffer-words)))
+	(tags (loop for cell in (downcase delicious-tags-list)
 		    collect (car cell) into tags
 		    finally return tags)))
     (loop for word in buffer-words

@@ -1,3 +1,8 @@
+2004-12-24  John Sullivan  <john@wjsullivan.net>
+
+	* delicious.el (delicious-suggest-tags): When comparing buffer
+	contents to tag list, ignore case.
+
 2004-12-23  John Sullivan  <john@wjsullivan.net>
 
 	* README (Keywords): Added description of tag suggesting.
