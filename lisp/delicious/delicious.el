@@ -4,7 +4,7 @@
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;; Created 25 October 2004
-;; Version: 0.1 2005-01-14
+;; Version: 0.1 2005-02-04
 ;; Keywords: comm, hypermedia
 
 ;; This program is free software; you can redistribute it and/or
@@ -47,7 +47,7 @@
 (defvar delicious-posted-urls '()
   "A running list of urls that have been posted since the last update of the list from the delicious server.")
 
-(defconst delicious-version  "delicious.el/0.1 2005-01-14"
+(defconst delicious-version  "delicious.el/0.1 2005-02-04"
   "The version string for this copy of delicious.el.")
 
 (defun delicious-post (url description &optional tags extended time)
@@ -242,6 +242,20 @@ The server uses the current date and time by default."
   "Prompt for the name of a w3m bookmark section."
   (let* ((completions (w3m-bookmark-sections)))
     (completing-read "Section to export (required): " completions nil t)))
+
+(defun delicious-search-posts-regexp (search-string)
+  "Search DELICIOUS-POSTS-LIST for SEARCH-STRING, a regular expression, and display the results in *delicious search results*."
+  (interactive "sEnter regexp search string: ")
+  (unless (and (boundp 'delicious-posts-list)
+               (not (null delicious-posts-list)))
+    (delicious-build-posts-list))  
+  (switch-to-buffer-other-window (get-buffer-create "*delicious search results*"))
+  (delete-region (point-min) (point-max))
+  (loop for post in delicious-posts-list
+        for match = (loop for field in post
+                          when (string-match search-string field) return post) 
+        if match do (loop for field in match do (insert field "\n")
+                          finally do (insert "\n"))))
 
 (provide 'delicious)
 
