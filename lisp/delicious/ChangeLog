@@ -1,3 +1,9 @@
+2004-12-11  John Sullivan  <john@wjsullivan.net>
+
+	* README: Finished writing the README file. Put it under a
+	Verbatim Copying notice for now, until a suitable free
+	documentation license can be selected.
+
 2004-12-07  John Sullivan  <john@wjsullivan.net>
 
 	* delicious.el (delicious-guess-description): Use `major-mode' to
