@@ -1,3 +1,22 @@
+Sun Feb  6 16:17:22 EST 2005  John Sullivan <john@wjsullivan.net>
+  * Improvements to *delicious search results* buffer and window handling
+  
+  * New delicious-search-buffer-prep function to consolidate preparation common
+    between the search functions. This affects all delicious-search-* functions.
+  
+  * New delicious-search-buffer-finish function to consolidate post-searching
+    duties between the search functions. This affects all delicious-search-*
+    functions.
+  
+  * If a search function is called from the *delicious search results* buffer, we
+    don't switch windows. 
+  
+  * *delicious search results* buffer is now in read-only View Mode, for easier
+     scrolling.
+
+    M ./ChangeLog +14
+    M ./delicious.el -31 +38
+	
 Sun Feb  6 14:55:11 EST 2005  John Sullivan <john@wjsullivan.net>
   * Improvements to delicious-search-insert-match
   
