@@ -65,13 +65,10 @@
                 (delicious-complete-tags)
                 (delicious-read-extended-description)
                 (delicious-read-time-string)))
-  (if (null (delicious-duplicate-url-p url))
-      (progn
-        (message "Waiting for server.")
-        (delicious-api-post url description tags extended time)
-	(add-to-list 'delicious-posted-urls url)
-        (message "URL posted."))
-    (message "URL not posted: Duplicate.")))
+  (message "Waiting for server.")
+  (delicious-api-post url description tags extended time)
+  (add-to-list 'delicious-posted-urls url)
+  (message "URL posted."))
 
 (defun delicious-read-time-string ()
   "Read a date string from a prompt and format it properly for the server.
@@ -79,8 +76,10 @@ The server uses the current date and time by default."
   (read-string "(Optional) Date/Time [yyyy-mm-ddThh:mm:ssZ]: "))
 
 (defun delicious-read-url ()
-  "Read a url from a prompt, suggesting an appropriate default."
-  (delicious-check-input (read-string "(Required) URL: " (delicious-guess-url)) "URL"))
+  "Read a url from a prompt, suggesting an appropriate default.  Check the input to make sure it is valid and react if it is a duplicate."
+  (let ((url (delicious-check-input (read-string "(Required) URL: " (delicious-guess-url)) "URL")))
+    (delicious-duplicate-url-p url)
+    url))
 
 (defun delicious-read-description ()
   "Read a description from a prompt, suggesting an appropriate default."
@@ -111,7 +110,8 @@ The server uses the current date and time by default."
 	      (y-or-n-p "This URL is a duplicate.\nIf you post it again, the old tags will be replaced by the new ones.\nPost? ")))
 	  (if (eq edit t)
 	      (setq duplicate nil)
-	    (setq duplicate t))
+;	    (setq duplicate t))
+	    (error "Duplicate URL not posted"))
 	  duplicate))))
 
 (defun delicious-complete-tags ()

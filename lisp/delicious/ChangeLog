@@ -1,3 +1,11 @@
+2004-12-23  John Sullivan  <john@wjsullivan.net>
+
+	* delicious.el (delicious-read-url): Moved duplicate checking so
+	that it occurs immediately after the URL prompt. 
+	(delicious-duplicate-url-p): Changed behavior to throw error if
+	duplicate is not desired.
+	(delicious-post): Removed duplicate checking from this stage.
+
 2004-12-22  John Sullivan  <john@wjsullivan.net>
 
 	* README (Keywords): Added note about required fields.

@@ -67,7 +67,7 @@
 (defvar delicious-api "/api/"
   "*The path to the del.ici.ous api.  It should begin and end in a slash.")
 
-(defconst delicious-api-version "delicious.el/0.1 2004-12-20"
+(defconst delicious-api-version "delicious.el/0.1 2004-12-23"
   "The version string for this copy of delicious-api.el.")
 
 (defconst delicious-api-field-match "=\"\\(.*?\\)\""
