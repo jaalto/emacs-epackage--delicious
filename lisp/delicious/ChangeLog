@@ -1,3 +1,12 @@
+2005-01-04  John Sullivan  <john@wjsullivan.net>
+
+	* README: Added brief blurb about delicious-api-html.
+
+	* delicioapi.el (delicious-api-html): Removed extraneous comments.
+	(delicious-api-html-count): Added defcustom statements for all of
+	the HTML parameters so that you can set defaults to use.
+	(delicious-api-html): Hacked use of defcustom defaults into long
+	argument list. This will get neater, I promise.
 
 2005-01-03  John Sullivan  <john@wjsullivan.net>
 

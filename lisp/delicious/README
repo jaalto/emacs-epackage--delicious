@@ -4,7 +4,7 @@
 
 Author: John Sullivan <john@wjsullivan.net>
 Created 25 October 2004
-Version: 0.1 2004-12-30
+Version: 0.1 2005-01-04
 Keywords: comm, hypermedia
 
 This program is free software; you can redistribute it and/or modify it under
@@ -166,6 +166,15 @@ used to enable tag completion for your new posts, and if you haven't fetched
 the list in a while, then tag completion won't be able to complete based on
 your more recent entries. Future versions of this program will include an
 improved cacheing mechanism that will make this command much less relevant. 
+
+- (delicious-api-html)
+
+This is a noninteractive function you can use to fetch an HTML feed of posts
+from del.icio.us according to a long list of arguments. Please see the
+docstring and the customization group for all of the parameters. It's very
+rough at the moment, but it seems to work. An interactive frontend is
+forthcoming. Note that if you do not give it a user name to fetch posts from,
+it will default to using your delicious-api-user name.
 
 * Advanced use
 

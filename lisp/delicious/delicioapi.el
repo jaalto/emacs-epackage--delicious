@@ -4,7 +4,7 @@
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;; Created 25 October 2004
-;; Version: 0.1 2005-01-03
+;; Version: 0.1 2005-01-04
 ;; Keywords: comm, hypermedia
 
 ;; This program is free software; you can redistribute it and/or
@@ -70,7 +70,7 @@
 (defvar delicious-api-html "/html/"
   "*The path to the del.icio.us HTML feed.  It should begin and end with a slash.")
 
-(defconst delicious-api-version "delicious.el/0.1 2005-01-03"
+(defconst delicious-api-version "delicious.el/0.1 2005-01-04"
   "The version string for this copy of delicious-api.el.")
 
 (defconst delicious-api-field-match "=\"\\(.*?\\)\""
@@ -116,6 +116,90 @@
   :group 'delicious
   :type 'integer
   :tag "del.icio.us timeout wait")
+
+(defcustom delicious-api-html-count 15
+  "*The number of times to show by default when fetching an HTML del.icio.us feed. The server default is 15."
+  :version "21.3.1"
+  :group 'delicious
+  :type 'integer
+  :tag "HTML item count parameter")
+
+(defcustom delicious-api-html-extended "title"
+  "*Either 'title' or 'body'. The server default is `title'."
+  :version "21.3.1"
+  :group 'delicious
+  :type 'string
+  :tag "HTML extended parameter")
+
+(defcustom delicious-api-html-divclass "delPost"
+  "*Class to use for div. The server default is `delPost'."
+  :version "21.3.1"
+  :group 'delicious
+  :type 'string
+  :tag "HTML divclass parameter")
+
+(defcustom delicious-api-html-aclass "delLink"
+  "*Class to use for a link. The server default is `delLink'."
+  :version "21.3.1"
+  :group 'delicious
+  :type 'string
+  :tag "HTML aclass parameter")
+
+(defcustom delicious-api-html-tags nil
+  "*Show tags or not. Server default is to show tags. Set this to true if you do NOT want tags."
+  :version "21.3.1"
+  :group 'delicious
+  :type 'boolean
+  :tag "HTML tags parameter")
+
+(defcustom delicious-api-html-tagclass "delTag"
+  "*Class to use for tags. Server default is `delTag'."
+  :version "21.3.1"
+  :group 'delicious
+  :type 'string
+  :tag "HTML tagclass parameter")
+
+(defcustom delicious-api-html-tagsep "delTagSep"
+  "*String to use for separator. Server default is `delTagSep'."
+  :version "21.3.1"
+  :group 'delicious
+  :type 'string
+  :tag "HTML tagsep parameter")
+
+(defcustom delicious-api-html-tagsepclass "delTagSep"
+  "*Class to use for separator. Server default is `delTagSep'."
+  :version "21.3.1"
+  :group 'delicious
+  :type 'string
+  :tag "HTML tagsepclass parameter")
+
+(defcustom delicious-api-html-bullet "raquo"
+  "*HTML entity to use for bullet. Set it to empty for no bullet. Server default is `raquo'."
+  :version "21.3.1"
+  :group 'delicious
+  :type 'string
+  :tag "HTML bullet parameter")
+
+(defcustom delicious-api-html-rssbutton "yes"
+  "*Add an RSS feed button using CSS. Server default is to show a button."
+  :version "21.3.1"
+  :group 'delicious
+  :type 'string
+  :tag "HTML rssbutton parameter")
+
+(defcustom delicious-api-html-extendeddiv nil
+  "*Extended entry in its own div. Server default is `no'."
+  :version "21.3.1"
+  :group 'delicious
+  :type 'boolean
+  :tag "HTML extendeddiv parameter")
+
+(defcustom delicious-api-html-extendedclass nil
+  "*Class to use for extendeddiv. Server default is empty."
+  :version "21.3.1"
+  :group 'delicious
+  :type 'string
+  :tag "HTML extendedclass parameter")
 
 ;; Functions
 
@@ -231,11 +315,6 @@ TAG is a tag to filter by.  The dates are the keys."
   (let ((uri (format "posts/delete?url=%s" url)))
     (delicious-send-request (delicious-build-request uri))))
 
-;;  /html/USERNAME/ [?arg=val&arg=val....] or /html/USERNAME/TAGNAME
-;;  [?arg=val&arg=val....]
-;; Note that I allow TAGS to be nil or nonnil, but the server has to
-;; have a "yes" or a "no" sent to it.
-
 (defun delicious-api-html 
   (&optional username tagname count extended divclass aclass tags tagclass tagsep tagsepclass bullet rssbutton extendeddiv extendedclass)
   "Get results formatted in HTML, according to a long list of options.
@@ -246,7 +325,7 @@ posts under that tag will be considered. COUNT is the number of items to show.
 It defaults to 15 at the server.  EXTENDED is either 'title' or 'body'.  It
 defaults to 'title'.  DIVCLASS is the name of the CSS class to use for the div
 elements.  It defaults to 'delPost'.  ACLASS is the CSS class to use for the
-link elements.  It defaults to 'delLink'.  If TAGS is non-nil, don't show tags.
+link elements.  It defaulnts to 'delLink'.  If TAGS is non-nil, don't show tags.
 If it is nil, do.  The server default is 'yes'.  TAGCLASS is the CSS class to
 use for tags.  It defaults to 'delTag'.  TAGSEP is the string to use for the
 separator.  If it is nil, use '/'.  TAGSEPCLASS is the CSS class to use for the
@@ -262,23 +341,41 @@ for EXTENDEDDIV."
                       (if (not (null tagname))
                           (format "%s?" tagname))
                       (if (not (null count))
-                          (format "count=%s&" count))
+                          (format "count=%s&" count)
+                        (format "count=%s&" delicious-api-html-count))
                       (if (not (null extended))
-                          (format "extended=%s&") extended)
+                          (format "extended=%s&" extended)
+                        (format "extended=%s&" delicious-api-html-extended))
                       (if (not (null divclass))
-                          (format "aclass=%s&") aclass)
+                          (format "divclass=%s&" divclass)
+                        (format "divclass=%s&" delicious-api-html-divclass))
+                      (if (not (null aclass))
+                          (format "aclass=%s&" aclass)
+                        (format "aclass=%s&" delicious-api-html-aclass))
                       (if (not (null tags))
-                          (format "tags=%s&") tags)
+                          (format "tags=%s&" tags)
+                        (format "tags=%s&" delicious-api-html-tags))
                       (if (not (null tagclass))
-                          (format "tagsep=%s&") tagclass)
+                          (format "tagclass=%s&" tagclass)
+                        (format "tagclass=%s&" delicious-api-html-tagclass))
+                      (if (not (null tagsep))
+                          (format "tagsep=%s&" tagsep)
+                        (format "tagsep=%s&" delicious-api-html-tagsep))
                       (if (not (null tagsepclass))
-                          (format "tagsepclass=%s&" tagsepclass))
+                          (format "tagsepclass=%s&" tagsepclass)
+                        (format "tagsepclass=%s&" delicious-api-html-tagsepclass))
                       (if (not (null bullet))
-                          (format "bullet=%s&" bullet))
+                          (format "bullet=%s&" bullet)
+                        (format "bullet=%s&" delicious-api-html-bullet))
                       (if (not (null rssbutton))
-                          (format "rssbutton=%s&" rssbutton))
+                          (format "rssbutton=%s&" rssbutton)
+                        (format "rssbutton=%s&" delicious-api-html-rssbutton))
                       (if (not (null extendeddiv))
-                          (format "extendedclass=%s&" extendedclass)))
+                          (format "extendeddiv=%s&" extendeddiv)
+                        (format "extendeddiv=%s&" delicious-api-html-extendeddiv))
+                      (if (not (null extendedclass))
+                          (format "extendedclass=%s&" extendedclass)
+                        (format "extendedclass=%s&" delicious-api-html-extendedclass)))
                          0 -1)))
     (delicious-send-request (delicious-api-build-html-request uri)))
   (save-excursion
