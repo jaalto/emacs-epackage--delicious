@@ -4,7 +4,7 @@
 
 Author: John Sullivan <john@wjsullivan.net>
 Created 25 October 2004
-Version: 0.1 2005-02-04
+Version: 0.2 2005-02-07
 Keywords: comm, hypermedia
 
 This program is free software; you can redistribute it and/or modify it under
@@ -32,6 +32,7 @@ worldwide, without royalty, in any medium, provided this notice is preserved.
 - delicioapi.el
 - delicious.el
 - ChangeLog
+- ChangeLog.OLD
 - README
 - COPYING
 
@@ -167,12 +168,67 @@ the list in a while, then tag completion won't be able to complete based on
 your more recent entries. Future versions of this program will include an
 improved cacheing mechanism that will make this command much less relevant. 
 
+* Interactive search commands
+
+Although some filtering can be done via the API, I have started implementing
+some search features that operate on the local copy of your posts list. This
+enables us to have much more powerful searching, means you aren't dependent on
+your internet connection to be able to search your posts (assuming you have a
+local copy of them stored, which can be done in memory now and in a file
+shortly), and minimizes load on the del.icio.us server.
+
+All of the search commands will display their results in a "*delicious search
+results*" buffer, which is displayed in Emacs's View mode and Delicious Search
+mode. The default is for this buffer to open in a window other than the active
+one, or for a second window to be created if none is available. Being in View
+mode, the buffer is read-only and has many nice shortcuts for speedy
+navigation. Delicious Search mode will also add some useful shortcuts in the
+future---for now, it just binds <TAB> to skip to the next URL, looping back to
+the beginning of the buffer if there are no more URLs. 
+
+Results are currently unsorted. At least, no intentional sorting is
+applied. That will change in the future. 
+
+The basic search command is:
+
 - M-x delicious-search-posts-regexp
 
-This command will prompt you for a regular expression, search your posts for
-matches, and display the matches in a buffer "*delicious search results*". This
-buffer will be cleared with each new search. The default is for this to pop up
-a second window, or use the other window. 
+This command will prompt you for a regular expression, search all the fields in
+all of your posts for matches, and display the matches.
+
+More targeted searching can be achieved by:
+
+- M-x delicious-search-description-regexp
+
+This command will prompt you for a regular expression, search only the
+description field of your posts for matches, and display them.
+
+- M-x delicious-search-href-regexp
+
+This command will prompt you for a regular expression, search only the
+href/link field of your posts, and display the matches.
+
+- M-x delicious-search-tags-regexp
+
+This command will prompt you for a regular expression, search only the tag
+field of your posts, and display the matches. When searching, it may be useful
+to remember that multiple tags are separated by whitespace. 
+
+Since tags are the means for organizing links in del.icio.us, we have a special
+search function just for them:
+
+- M-x delicious-search-tags
+
+This command will prompt you for tags, one at a time. You can enter as many as
+you like, and you can use <TAB>, <SPC>, or '?' to use Emacs minibuffer
+completion based on your previously used tags. Just hit enter at the prompt
+when you are done. A search will be done for all of the posts that have all of
+those tags. The results will be displayed the same as the other search
+commands. It is possible to use regular expression syntax within each tag, as
+that is the way the match is determined internally, but you may run into
+problems with some of the regexp characters and the completion commands. The
+order of the tags is not considered important when determining matches. You do
+not need to account for whitespace between tags with this method.
 
 * Useful noninteractive functions
 

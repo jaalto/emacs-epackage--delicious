@@ -1,5 +1,8 @@
 2005-02-07  John Sullivan  <john@wjsullivan.net>
 
+	* README: Added documentation section "* Interactive search
+	commands" with information about all of the new searching functions.
+
 	* delicious.el (delicious-search-posts-regexp): Added match
 	counting for display in the search results buffer.
 	(delicious-search-description-regexp): Added match counting for
