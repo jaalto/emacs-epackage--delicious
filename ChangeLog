@@ -1,3 +1,14 @@
+Sun Feb  6 11:13:45 EST 2005  John Sullivan <john@wjsullivan.net>
+  * Fix delicious-search-mode keymap.
+
+    M ./delicious.el -1 +1
+
+Sun Feb  6 05:03:15 EST 2005  John Sullivan <john@wjsullivan.net>
+  * Created new ChangeLog file for darcs-generated ChangeLog.
+
+     ./ChangeLog -> ./ChangeLog.OLD
+    A ./ChangeLog
+
 Sun Feb  6 04:54:53 EST 2005  John Sullivan <john@wjsullivan.net>
   * Added regexp search function for the link field.
 
@@ -36,3 +47,271 @@ Sat Feb  5 20:36:48 EST 2005  johnsu01
     M ./lisp/delicious/ChangeLog +22
     M ./lisp/delicious/delicioapi.el -34 +50
     M ./lisp/delicious/delicious.el -12 +21
+
+Fri Feb  4 20:11:34 EST 2005  johnsu01
+  * propertizing
+
+    M ./lisp/delicious/ChangeLog +4
+    M ./lisp/delicious/delicious.el -1 +9
+
+Fri Feb  4 07:14:40 EST 2005  johnsu01
+  * added searching
+
+    M ./lisp/delicious/ChangeLog +9
+    M ./lisp/delicious/delicious.el -2 +16
+
+Fri Feb  4 06:14:40 EST 2005  johnsu01
+  * added searching
+
+    M ./lisp/delicious/README -1 +8
+
+Thu Feb  3 19:58:46 EST 2005  johnsu01
+  * Added extended support
+
+    M ./lisp/delicious/ChangeLog +8
+    M ./lisp/delicious/delicioapi.el -8 +8
+
+Fri Jan 14 13:50:44 EST 2005  johnsu01
+  * fixed
+
+    M ./lisp/delicious/ChangeLog +1
+    M ./lisp/delicious/delicioapi.el -1 +1
+
+Fri Jan 14 07:20:18 EST 2005  johnsu01
+  * bugfixes
+
+    M ./lisp/delicious/ChangeLog +3
+    M ./lisp/delicious/delicioapi.el -12 +12
+    M ./lisp/delicious/delicious.el -1 +1
+
+Fri Jan 14 06:21:40 EST 2005  johnsu01
+  * w3m readme
+
+    M ./lisp/delicious/README -1 +19
+
+Fri Jan 14 06:21:21 EST 2005  johnsu01
+  * added w3m exporting
+
+    M ./lisp/delicious/ChangeLog +11
+    M ./lisp/delicious/delicious.el -26 +66
+
+Mon Jan 10 19:54:36 EST 2005  johnsu01
+  * fixed uri logic
+
+    M ./lisp/delicious/ChangeLog +5
+    M ./lisp/delicious/delicioapi.el -13 +25
+
+Mon Jan 10 07:14:51 EST 2005  johnsu01
+  * doc fix
+
+    M ./lisp/delicious/README -1 +2
+
+Mon Jan 10 07:12:27 EST 2005  johnsu01
+  * fixes
+
+    M ./lisp/delicious/delicious.el -2 +10
+
+Mon Jan 10 07:11:51 EST 2005  johnsu01
+  * updates
+
+    M ./lisp/delicious/ChangeLog +29
+    M ./lisp/delicious/README -5 +40
+    M ./lisp/delicious/delicioapi.el -9 +12
+    M ./lisp/delicious/delicious.el -5 +9
+
+Thu Jan  6 13:47:27 EST 2005  johnsu01
+  * update
+
+    M ./lisp/delicious/ChangeLog +4
+    M ./lisp/delicious/delicioapi.el -61 +61
+
+Wed Jan  5 19:55:16 EST 2005  johnsu01
+  * html and w3m
+
+    M ./lisp/delicious/ChangeLog +15
+    M ./lisp/delicious/delicioapi.el -197 +224
+    M ./lisp/delicious/delicious.el -2 +10
+
+Tue Jan  4 20:01:12 EST 2005  johnsu01
+  * docs
+
+    M ./lisp/delicious/ChangeLog +3
+    M ./lisp/delicious/README -6 +81
+
+Tue Jan  4 06:51:39 EST 2005  johnsu01
+  * html work
+
+    M ./lisp/delicious/ChangeLog +9
+    M ./lisp/delicious/README -1 +10
+    M ./lisp/delicious/delicioapi.el -17 +114
+
+Tue Jan  4 05:59:56 EST 2005  johnsu01
+  * merged
+
+    M ./lisp/delicious/ChangeLog +6
+    M ./lisp/delicious/README -1 +1
+    M ./lisp/delicious/delicioapi.el -55 +55
+
+Mon Jan  3 22:28:35 EST 2005  johnsu01
+  * fixed html
+
+    M ./lisp/delicious/ChangeLog +8
+    M ./lisp/delicious/delicioapi.el -7 +19
+    M ./lisp/delicious/delicious.el -1 +1
+
+Tue Dec 28 07:20:24 EST 2004  johnsu01
+  * combined
+
+    M ./lisp/delicious/ChangeLog +21
+    M ./lisp/delicious/README -24 +22
+    M ./lisp/delicious/delicioapi.el -53 +78
+    M ./lisp/delicious/delicious.el -23 +16
+
+Fri Dec 24 16:07:35 EST 2004  johnsu01
+  * fix case
+
+    M ./lisp/delicious/ChangeLog +1
+    M ./lisp/delicious/delicious.el -5 +5
+
+Fri Dec 24 16:02:07 EST 2004  johnsu01
+  * case fix
+
+    M ./lisp/delicious/ChangeLog +5
+    M ./lisp/delicious/delicioapi.el -2 +2
+    M ./lisp/delicious/delicious.el -3 +3
+
+Thu Dec 23 20:58:30 EST 2004  johnsu01
+  * added tag suggesting
+
+    M ./lisp/delicious/ChangeLog +8
+    M ./lisp/delicious/README -1 +3
+    M ./lisp/delicious/delicioapi.el -1 +1
+    M ./lisp/delicious/delicious.el -10 +35
+
+Thu Dec 23 20:09:06 EST 2004  johnsu01
+  * moved duplicate checking
+
+    M ./lisp/delicious/ChangeLog +8
+    M ./lisp/delicious/delicioapi.el -1 +1
+    M ./lisp/delicious/delicious.el -10 +10
+
+Thu Dec 23 05:26:04 EST 2004  johnsu01
+  * work
+
+    M ./lisp/delicious/delicious.el -1 +2
+
+Thu Dec 23 02:20:51 EST 2004  johnsu01
+  * work
+
+    M ./lisp/delicious/ChangeLog +12
+    M ./lisp/delicious/README +6
+    M ./lisp/delicious/delicioapi.el -52 +45
+    M ./lisp/delicious/delicious.el -15 +21
+
+Mon Dec 20 07:27:54 EST 2004  johnsu01
+  * fixed readme
+
+    M ./lisp/delicious/ChangeLog +4
+    M ./lisp/delicious/README -5 +6
+
+Mon Dec 20 07:23:53 EST 2004  johnsu01
+  * new version
+
+    M ./lisp/delicious/ChangeLog +7
+    M ./lisp/delicious/delicioapi.el -2 +2
+    M ./lisp/delicious/delicious.el -4 +15
+
+Sun Dec 12 15:49:46 EST 2004  johnsu01
+  * see ChangeLog
+
+    M ./lisp/delicious/ChangeLog +11
+    M ./lisp/delicious/README -10 +25
+    M ./lisp/delicious/delicioapi.el -41 +32
+
+Sat Dec 11 20:03:35 EST 2004  johnsu01
+  * finished first draft of README.
+
+    M ./lisp/delicious/ChangeLog +6
+    M ./lisp/delicious/README -41 +96
+
+Fri Dec 10 20:25:15 EST 2004  johnsu01
+  * fleshed *Getting started and *Commands sections.
+
+    M ./lisp/delicious/README -17 +72
+
+Thu Dec  9 00:37:45 EST 2004  johnsu01
+  * added rough draft of README file.
+
+    M ./lisp/delicious/README -313 +36
+
+Wed Dec  8 20:34:53 EST 2004  johnsu01
+  * Began work to integrate into customization.
+
+    M ./lisp/delicious/delicioapi.el +8
+
+Wed Dec  8 03:57:22 EST 2004  johnsu01
+  * Corrected name of GPL file.
+
+    R ./lisp/delicious/gpl.txt
+    M ./lisp/delicious/maketar.sh -1 +1
+
+Tue Dec  7 20:15:54 EST 2004  johnsu01
+  * guessing fixes
+
+    M ./lisp/delicious/ChangeLog +6
+    M ./lisp/delicious/delicious.el -4 +5
+
+Mon Dec  6 22:01:04 EST 2004  johnsu01
+  * removed cvs log command from tar script, using ChangeLog instead.
+
+    M ./lisp/delicious/maketar.sh -2 +1
+
+Mon Dec  6 22:00:16 EST 2004  johnsu01
+  * see ChangeLog
+
+    M ./lisp/delicious/ChangeLog -226
+    M ./lisp/delicious/delicious.el -5 +21
+
+Mon Dec  6 06:39:38 EST 2004  johnsu01
+  * Added license to the archive for real. tar script now generates the changelog and copies over to the server.
+
+    A ./lisp/delicious/gpl.txt
+    M ./lisp/delicious/maketar.sh -1 +3
+
+Mon Dec  6 06:22:57 EST 2004  johnsu01
+  * When posting, the current w3m title and url information will be used as the suggested description and url if we are in a w3m buffer. Also added warning that your transaction may still occur if the timeout period passes.
+
+    M ./lisp/delicious/delicioapi.el -2 +2
+    M ./lisp/delicious/delicious.el -3 +9
+
+Mon Dec  6 05:57:55 EST 2004  johnsu01
+  * added build script.
+
+    M ./lisp/delicious/maketar.sh -2 +1
+
+Mon Dec  6 05:49:53 EST 2004  johnsu01
+  * moved delicious sources to proper place in tree.
+
+    M ./delicioapi.el -366
+    M ./lisp/delicious/delicioapi.el -385 +201
+    M ./lisp/delicious/delicious.el -201 +51
+
+Mon Dec  6 05:47:30 EST 2004  johnsu01
+  * Initial revision
+
+    A ./delicioapi.el
+    A ./delicious.el
+
+Mon Dec  6 04:49:54 EST 2004  johnsu01
+  * moved delicious sources to proper place in tree.
+
+    A ./lisp/
+    A ./lisp/delicious/
+    A ./lisp/delicious-el.tar.gz
+    A ./lisp/delicious/CHANGELOG
+    A ./lisp/delicious/COPYING
+    A ./lisp/delicious/ChangeLog
+    A ./lisp/delicious/README
+    A ./lisp/delicious/delicioapi.el
+    A ./lisp/delicious/delicious.el
+    A ./lisp/delicious/maketar.sh
