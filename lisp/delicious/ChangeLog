@@ -2,6 +2,7 @@
 
 	* delicioapi.el (delicious-api-get-recent): Fixed bug, made count argument
 	truly optional.
+	Fixed parentheses problem. Oops.
 
 	* README (w3m): Documented delicious-w3m-export.
 

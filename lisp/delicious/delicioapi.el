@@ -278,7 +278,7 @@
                     (format "&count=%s" count-fixed)))
        (search (delicious-build-search "href" "description" "hash" "tag" "time")))
   (delicious-send-request (delicious-build-request uri))
-  (delicious-do-search-list (car search) (cdr search)))))
+  (delicious-do-search-list (car search) (cdr search))))
 
 (defun delicious-api-get-all ()
 "Return a list of all posts from your account.  The list is HREF, DESCRIPTION, HASH, TAG, and TIME."
