@@ -2,6 +2,7 @@
 
 	* delicious.el (delicious-suggest-tags): When comparing buffer
 	contents to tag list, ignore case.
+	(delicious-buffer-words): Changed this to return lowercase words.
 
 2004-12-23  John Sullivan  <john@wjsullivan.net>
 

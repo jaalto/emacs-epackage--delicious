@@ -133,9 +133,9 @@ The server uses the current date and time by default."
 
 (defun delicious-suggest-tags ()
   "Suggest tags based on the intersection of the contents of the current buffer and the current list of tags."
-  (let ((buffer-words (downcase (delicious-buffer-words)))
-	(tags (loop for cell in (downcase delicious-tags-list)
-		    collect (car cell) into tags
+  (let ((buffer-words (delicious-buffer-words))
+	(tags (loop for cell in delicious-tags-list
+		    collect (downcase (car cell)) into tags
 		    finally return tags)))
     (loop for word in buffer-words
 	  if (member word tags)
@@ -143,12 +143,12 @@ The server uses the current date and time by default."
 	  finally return shared)))
   
 (defun delicious-buffer-words ()
-  "Break the current buffer into a list of unique words."
+  "Break the current buffer into a list of lowercase unique words."
   (save-excursion
     (goto-char (point-min))
     (loop until (eobp)
 	  with words = '()
-	  for word = (current-word)
+	  for word = (downcase (current-word))
 	  if (not (member word words))
   	    collect word into words
             end
