@@ -47,7 +47,7 @@
 (defvar delicious-posted-urls '()
   "A running list of urls that have been posted since the last update of the list from the delicious server.")
 
-(defconst delicious-version  "delicious.el/0.1 2005-01-05"
+(defconst delicious-version  "delicious.el/0.1 2005-01-14"
   "The version string for this copy of delicious.el.")
 
 (defun delicious-post (url description &optional tags extended time)

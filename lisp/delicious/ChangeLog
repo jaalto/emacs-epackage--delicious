@@ -1,5 +1,8 @@
 2005-01-14  John Sullivan  <john@wjsullivan.net>
 
+	* delicioapi.el (delicious-api-get-recent): Fixed bug, made count argument
+	truly optional.
+
 	* README (w3m): Documented delicious-w3m-export.
 
 	* delicious.el (delicious-w3m-export): Added rudimentary export of

@@ -4,7 +4,7 @@
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;; Created 25 October 2004
-;; Version: 0.1 2005-01-10
+;; Version: 0.1 2005-01-14
 ;; Keywords: comm, hypermedia
 
 ;; This program is free software; you can redistribute it and/or
@@ -70,7 +70,7 @@
 (defvar delicious-api-html "/html/"
   "*The path to the del.icio.us HTML feed.  It should begin and end with a slash.")
 
-(defconst delicious-api-version "delicioapi.el/0.1 2005-01-05"
+(defconst delicious-api-version "delicioapi.el/0.1 2005-01-14"
 "The version string for this copy of delicioapi.el.")
 
 (defconst delicious-api-field-match "=\"\\(.*?\\)\""
@@ -266,19 +266,19 @@
 
 (defun delicious-api-get-recent (&optional tag count)
 "Return a list, optionally filtered by TAG, of the COUNT most recent posts.  The list is HREF, DESCRIPTION, HASH, TAG, and TIME.  This will max out at 100.  Use `delicious-api-get-all' if you want more than that."
-(let* ((tag-fixed (url-hexify-string tag))
-       (count-fixed (if 
-                        (> count 100) 
-                        100
-                      count))
+(let* ((count-fixed (cond
+                     ((null count)
+                      15)
+                     ((> count 100) 
+                      100)
+                     (t count)))
        (uri (concat "posts/recent?"
-                    (unless (equal tag-fixed "")
-                      (format "&tag=%s" tag-fixed))
-                    (unless (null count-fixed)
-                      (format "&count=%s" count-fixed))))
+                    (unless (null tag)
+                      (format "&tag=%s" (url-hexify-string tag)))
+                    (format "&count=%s" count-fixed)))
        (search (delicious-build-search "href" "description" "hash" "tag" "time")))
   (delicious-send-request (delicious-build-request uri))
-  (delicious-do-search-list (car search) (cdr search))))
+  (delicious-do-search-list (car search) (cdr search)))))
 
 (defun delicious-api-get-all ()
 "Return a list of all posts from your account.  The list is HREF, DESCRIPTION, HASH, TAG, and TIME."
