@@ -63,7 +63,7 @@
 ;;
 ;; Depending on the speed of your connection and of the del.icio.us
 ;; server, you might want to use a higher number for
-;; `delicious-api-timeout'. The default is 30 seconds.
+;; `delicious-api-timeout'. The default is 60 seconds.
 ;;
 ;; Please report any bugs or suggestions to me at
 ;; john@wjsullivan.net. If enough people are interested, perhaps we
@@ -308,7 +308,7 @@ Output goes to `delicious-api-buffer'."
 		 (accept-process-output proc))))
 	   (cancel-timer time-out))))
     (cond ((equal error-check "timeout")
-	   (error "Timed out waiting for response")
+	   (error "Timed out waiting for response. Your transaction may still occur, though.")
 	   (kill-process (get-process "delicious")))
 	  (error-check
 	   (error error-check)))))

@@ -59,8 +59,7 @@
   ;; figure out how to get right time-string format
   "Post a url to your del.icio.us account with arguments URL, DESCRIPTION, TAGS, EXTENDED, and TIME."
   (interactive (list 
-                (read-string "(Required) URL: " (or (thing-at-point-url-at-point)
-                                                    "http://"))
+                (read-string "(Required) URL: " (delicious-guess-url))
                 (read-string "(Required) Description: " (delicious-guess-description))
                 (delicious-complete-tags)
                 (read-string "(Optional) Extended Description: ")
@@ -118,12 +117,19 @@
   ;; try w3m page title
   "Try some different things to get a default description."
   (or
+   (if (and (boundp 'w3m-current-url)
+            (not (null 'w3m-current-url)))
+       (w3m-current-title))
    (if (equal (buffer-name) (or "*Article*" "*Summary*"))
        (aref gnus-current-headers 1))))
 
 (defun delicious-guess-url ()
   "Try some different things to guess a url."
   ;; if there is a prefix, maybe it should use the kill ring
-)
+  (or (if (and (boundp 'w3m-current-url)
+               (not (null 'w3m-current-url)))
+          w3m-current-url)
+      (thing-at-point-url-at-point)
+      "http://"))
 
 (provide 'delicious)
