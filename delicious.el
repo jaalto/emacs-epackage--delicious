@@ -44,7 +44,7 @@
 
 (require 'delicioapi)
 
-(defface delicious-result-link-face 
+(defface delicious-result-href-face 
   '((t (:underline t :foreground "DeepSkyBlue1")))
     "Face for links in search results."
     :group 'delicious)
@@ -382,31 +382,10 @@ Display the results in *delicious search results*."
                  
 (defun delicious-search-insert-match (post)
   "Insert POST with the fields propertized."
-  (loop for field in post
-        if (equal (car field) "href")
-            do (insert (propertize (cdr field) 
-                                   'face 'delicious-result-link-face) "\n")
-            else if (equal (car field) "description")
-                do (insert (propertize 
-                            (cdr field)
-                            'face 'delicious-result-description-face) "\n")
-            else if (equal (car field) "extended")
-                do (insert (propertize
-                            (cdr field)
-                            'face 'delicious-result-extended-face) "\n")
-            else if (equal (car field) "hash")
-                do (insert (propertize
-                            (cdr field)
-                            'face 'delicious-result-hash-face) "\n")
-            else if (equal (car field) "tag")
-                do (insert (propertize
-                            (cdr field)
-                            'face 'delicious-result-tag-face) "\n")
-            else if (equal (car field) "time")
-                do (insert (propertize
-                            (cdr field)
-                            'face 'delicious-result-time-face) "\n")
-            else do (insert (cdr field) "\n")
+  (loop for cell in post
+        do (insert (propertize (cdr cell) 'face 
+                               (intern (concat "delicious-result-" (car cell) "-face")))
+                   "\n")
         finally do (insert "\n")))
 
 (defun delicious-build-posts-list-maybe ()
