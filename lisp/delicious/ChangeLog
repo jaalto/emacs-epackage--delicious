@@ -1,3 +1,11 @@
+2005-02-03  John Sullivan  <john@wjsullivan.net>
+
+	* delicioapi.el (delicious-api-get-posts): Added support for
+	extended descriptions.
+	(delicious-api-get-recent): added support for extended descriptions.
+	(delicious-api-get-all): added support for extended descriptions.
+	(delicious-api-version): Updated version date.
+
 2005-01-14  John Sullivan  <john@wjsullivan.net>
 
 	* delicioapi.el (delicious-api-get-recent): Fixed bug, made count argument
