@@ -4,7 +4,7 @@
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;; Created 25 October 2004
-;; Version: 0.1 2004-12-20
+;; Version: 0.1 2004-12-22
 ;; Keywords: comm, hypermedia
 
 ;; This program is free software; you can redistribute it and/or
@@ -23,7 +23,7 @@
 ;; Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 ;; MA 02111-1307 USA
 
-;; Commentary
+;;; Commentary
 
 ;; You should read the instructions in the source for `delicioapi.el' to get
 ;; the necessary setup instructions. This file is the collection of functions
@@ -46,8 +46,10 @@
 ;; add offline caching of requests so that they can be dumped all at once
 ;; write a function to post a buffer full of urls
 ;; write something that lets you edit an entry, probably by deleting the old version and posting the new version
-;; I complained before about the BBDB entry system that uses the minibuffer. Should I have at least an option 
+;; I complained before about the BBDB entry system that uses the minibuffer. Should I have at least an option
 ;;  for a form-based entry system in a pop-up window?
+
+;;; Code:
 
 (require 'delicioapi)
 
@@ -57,7 +59,7 @@
 (defun delicious-post (url description &optional tags extended time)
   ;; figure out how to get right time-string format
   "Post a url to your del.icio.us account with arguments URL, DESCRIPTION, TAGS, EXTENDED, and TIME."
-  (interactive (list 
+  (interactive (list
                 (delicious-read-url)
                 (delicious-read-description)
                 (delicious-complete-tags)
@@ -78,18 +80,23 @@ The server uses the current date and time by default."
 
 (defun delicious-read-url ()
   "Read a url from a prompt, suggesting an appropriate default."
-  (read-string "(Required) URL: " (delicious-guess-url)))
- 
+  (delicious-check-input (read-string "(Required) URL: " (delicious-guess-url)) "URL"))
+
 (defun delicious-read-description ()
   "Read a description from a prompt, suggesting an appropriate default."
-  (read-string "(Required) Description: " (delicious-guess-description)))
+  (delicious-check-input (read-string "(Required) Description: " (delicious-guess-description)) "Description"))
+
+(defun delicious-check-input (input &optional name)
+  "Verify that INPUT has content.  NAME is the name of the field being checked."
+  (if (equal input "")
+      (error "%s was a required field" name)))
 
 (defun delicious-read-extended-description ()
   "Read an extended description from a prompt."
   (read-string "(Optional) Extended Description: "))
 
 (defun delicious-duplicate-url-p (url)
-  "Check to see if url is a duplicate with an already posted url."
+  "Check to see if URL is a duplicate."
   (unless (and (boundp 'delicious-posts-list)
                (not (null delicious-posts-list)))
     (message "Refreshing delicious post list from server.")
@@ -98,8 +105,8 @@ The server uses the current date and time by default."
   (if (or (assoc url delicious-posts-list)
 	  (member url delicious-posted-urls))
       (progn
-	(let 
-	    ((edit 
+	(let
+	    ((edit
 	      (y-or-n-p "This URL is a duplicate.\nIf you post it again, the old tags will be replaced by the new ones.\nPost? ")))
 	  (if (eq edit t)
 	      (setq duplicate nil)
@@ -117,7 +124,7 @@ The server uses the current date and time by default."
                    delicious-tags-list)
         until (equal tag "")
         collect tag into tags
-        finally return (progn 
+        finally return (progn
 	         (add-to-list 'delicious-tags-local tags)
                          (message "%s" tags)
                          (mapconcat 'identity tags " "))))
@@ -140,10 +147,7 @@ The server uses the current date and time by default."
        (aref gnus-current-headers 1))))
 
 (defun delicious-guess-url ()
-  "Try some different things to guess a url.
-If we're in a w3m buffer, use the current url. If not, use the url under point. If
-not that, search through the buffer and see if there is a url to use in the buffer. 
-If not that, just insert http:// into the prompt."
+  "Try some different things to guess a url.  If we're in a w3m buffer, use the current url.  If not, use the url under point.  If not that, search through the buffer and see if there is a url to use in the buffer.  If not that, just insert http:// into the prompt."
   ;; if there is a prefix, maybe it should use the kill ring
   (or (if (and (boundp 'w3m-current-url)
                (not (null w3m-current-url))
@@ -161,3 +165,5 @@ If not that, just insert http:// into the prompt."
       "http://"))
 
 (provide 'delicious)
+
+;;; delicious.el ends here

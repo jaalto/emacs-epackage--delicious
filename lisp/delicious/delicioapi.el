@@ -4,7 +4,7 @@
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;; Created 25 October 2004
-;; Version: 0.1 2004-12-20
+;; Version: 0.1 2004-12-22
 ;; Keywords: comm, hypermedia
 
 ;; This program is free software; you can redistribute it and/or
@@ -22,7 +22,7 @@
 ;; Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 ;; MA 02111-1307 USA
 
-;; Commentary
+;;; Commentary
 
 ;; This is a complete set of functions for interacting with the REST
 ;; API at <http://del.icio.us>, a "social bookmarking" project.  None of
@@ -45,13 +45,15 @@
 ;; <john@wjsullivan.net>. If enough people are interested, perhaps we
 ;; will open an area at <http://www.emacswiki.org>.
 
-;;; Dependcies
+;;; Code:
+
+;; Dependcies
 
 (require 'cl)
 (require 'url)
 (require 'thingatpt)
 
-;;; Variables
+;; Variables
 
 (defvar delicious-api-buffer "*delicious output*"
   "*The name of the buffer to direct output to.")
@@ -63,7 +65,7 @@
   "The delicious host name.")
 
 (defvar delicious-api "/api/"
-  "*The path to the del.ici.ous api. It should begin and end in a slash.")
+  "*The path to the del.ici.ous api.  It should begin and end in a slash.")
 
 (defconst delicious-api-version "delicious.el/0.1 2004-12-20"
   "The version string for this copy of delicious-api.el.")
@@ -77,7 +79,7 @@
 (defconst delicious-api-error-match "\\(HTTP/1.0 503 Service Unavailable\\)"
   "Regular expression to match the various error messages.")
 
-;;; Customization
+;; Customization
 
 (defgroup delicious nil
   "Functions for interacting with the del.icio.us API, a web application for managing bookmarks."
@@ -99,29 +101,26 @@
   :tag "del.icio.us password")
 
 (defcustom delicious-api-from nil
-  "*Sent to the server to identify the request sender. Use your email address."
+  "*Sent to the server to identify the request sender.  Use your email address."
   :version "21.3.1"
   :group 'delicious
   :type 'string
   :tag "del.icio.us 'From' header")
 
 (defcustom delicious-api-timeout 60
-  "*The number of seconds to wait for output before timing out. The default is 60."
+  "*The number of seconds to wait for output before timing out.  The default is 60."
   :version "21.3.1"
   :group 'delicious
   :type 'integer
   :tag "del.icio.us timeout wait")
 
-;;; Functions
+;; Functions
 
 ;; All "inbox" function have been commented out because they have been temporarily disabled at the
 ;;  del.icio.us. server.
 
 (defun delicious-api-post (url &optional description tags extended time)
-  "Post a URL to your del.icio.us account.
-You must include a DESCRIPTION (string). TAGS (space separated string),
-EXTENDED (extra description string) and TIME (in the format %C%y-%m-%dT%H:%M:%SZ)
-are optional additions."
+  "Post a URL to your del.icio.us account.  You must include a DESCRIPTION (string).  TAGS (space separated string), EXTENDED (extra description string) and TIME (in the format %C%y-%m-%dT%H:%M:%SZ) are optional additions."
   (let* ((description (url-hexify-string description))
 	 (tags (url-hexify-string tags))
 	 (extended (url-hexify-string extended))
@@ -131,8 +130,7 @@ are optional additions."
     (delicious-send-request (delicious-build-request post-url))))
 
 (defun delicious-api-get-tags ()
-  "Return a hash table of your tags and the number of your entries under each tag.
-The keys are the tags."
+  "Return a hash table of your tags and the number of your entries under each tag.  The keys are the tags."
   (let ((uri "tags/get?")
 	(search (delicious-build-search "count" "tag")))
     (delicious-send-request (delicious-build-request uri))
@@ -169,10 +167,8 @@ The keys are the tags."
 
 
 (defun delicious-api-get-posts (&optional tag date)
-   "Return a list of posts on a given DATE, filtered by TAG.
-If no date is supplied, the most recent date with posts will be used.
-The list is HREF, DESCRIPTION, HASH, TAG, and TIME."
-  (let* ((uri (concat "posts/get?" 
+   "Return a list of posts filtered by TAG on a given DATE.  If no date is supplied, the most recent date with posts will be used.  The list is HREF, DESCRIPTION, HASH, TAG, and TIME."
+  (let* ((uri (concat "posts/get?"
 		      (unless (null tag)
 			(format "&tag=%s" tag))
 		      (unless (null date)
@@ -182,12 +178,10 @@ The list is HREF, DESCRIPTION, HASH, TAG, and TIME."
     (delicious-do-search-list (car search) (cdr search))))
 
 (defun delicious-api-get-recent (&optional tag count)
-  "Return a list of the COUNT most recent posts, optionally filtered by TAG.
-The list is HREF, DESCRIPTION, HASH, TAG, and TIME. This will max out at 100.
-Use `delicious-api-get-all' if you want more than that."
+  "Return a list, optionally filtered by TAG, of the COUNT most recent posts.  The list is HREF, DESCRIPTION, HASH, TAG, and TIME.  This will max out at 100.  Use `delicious-api-get-all' if you want more than that."
    (let* ((tag (unless (null tag) (url-hexify-string tag)))
 	  (count (if (> count 100) 100) count)
-	 (uri (concat "posts/recent?" 
+	 (uri (concat "posts/recent?"
 		      (unless (null tag)
 			(format "&tag=%s" tag))
 		      (unless (null count)
@@ -197,7 +191,7 @@ Use `delicious-api-get-all' if you want more than that."
      (delicious-do-search-list (car search) (cdr search))))
 
 (defun delicious-api-get-all ()
-  "Return a list of all posts from your account. The list is HREF, DESCRIPTION, HASH, TAG, and TIME."
+  "Return a list of all posts from your account.  The list is HREF, DESCRIPTION, HASH, TAG, and TIME."
   (let ((uri "posts/all")
 	(search (delicious-build-search "href" "description" "hash" "tag" "time")))
     (delicious-send-request (delicious-build-request uri))
@@ -205,7 +199,7 @@ Use `delicious-api-get-all' if you want more than that."
 
 (defun delicious-api-get-dates (&optional tag)
   "Return a hash table of dates with the number of posts at each date.
-TAG is a tag to filter by. The dates are the keys."
+TAG is a tag to filter by.  The dates are the keys."
   (let* ((tag (url-hexify-string tag))
 	 (uri (concat "posts/dates?"
 		      (unless (null tag)
@@ -215,7 +209,7 @@ TAG is a tag to filter by. The dates are the keys."
     (delicious-do-search-hash (car search) 2)))
 
 ;; (defun delicious-api-unsubscribe (name &optional tag)
-;;   "Unsubscribe the inbox feed from NAME under TAG." 
+;;   "Unsubscribe the inbox feed from NAME under TAG."
 ;;   (let ((uri (format "inbox/unsub?&user=%s&tag=%s" name tag)))
 ;;     (delicious-send-request (delicious-build-request uri))))
 
@@ -245,28 +239,28 @@ TAG is a tag to filter by. The dates are the keys."
 				     extendeddiv extendedclass)
   "Get results formatted in HTML, according to a long list of options.
 If TAGNAME is nil, then results from all of the user's tags will be
-used. If TAGNMAE is passed, only posts under that tag will be
-considered. 
+used.  If TAGNMAE is passed, only posts under that tag will be
+considered.
 
-COUNT is the number of items to show. It defaults to 15.
-EXTENDED is either 'title' or 'body'. It defaults to 'title'.
-DIVCLASS is the name of the CSS class to use for the div elements. It
+COUNT is the number of items to show.  It defaults to 15.
+EXTENDED is either 'title' or 'body'.  It defaults to 'title'.
+DIVCLASS is the name of the CSS class to use for the div elements.  It
 defaults to 'delPost'.
-ACLASS is the CSS class to use for the link elements. It defaults to
+ACLASS is the CSS class to use for the link elements.  It defaults to
 'delLink'.
-If TAGS is non-nil, don't show tags. If it is nil, do. The server
+If TAGS is non-nil, don't show tags.  If it is nil, do.  The server
 default is 'yes'.
-TAGCLASS is the CSS class to use for tags. It defaults to 'delTag'.
-TAGSEP is the string to use for the separator. If it is nil, use '/'.
-TAGSEPCLASS is the CSS class to use for the separator. If it is nil,
+TAGCLASS is the CSS class to use for tags.  It defaults to 'delTag'.
+TAGSEP is the string to use for the separator.  If it is nil, use '/'.
+TAGSEPCLASS is the CSS class to use for the separator.  If it is nil,
 use 'delTagSep'.
-BULLET is the HTML entity to use for the bullets. Default is nil,
-which means no bullet. 'raquo' is a sample alternative value, which is
+BULLET is the HTML entity to use for the bullets.  Default is nil,
+which means no bullet.  'raquo' is a sample alternative value, which is
 also the default for the server.
-If RSSBUTTON is nil, add an RSS feed button using CSS. It it is
+If RSSBUTTON is nil, add an RSS feed button using CSS.  It it is
 non-nil, don't add an RSS feed button.
-EXTENDEDDIV is an extended entry in its own div. If it is nil, don't
-use it. If it is non-nil, do something.
+EXTENDEDDIV is an extended entry in its own div.  If it is nil, don't
+use it.  If it is non-nil, do something.
 EXTENDEDCLASS is a CSS class to use for EXTENDEDDIV.")
 
 (defun delicious-api-build-tag-completion ()
@@ -287,9 +281,9 @@ EXTENDEDCLASS is a CSS class to use for EXTENDEDDIV.")
 	    uri delicious-api-from delicious-api-user-agent (delicious-auth))))
 
 (defun delicious-send-request (request)
-  "Send the REQUEST to the server. Wait for success, HTTP error, or timeout.
+  "Send the REQUEST to the server.  Wait for success, HTTP error, or timeout.
 Output goes to `delicious-api-buffer'."
-  (let ((error-check 
+  (let ((error-check
 	 (catch 'error
 	   (unless (null (get-buffer delicious-api-buffer))
 	     (kill-buffer delicious-api-buffer))
@@ -307,7 +301,7 @@ Output goes to `delicious-api-buffer'."
 		 (accept-process-output proc))))
 	   (cancel-timer time-out))))
     (cond ((equal error-check "timeout")
-	   (error "Timed out waiting for response. Your transaction may still occur, though.")
+	   (error "Timed out waiting for response.  Your transaction may still occur, though")
 	   (kill-process (get-process "delicious")))
 	  (error-check
 	   (error error-check)))))
@@ -317,14 +311,13 @@ Output goes to `delicious-api-buffer'."
   (let ((search-string nil)
 	(count-fields (length fields)))
     (loop for field in fields do
- 	  (setq search-string 
-		(concat search-string 
+ 	  (setq search-string
+		(concat search-string
 			field delicious-api-field-match ".*")))
     (cons search-string count-fields)))
 
 (defun delicious-do-search-list (search-string fields)
-  "Return a list of matches for SEARCH-STRING, which contains FIELDS separate fields.
-Output goes to `delicious-api-buffer'."
+  "Return a list of occurrences of SEARCH-STRING.  SEARCH-STRING has FIELDS separate fields.  Output to `delicious-api-buffer'."
   (save-excursion
     (with-current-buffer delicious-api-buffer
       (goto-char (point-min))
@@ -338,10 +331,7 @@ Output goes to `delicious-api-buffer'."
 	results-list))))
 
 (defun delicious-do-search-hash (search-string key)
-  "Return a hash table of matches from `delicious-api-buffer' for SEARCH-STRING. 
-KEY is either 1 or 2. If it is 1, then the hash key will be the match for the first
-field in the search string. If it is 2, then the key will be the match for the second
-field."
+  "Return a hash table of occurrences in `delicious-api-buffer' of SEARCH-STRING.  KEY is either 1 or 2. If it is 1, then the hash key will be the match for the first field in the search string.  If it is 2, then the key will be the match for the second field."
   (save-excursion
     (with-current-buffer delicious-api-buffer
       (goto-char (point-min))
@@ -363,3 +353,5 @@ field."
   (message "%s" delicious-api-version))
 
 (provide 'delicioapi)
+
+;;; delicioapi.el ends here

@@ -1,3 +1,15 @@
+2004-12-22  John Sullivan  <john@wjsullivan.net>
+
+	* README (Keywords): Added note about required fields.
+
+	* delicious.el: Made fixes to pass M-x checkdoc.
+	(delicious-read-url): Added check to make sure that something is
+	actually entered, because URL is a required field.
+	(delicious-read-description): Added check to make sure that
+	something is actually entered, because DESCRIPTION is a required field.
+
+	* delicioapi.el: Made fixes to pass M-x checkdoc.
+
 2004-12-20  John Sullivan  <john@wjsullivan.net>
 
 	* README (Version): Added date to version line.

@@ -117,6 +117,9 @@ two things are true, it will scan the current buffer for a URL. It will suggest
 the first one that it finds. If it doesn't find one, it will just put an
 "http://" in the input line for you.
 
+URL is a required field. If you try to enter a blank URL, the program will
+abort. 
+
 When prompted for tags, enter one at a time, hitting enter after each. You have
 tab-completion available in typical Emacs style, based on all of the tags you
 have used in the past. When you are done entering tags, just hit enter at the
@@ -127,6 +130,9 @@ are in a w3m-el buffer, delicious-el will suggest the title of the page being
 viewed as a description. If you are looking at an article in gnus, it will
 suggest the title of the article as a description. If you like the suggestion,
 hit enter. If you don't, just erase it and type your own.
+
+The server requires some kind of description be entered. If you don't enter
+one, the program will abort. 
 
 Extended Description is the next field, and it's all up to you. No guessing
 attempts are made here.
