@@ -43,7 +43,6 @@
 ;; Notes to myself
 
 ;; (format-time-string "%C%y-%m-%dT%H:%M:%SZ")))
-;; break url into function, try to guess by w3m current page
 ;; add offline caching of requests so that they can be dumped all at once
 ;; write a function to post a buffer full of urls
 ;; write something that lets you edit an entry, probably by deleting the old version and posting the new version
@@ -59,11 +58,11 @@
   ;; figure out how to get right time-string format
   "Post a url to your del.icio.us account with arguments URL, DESCRIPTION, TAGS, EXTENDED, and TIME."
   (interactive (list 
-                (read-string "(Required) URL: " (delicious-guess-url))
-                (read-string "(Required) Description: " (delicious-guess-description))
+                (delicious-read-url)
+                (delicious-read-description)
                 (delicious-complete-tags)
-                (read-string "(Optional) Extended Description: ")
-                (read-string "(Optional) Date/Time: ")))
+                (delicious-read-extended-description)
+                (delicious-read-time-string)))
   (if (null (delicious-duplicate-url-p url))
       (progn
         (message "Waiting for server.")
@@ -71,6 +70,23 @@
 	(add-to-list 'delicious-posted-urls url)
         (message "URL posted."))
     (message "URL not posted: Duplicate.")))
+
+(defun delicious-read-time-string ()
+  "Read a date string from a prompt and format it properly for the server.
+The server uses the current date and time by default."
+  (read-string "(Optional) Date/Time [yyyy-mm-ddThh:mm:ssZ]: "))
+
+(defun delicious-read-url ()
+  "Read a url from a prompt, suggesting an appropriate default."
+  (read-string "(Required) URL: " (delicious-guess-url)))
+ 
+(defun delicious-read-description ()
+  "Read a description from a prompt, suggesting an appropriate default."
+  (read-string "(Required) Description: " (delicious-guess-description)))
+
+(defun delicious-read-extended-description ()
+  "Read an extended description from a prompt."
+  (read-string "(Optional) Extended Description: "))
 
 (defun delicious-duplicate-url-p (url)
   "Check to see if url is a duplicate with an already posted url."
