@@ -1,5 +1,10 @@
 2005-01-10  John Sullivan  <john@wjsullivan.net>
 
+	* delicioapi.el (delicious-api-html-uri): Fixed logic so that
+	we're not sending "nil" as an argument to the server for any of
+	the parameters anymore. This needs more cleaning up, and can be
+	done much more efficiently.
+
 	* README (delicious-w3m-bookmark-recent): Documented new function.
 
 	* delicious.el (delicious-w3m-html): Made count require a number.
