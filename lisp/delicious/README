@@ -292,7 +292,8 @@ now. So far, I've implemented these features:
    on recent posts. You tell it how many posts to scan, what tag (or tag
    intersection like "foo+bar" to filter by, and what w3m bookmark section to
    put the posts in. It will deposit the matching posts in that section,
-   without checking for duplicates or making any effort at synching (yet).
+   without checking for duplicates or making any effort at synching (yet). Note
+   that you need to have the `w3m-bookmarks.el' library loaded to use this feature.
 
 * Problems
 
