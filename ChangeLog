@@ -2,6 +2,8 @@
 
 	* delicious.el (delicious-load-posts-file): Fixed a problem that
 	was preventing save-excursion from working. 
+	(delicious-get-posts-from-stored): Filters stored posts by
+	tag. Date is not yet working. 
 
 	* readme: Documented `delicious-load-posts' and
 	`delicious-save-posts'.

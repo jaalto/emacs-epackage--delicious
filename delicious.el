@@ -476,9 +476,25 @@ Display the results in *delicious search results*."
         (insert-file-contents file)
         (setq delicious-posts-list (read (buffer-string))))))
   (message "Done reading posts."))
+
+(defun delicious-get-posts-from-stored (&optional tag date)
+  "Return a list of posts filtered by TAG."
+;;  on a given DATE.
+;; If no date is supplied, the most recent date with posts will be used.
+;; The list is HREF, DESCRIPTION, EXTENDED, HASH, TAG, and TIME.
+  (let ((matches '()))
+    (mapc (lambda (post)
+            (if (member tag (split-string (cdr (assoc "tag" post))))
+                (add-to-list 'matches post)))
+          delicious-posts-list)
+    matches))
+
+
+;; added function delicious-get-posts-from-stored to search posts offline by tag
+          
   
 (provide 'delicious)
-
+         
 ;;; delicious.el ends here
 
 
