@@ -4,7 +4,7 @@
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;; Created 25 October 2004
-;; Version: 0.2 2005-02-05
+;; Version: 0.2 2005-02-06
 ;; Keywords: comm, hypermedia
 
 ;; This program is free software; you can redistribute it and/or
@@ -45,14 +45,39 @@
 (require 'delicioapi)
 
 (defface delicious-result-link-face 
-  '((t (:underline t :foreground "yellow")))
+  '((t (:underline t :foreground "DeepSkyBlue1")))
     "Face for links in search results."
     :group 'delicious)
+
+(defface delicious-result-description-face 
+  '((t (:foreground "SeaGreen2")))
+    "Face for links in search results."
+    :group 'delicious)
+
+(defface delicious-result-extended-face 
+  '((t (:foreground "SeaGreen3")))
+    "Face for links in search results."
+    :group 'delicious)
+
+(defface delicious-result-hash-face
+  '((t (:foreground "DodgerBlue4")))
+  "Face for the hash in search results."
+  :group 'delicious)
+
+(defface delicious-result-tag-face 
+  '((t (:foreground "LightCoral")))
+    "Face for links in search results."
+    :group 'delicious)
+
+(defface delicious-result-time-face
+  '((t (:foreground "DodgerBlue4")))
+  "Face for timestamp in search results."
+  :group 'delicious)
 
 (defvar delicious-posted-urls '()
   "A running list of urls that have been posted since the last update of the list from the delicious server.")
 
-(defconst delicious-version  "delicious.el/0.2 2005-02-05"
+(defconst delicious-version  "delicious.el/0.2 2005-02-06"
   "The version string for this copy of delicious.el.")
 
 (defun delicious-post (url description &optional tags extended time)
@@ -84,13 +109,15 @@ The server uses the current date and time by default."
 
 (defun delicious-read-url ()
   "Read a url from a prompt, suggesting an appropriate default.  Check the input to make sure it is valid and react if it is a duplicate."
-  (let ((url (delicious-check-input (read-string "(Required) URL: " (delicious-guess-url)) "URL")))
+  (let ((url (delicious-check-input 
+              (read-string "(Required) URL: " (delicious-guess-url)) "URL")))
     (delicious-duplicate-url-p url)
     url))
 
 (defun delicious-read-description ()
   "Read a description from a prompt, suggesting an appropriate default."
-  (delicious-check-input (read-string "(Required) Description: " (delicious-guess-description)) "Description"))
+  (delicious-check-input 
+   (read-string "(Required) Description: " (delicious-guess-description)) "Description"))
 
 (defun delicious-check-input (input &optional name)
   "Verify that INPUT has content.  NAME is the name of the field being checked."
@@ -104,9 +131,7 @@ The server uses the current date and time by default."
 
 (defun delicious-duplicate-url-p (url)
   "Check to see if URL is a duplicate."
-  (unless (and (boundp 'delicious-posts-list)
-               (not (null delicious-posts-list)))
-    (delicious-build-posts-list))
+  (delicious-build-posts-list-maybe)
   (if (or (assoc `(href . ,url) delicious-posts-list)
           (assoc `(href . ,url) delicious-posted-urls))
       (progn (let ((edit
@@ -206,7 +231,8 @@ The server uses the current date and time by default."
   "Visit the HTML feed page, in a new-session if a prefix is used, for the del.icio.us USERNAME showing COUNT most recent posts under TAG."
   (interactive "sUsername (RET for yours): \nnNumber of posts (RET for 15): \nsTag (RET for all): ")
   (w3m-browse-url 
-   (format "http://%s%s%s" delicious-api-host delicious-api-html (delicious-api-html-uri username tag count))
+   (format "http://%s%s%s" delicious-api-host delicious-api-html 
+           (delicious-api-html-uri username tag count))
    (not (null current-prefix-arg))))
 
 (defun delicious-w3m-bookmark-recent (count tag section)
@@ -256,24 +282,126 @@ The server uses the current date and time by default."
   (let* ((completions (w3m-bookmark-sections)))
     (completing-read "Section to export (required): " completions nil t)))
 
+(define-minor-mode delicious-search-mode
+  "Toggle Delicious Search mode.
+With no argument, this command toggles the mode.
+Non-null prefix argument turns on the mode.
+Null prefix argument turns off the mode.
+
+When Delicious Search mode is enabled, the tab key 
+advances to the next search result."
+  nil
+  " Delicious Search"
+  '([tab] . delicious-search-next-result))
+
+(defun delicious-search-next-result ()
+  "Goto the next search result in a delicious search results list."
+  (interactive)
+  (if (thing-at-point-url-at-point)
+      (goto-char (match-end 0)))
+  (let ((last-match (match-beginning 0)))
+    (re-search-forward thing-at-point-url-regexp nil t)
+    (if (equal (match-beginning 0) last-match)
+        (goto-char (point-min))
+      (goto-char (match-beginning 0)))))
+
 (defun delicious-search-posts-regexp (search-string)
-  "Search DELICIOUS-POSTS-LIST for SEARCH-STRING, a regular expression, and display the results in *delicious search results*."
+  "Search DELICIOUS-POSTS-LIST for SEARCH-STRING, a regular expression.
+Display the results in *delicious search results*."
   (interactive "sEnter regexp search string: ")
-  (unless (and (boundp 'delicious-posts-list)
-               (not (null delicious-posts-list)))
-    (delicious-build-posts-list))  
+  (delicious-build-posts-list-maybe)
   (switch-to-buffer-other-window (get-buffer-create "*delicious search results*"))
+  (delicious-search-mode 1)
   (delete-region (point-min) (point-max))
   (loop for post in delicious-posts-list
         for match = (loop for field in post
                           when (string-match search-string (cdr field)) return post)
-        if match do (loop for field in post
-                          if (string-match thing-at-point-url-regexp (cdr field))
-                              do (insert (propertize (cdr field) 
-                                                     'face 'delicious-result-link-face) "\n")
-                          else do (insert (cdr field) "\n")
-                          finally do (insert "\n"))))
+        if match do (delicious-search-insert-match post))
+  (goto-char (point-min)))
+
+(defun delicious-search-description-regexp (search-string)
+  "Search the descriptions in DELICIOUS-POSTS-LIST for SEARCH-STRING, a regular expression.
+Display the results in *delicious search results*."
+  (interactive "sEnter regexp search string: ")
+  (delicious-build-posts-list-maybe)
+  (switch-to-buffer-other-window (get-buffer-create "*delicious search results*"))
+  (delicious-search-mode 1)
+  (delete-region (point-min) (point-max))
+  (loop for post in delicious-posts-list
+        for match = (loop for field in post
+                          if (equal (car field) "description")
+                             when (string-match search-string (cdr field)) return post)
+        if match do (delicious-search-insert-match post))
+  (goto-char (point-min)))
+
+(defun delicious-search-tags-regexp (search-string)
+  "Search the tags in DELICIOUS-POSTS-LIST for SEARCH-STRING, a regular expression.
+Display the results in *delicious search results*."
+  (interactive "sEnter regexp search string: ")
+  (delicious-build-posts-list-maybe)
+  (switch-to-buffer-other-window (get-buffer-create "*delicious search results*"))
+  (delicious-search-mode 1)
+  (delete-region (point-min) (point-max))
+  (loop for post in delicious-posts-list
+        for match = (loop for field in post
+                          if (equal (car field) "tag")
+                              when (string-match search-string (cdr field)) return post)
+        if match do (delicious-search-insert-match post))
+  (goto-char (point-min)))
+
+(defun delicious-search-tags (tags)
+  "Display all posts with TAGS."
+  (interactive (list (delicious-complete-tags t)))
+  (delicious-build-posts-list-maybe)
+  (switch-to-buffer-other-window (get-buffer-create "*delicious search results*"))
+  (delicious-search-mode 1)
+  (delete-region (point-min) (point-max))
+  (let ((tags (split-string tags " ")))
+    (loop for post in delicious-posts-list
+          for match = (loop for tag in tags
+                            with post-tags = (cdr (assoc "tag" post))
+                            unless (string-match tag post-tags)
+                            return 1)
+          unless match do (delicious-search-insert-match post)))
+  (goto-char (point-min)))
+                 
+(defun delicious-search-insert-match (post)
+  "Insert POST with the fields propertized."
+  (loop for field in post
+        if (equal (car field) "href")
+            do (insert (propertize (cdr field) 
+                                   'face 'delicious-result-link-face) "\n")
+            else if (equal (car field) "description")
+                do (insert (propertize 
+                            (cdr field)
+                            'face 'delicious-result-description-face) "\n")
+            else if (equal (car field) "extended")
+                do (insert (propertize
+                            (cdr field)
+                            'face 'delicious-result-extended-face) "\n")
+            else if (equal (car field) "hash")
+                do (insert (propertize
+                            (cdr field)
+                            'face 'delicious-result-hash-face) "\n")
+            else if (equal (car field) "tag")
+                do (insert (propertize
+                            (cdr field)
+                            'face 'delicious-result-tag-face) "\n")
+            else if (equal (car field) "time")
+                do (insert (propertize
+                            (cdr field)
+                            'face 'delicious-result-time-face) "\n")
+            else do (insert (cdr field) "\n")
+        finally do (insert "\n")))
+
+(defun delicious-build-posts-list-maybe ()
+  "Do the inital load of DELICIOUS-POSTS-LIST if needed."
+  (unless (and (boundp 'delicious-posts-list)
+               (not (null delicious-posts-list)))
+    (delicious-build-posts-list)))
 
 (provide 'delicious)
 
 ;;; delicious.el ends here
+
+
