@@ -123,7 +123,9 @@ abort.
 When prompted for tags, enter one at a time, hitting enter after each. You have
 tab-completion available in typical Emacs style, based on all of the tags you
 have used in the past. When you are done entering tags, just hit enter at the
-prompt. 
+prompt. delicious-el will suggest possible tags above the prompt. Suggestions
+currently are just a list of words that appear both in your current buffer and
+in your tags list.
 
 delicious-el will attempt to guess an appropriate description. If you
 are in a w3m-el buffer, delicious-el will suggest the title of the page being

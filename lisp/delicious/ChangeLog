@@ -1,10 +1,18 @@
 2004-12-23  John Sullivan  <john@wjsullivan.net>
 
+	* README (Keywords): Added description of tag suggesting.
+
 	* delicious.el (delicious-read-url): Moved duplicate checking so
 	that it occurs immediately after the URL prompt. 
 	(delicious-duplicate-url-p): Changed behavior to throw error if
 	duplicate is not desired.
 	(delicious-post): Removed duplicate checking from this stage.
+	(delicious-suggest-tags): Function which suggests tags to use
+	above the prompt. Currently, suggestions are just based on overlap
+	between words in the buffer and words in your tags list.
+	(delicious-buffer-words): Function which breaks the buffer into a
+	list of unique words. Used to suggest tags.
+	(delicious-complete-tags): Added line to suggest tags above the prompt.
 
 2004-12-22  John Sullivan  <john@wjsullivan.net>
 

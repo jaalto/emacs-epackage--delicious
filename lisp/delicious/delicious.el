@@ -4,7 +4,7 @@
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;; Created 25 October 2004
-;; Version: 0.1 2004-12-22
+;; Version: 0.1 2004-12-23
 ;; Keywords: comm, hypermedia
 
 ;; This program is free software; you can redistribute it and/or
@@ -120,15 +120,40 @@ The server uses the current date and time by default."
   (unless (and (boundp 'delicious-tags-list)
                (not (null delicious-tags-list)))
     (delicious-build-tags-list))
-  (loop for tag = (completing-read
-                   (format "Tags so far: %s\n(Optional. Enter one at a time, blank to end.) Tag: " tags)
-                   delicious-tags-list)
-        until (equal tag "")
-        collect tag into tags
-        finally return (progn
-	         (add-to-list 'delicious-tags-local tags)
-                         (message "%s" tags)
-                         (mapconcat 'identity tags " "))))
+  (loop with suggested-tags = (delicious-suggest-tags)
+	for tag = (completing-read
+		   (format "Suggested Tags: %s\nTags so far: %s\n(Optional. Enter one at a time, blank to end.) Tag: " suggested-tags tags)
+		   delicious-tags-list)
+	until (equal tag "")
+	collect tag into tags
+	finally return (progn
+			 (add-to-list 'delicious-tags-local tags)
+			 (message "%s" tags)
+			 (mapconcat 'identity tags " "))))
+
+(defun delicious-suggest-tags ()
+  "Suggest tags based on the intersection of the contents of the current buffer and the current list of tags."
+  (let ((buffer-words (delicious-buffer-words))
+	(tags (loop for cell in delicious-tags-list
+		    collect (car cell) into tags
+		    finally return tags)))
+    (loop for word in buffer-words
+	  if (member word tags)
+	  collect word into shared
+	  finally return shared)))
+  
+(defun delicious-buffer-words ()
+  "Break the current buffer into a list of unique words."
+  (save-excursion
+    (goto-char (point-min))
+    (loop until (eobp)
+	  with words = '()
+	  for word = (current-word)
+	  if (not (member word words))
+  	    collect word into words
+            end
+	  do (forward-word 1)
+	  finally return words)))
 
 (defun delicious-build-tags-list ()
   "Refresh or build the tags table for use in completion."

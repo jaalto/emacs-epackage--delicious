@@ -4,7 +4,7 @@
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;; Created 25 October 2004
-;; Version: 0.1 2004-12-22
+;; Version: 0.1 2004-12-23
 ;; Keywords: comm, hypermedia
 
 ;; This program is free software; you can redistribute it and/or
