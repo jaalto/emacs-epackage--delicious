@@ -1,5 +1,10 @@
 2005-02-08  John Sullivan  <john@wjsullivan.net>
 
+	* delicious.el (delicious-search-mode-map): Moved keymap out of
+	delicious-search-mode macro and into its own variable.
+	(delicious-search-mode): Moved keymap to
+	delicious-search-mode-map.
+
 	* README: Added note about dependency on external url.el, not
 	distributed with delicious-el.
 

@@ -282,6 +282,12 @@ The server uses the current date and time by default."
   (let* ((completions (w3m-bookmark-sections)))
     (completing-read "Section to export (required): " completions nil t)))
 
+(defvar delicious-search-mode-map
+   (let ((map (make-sparse-keymap)))
+     (define-key map [tab] 'delicious-search-next-result)
+     map)
+   "Keymap for `delicious-search-mode'.")
+
 (define-minor-mode delicious-search-mode
   "Toggle Delicious Search mode.
 With no argument, this command toggles the mode.
@@ -292,7 +298,7 @@ When Delicious Search mode is enabled, the tab key
 advances to the next search result."
   nil
   " Delicious Search"
-  '(([tab] . delicious-search-next-result)))
+  delicious-search-mode-map)
 
 (defun delicious-search-next-result ()
   "Goto the next search result in a delicious search results list."
