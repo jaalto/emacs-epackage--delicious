@@ -305,6 +305,17 @@ advances to the next search result."
         (goto-char (point-min))
       (goto-char (match-beginning 0)))))
 
+(defun delicious-search-previous-result ()
+  "Goto the previous search result in a delicious search results list."
+  (interactive)
+  (if (thing-at-point-url-at-point)
+      (goto-char (match-beginning 0)))
+  (let ((last-match (match-beginning 0)))
+    (re-search-backward thing-at-point-url-regexp nil t)
+    (if (equal (match-beginning 0) last-match)
+        (goto-char (point-max))
+      (goto-char (match-beginning 0)))))
+
 (defun delicious-search-posts-regexp (search-string)
   "Search DELICIOUS-POSTS-LIST for SEARCH-STRING, a regular expression.
 Display the results in *delicious search results*."
@@ -392,10 +403,10 @@ Display the results in *delicious search results*."
   "Take care of post-search issues."
   (with-current-buffer "*delicious search results*"
     (goto-char (point-min))
-    (delicious-search-mode 1)
     (insert (format "Your search for \"%s\" returned %d results.\n\n" 
                     search-string matches)) 
-    (view-mode 1)))
+    (view-mode 1)
+    (delicious-search-mode 1)))
 
 (defun delicious-search-insert-match (post)
   "Insert POST with the fields propertized."

@@ -36,6 +36,10 @@ worldwide, without royalty, in any medium, provided this notice is preserved.
 - README
 - COPYING
 
+* Dependencies not included
+
+- url.el
+
 * Overview
 
 This is a complete set of functions for interacting with <http://del.icio.us>,
@@ -44,7 +48,7 @@ a "social bookmarking" project written and maintained by Joshua Shachter.
 'delicioapi.el' contains the back-end functions that interact with the API,
 behind the scenes. I have kept these in a separate file to make them available
 for others to use in writing their own delicious applications, without being
-required to load the commands that I have written.
+required to load the commands that I have written. 
 
 'delicious.el' contains the front-end interactive functions and commands for
 putting the API functions to productive use, via Emacs. 'delicioapi.el' must be
