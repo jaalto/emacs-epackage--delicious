@@ -4,7 +4,7 @@
 
 Author: John Sullivan <john@wjsullivan.net>
 Created 25 October 2004
-Version: 0.1 2005-01-10
+Version: 0.1 2005-01-14
 Keywords: comm, hypermedia
 
 This program is free software; you can redistribute it and/or modify it under
@@ -294,6 +294,24 @@ now. So far, I've implemented these features:
    put the posts in. It will deposit the matching posts in that section,
    without checking for duplicates or making any effort at synching (yet). Note
    that you need to have the `w3m-bookmarks.el' library loaded to use this feature.
+
+-- delicious-w3m-export. This is an interactive command that will export a w3m
+   bookmark section to del.icio.us. It's very primitive and not 100% reliable
+   at the moment. You can export one section at a time. When prompted for the
+   section name, <tab> will complete based on your existing sections. You can
+   then enter tags just like you do when you post. These tags will all be
+   assigned to each entry in the w3m section. You must enter at least one
+   tag. After that, you can enter an optional extended description and time
+   parameter, which will be attached to all of the posts from this section. I
+   say it's not 100% reliable because a few times I've had some posts not show
+   up, and I haven't figured out why yet. Also, this command may not behave if
+   your `w3m-bookmark-section-format' is not something close to
+   "<h2>%s</h2>\n<ul>\n<li><a href=\"%s\">%s</a>\n<!--End of section (do not
+   delete this comment)-->\n</ul>\n". It _should_ work as long as the section
+   titles are enclosed in "<h2></h2>", each bookmark begins with <li>, and each
+   bookmark only occupies one line. Future versions may be more flexible in
+   this regard and will do verification of your posts. You need to have the
+   `w3m-bookmarks.el' library loaded to use this feature.
 
 * Problems
 
