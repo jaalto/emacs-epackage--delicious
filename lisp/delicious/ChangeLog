@@ -1,3 +1,24 @@
+2004-12-25  John Sullivan  <john@wjsullivan.net>
+
+	* delicioapi.el (delicious-api-build-html-request): Added separate
+	function to handle fetching HTML feed requests, because these
+	requests use a different address.
+	(General): Tried to fix whitespace and indentation issues.
+	(delicious-api-html): New variable to hold URL path for del.icio.us
+	HTML feed.
+
+	* README (Commands): Added description of M-x
+	delicious-build-tags-list.
+	(Commands): Added description of M-x delicious-build-posts-list.
+	(Advanced use): Remove outdated section about refreshing.
+
+	* delicious.el: Remove extraneous comments about to-do items.
+	(delicious-duplicate-url-p): Broke post server refresh out into
+	separate function. Removed extraneous comment.
+	(delicious-build-posts-list): New interactive function. Refresh
+	the list of posts from the server. Mainly used for duplicate
+	checking.
+	
 2004-12-24  John Sullivan  <john@wjsullivan.net>
 
 	* delicious.el (delicious-suggest-tags): When comparing buffer

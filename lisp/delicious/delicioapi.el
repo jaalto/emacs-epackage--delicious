@@ -4,7 +4,7 @@
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;; Created 25 October 2004
-;; Version: 0.1 2004-12-24
+;; Version: 0.1 2004-12-25
 ;; Keywords: comm, hypermedia
 
 ;; This program is free software; you can redistribute it and/or
@@ -67,7 +67,10 @@
 (defvar delicious-api "/api/"
   "*The path to the del.ici.ous api.  It should begin and end in a slash.")
 
-(defconst delicious-api-version "delicious.el/0.1 2004-12-24"
+(defvar delicious-api-html "/html/"
+  "*The path to the del.icio.us HTML feed.  It should begin and end with a slash.")
+
+(defconst delicious-api-version "delicious.el/0.1 2004-12-25"
   "The version string for this copy of delicious-api.el.")
 
 (defconst delicious-api-field-match "=\"\\(.*?\\)\""
@@ -233,35 +236,56 @@ TAG is a tag to filter by.  The dates are the keys."
 ;; Note that I allow TAGS to be nil or nonnil, but the server has to
 ;; have a "yes" or a "no" sent to it.
 
-(defun delicious-api-html (&optional tagname count extended divclass
-				     aclass tags tagclass tagsep
-				     tagsepclass bullet rssbutton
-				     extendeddiv extendedclass)
+(defun delicious-api-html (&optional username tagname count extended divclass aclass tags tagclass tagsep tagsepclass bullet rssbutton extendeddiv extendedclass)
   "Get results formatted in HTML, according to a long list of options.
-If TAGNAME is nil, then results from all of the user's tags will be
-used.  If TAGNMAE is passed, only posts under that tag will be
-considered.
+USERNAME is the name of the user whose links you want to fetch. If you don't
+specify a name, `delicious-api-user' will be used.  If TAGNAME is nil, then
+results from all of the user's tags will be used.  If TAGNAME is passed, only
+posts under that tag will be considered. COUNT is the number of items to show.
+It defaults to 15 at the server.  EXTENDED is either 'title' or 'body'.  It
+defaults to 'title'.  DIVCLASS is the name of the CSS class to use for the div
+elements.  It defaults to 'delPost'.  ACLASS is the CSS class to use for the
+link elements.  It defaults to 'delLink'.  If TAGS is non-nil, don't show tags.
+If it is nil, do.  The server default is 'yes'.  TAGCLASS is the CSS class to
+use for tags.  It defaults to 'delTag'.  TAGSEP is the string to use for the
+separator.  If it is nil, use '/'.  TAGSEPCLASS is the CSS class to use for the
+separator.  If it is nil, use 'delTagSep'.  BULLET is the HTML entity to use
+for the bullets.  Default is nil, which means no bullet.  'raquo' is a sample
+alternative value, which is also the default for the server.  If RSSBUTTON is
+nil, add an RSS feed button using CSS.  It it is non-nil, don't add an RSS feed
+button.  EXTENDEDDIV is an extended entry in its own div.  If it is nil, don't
+use it.  If it is non-nil, do something.  EXTENDEDCLASS is a CSS class to use
+for EXTENDEDDIV."
+  (let* ((user (or username delicious-api-user))
+         (uri (concat (format "%s/?" user)
+                      (if (not (null tagname))
+                          (format "%s?" tagname))
+                      (if (not (null count))
+                          (format "count=%s&" count))
+                      (if (not (null extended))
+                          (format "extended=%s&") extended)
+                      (if (not (null divclass))
+                          (format "aclass=%s&") aclass)
+                      (if (not (null tags))
+                          (format "tags=%s&") tags)
+                      (if (not (null tagclass))
+                          (format "tagsep=%s&") tagclass)
+                      (if (not (null tagsepclass))
+                          (format "tagsepclass=%s&" tagsepclass))
+                      (if (not (null bullet))
+                          (format "bullet=%s&" bullet))
+                      (if (not (null rssbutton))
+                          (format "rssbutton=%s&" rssbutton))
+                      (if (not (null extendeddiv))
+                          (format "extendedclass=%s&" extendedclass)))
+              (substring uri 0 -1))) 
+    (delicious-send-request (delicious-api-build-html-request uri))))
 
-COUNT is the number of items to show.  It defaults to 15.
-EXTENDED is either 'title' or 'body'.  It defaults to 'title'.
-DIVCLASS is the name of the CSS class to use for the div elements.  It
-defaults to 'delPost'.
-ACLASS is the CSS class to use for the link elements.  It defaults to
-'delLink'.
-If TAGS is non-nil, don't show tags.  If it is nil, do.  The server
-default is 'yes'.
-TAGCLASS is the CSS class to use for tags.  It defaults to 'delTag'.
-TAGSEP is the string to use for the separator.  If it is nil, use '/'.
-TAGSEPCLASS is the CSS class to use for the separator.  If it is nil,
-use 'delTagSep'.
-BULLET is the HTML entity to use for the bullets.  Default is nil,
-which means no bullet.  'raquo' is a sample alternative value, which is
-also the default for the server.
-If RSSBUTTON is nil, add an RSS feed button using CSS.  It it is
-non-nil, don't add an RSS feed button.
-EXTENDEDDIV is an extended entry in its own div.  If it is nil, don't
-use it.  If it is non-nil, do something.
-EXTENDEDCLASS is a CSS class to use for EXTENDEDDIV.")
+(defun delicious-api-build-html-request (uri)
+  "Return the proper HTTP request to get URI from the HTML feed."
+  (let* ((uri (format "http://%s%s%s" delicious-api-host delicious-api-html uri)))
+    (format "GET %s HTTP/1.0\nFrom: %s\nUser-Agent: %s\nAuthorization: Basic %s\n\n"
+            uri delicious-api-from delicious-api-user-agent (delicious-auth))))
 
 (defun delicious-api-build-tag-completion ()
   "Return a numbered list of current tags, to use in tab completion."
@@ -269,42 +293,43 @@ EXTENDEDCLASS is a CSS class to use for EXTENDEDDIV.")
 	(tags-list '())
 	(counter 1))
     (maphash '(lambda (key value)
-		(setq tags-list (cons (list key counter) tags-list))
-		(setq counter (1+ counter)))
-	     tags-hash)
+                (setq tags-list (cons (list key counter) tags-list))
+                (setq counter (1+ counter)))
+             tags-hash)
     (reverse tags-list)))
 
 (defun delicious-build-request (uri)
   "Return the proper HTTP request to get URI."
   (let* ((uri (format "http://%s%s%s" delicious-api-host delicious-api uri)))
     (format "GET %s HTTP/1.0\nFrom: %s\nUser-Agent: %s\nAuthorization: Basic %s\n\n"
-	    uri delicious-api-from delicious-api-user-agent (delicious-auth))))
+            uri delicious-api-from delicious-api-user-agent (delicious-auth))))
 
 (defun delicious-send-request (request)
   "Send the REQUEST to the server.  Wait for success, HTTP error, or timeout.
 Output goes to `delicious-api-buffer'."
   (let ((error-check
-	 (catch 'error
-	   (unless (null (get-buffer delicious-api-buffer))
-	     (kill-buffer delicious-api-buffer))
-	   (open-network-stream "delicious" delicious-api-buffer delicious-api-host "http")
-	   (process-send-string "delicious" request)
-	   (with-current-buffer delicious-api-buffer
-	     (let ((proc (get-process "delicious")))
-	       (setq time-out (run-with-timer delicious-api-timeout nil '(lambda () (throw 'error "timeout"))))
-	       (while (save-excursion
-			(and (memq (process-status proc) '(open run))
-			     (not (re-search-forward delicious-api-success-match nil t))))
-		 (save-excursion
-		   (if (re-search-forward delicious-api-error-match nil t)
-		       (throw 'error (match-string 1))))
-		 (accept-process-output proc))))
-	   (cancel-timer time-out))))
+         (catch 'error
+           (unless (null (get-buffer delicious-api-buffer))
+             (kill-buffer delicious-api-buffer))
+           (open-network-stream "delicious" delicious-api-buffer delicious-api-host "http")
+           (process-send-string "delicious" request)
+           (with-current-buffer delicious-api-buffer
+             (let ((proc (get-process "delicious")))
+               (setq time-out (run-with-timer delicious-api-timeout nil 
+                                              '(lambda () (throw 'error "timeout"))))
+               (while (save-excursion
+                        (and (memq (process-status proc) '(open run))
+                             (not (re-search-forward delicious-api-success-match nil t))))
+                 (save-excursion
+                   (if (re-search-forward delicious-api-error-match nil t)
+                       (throw 'error (match-string 1))))
+                 (accept-process-output proc))))
+           (cancel-timer time-out))))
     (cond ((equal error-check "timeout")
-	   (error "Timed out waiting for response.  Your transaction may still occur, though")
-	   (kill-process (get-process "delicious")))
-	  (error-check
-	   (error error-check)))))
+           (error "Timed out waiting for response.  Your transaction may still occur, though")
+           (kill-process (get-process "delicious")))
+          (error-check
+           (error error-check)))))
 	   
 (defun delicious-build-search (&rest fields)
   "Given list FIELDS, return a list with CAR as the search-string and CDR the number of search fields."

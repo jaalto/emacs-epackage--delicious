@@ -4,7 +4,7 @@
 
 Author: John Sullivan <john@wjsullivan.net>
 Created 25 October 2004
-Version: 0.1 2004-12-20
+Version: 0.1 2004-12-25
 Keywords: comm, hypermedia
 
 This program is free software; you can redistribute it and/or modify it under
@@ -99,8 +99,6 @@ your web site. In order to respect that, this program does a number of things
 
 * Commands to Use and What to Expect
 
-There is really only one useful command at the moment. 
-
 - M-x delicious-post
 
 This is the command to post a URL to your del.icio.us account. The first time
@@ -148,6 +146,27 @@ have to be included.
 Once you enter the Date/Time and hit enter, the URL should be posted to the
 server!
 
+- M-x delicious-build-posts-list
+
+This command will refresh the local list of your posts from the server. You
+shouldn't use this often. The reason posts are cached locally is to avoid
+bothering the server too much. There isn't much reason to use this command,
+because a separate list of posts made during your current session is
+maintained, and is used for duplicate-checking. But if you suspect that
+something has gone wrong, you can use this command to refresh from the server.
+
+- M-x delicious-build-tags-list
+
+This command will refresh the local list of the tags you have used from the
+server. You shouldn't use this often, because the reason tags are cached
+locally is to avoid bothering the server too much. But it might be useful if
+you have had the same Emacs session open for a while, because normally the tags
+list is only fetched once, the first time you make a post. The tags list is
+used to enable tag completion for your new posts, and if you haven't fetched
+the list in a while, then tag completion won't be able to complete based on
+your more recent entries. Future versions of this program will include an
+improved cacheing mechanism that will make this command much less relevant. 
+
 * Advanced use
 
 - Binding commands to keys
@@ -155,27 +174,6 @@ server!
 The author uses this in his `.emacs' to bind `delicious-post' to <C-c p>. 
 
 (global-set-key "\C-cp" 'delicious-post)
-
-- Refreshing information from the server
-
-In order to minimize calls to the server, this program will only fetch your
-list of tags (for use in tag completion) and your list of posts (for duplicate
-checking) once, the first time you use the delicious-post function. If you
-really want to force a refresh of your tags list and posts list so that newer
-tags are available for completion, evaluate:
-
-(setq delicious-tags-list nil)
-
-and/or:
-
-(setq delicious-posts-list nil)
-
-You should only do this if you have had your Emacs session open for a few hours
-or more. Otherwise you are placing an unreasonable burden on the server. There
-isn't much reason to refresh your post list anyway, because a list of new posts
-is maintained locally for purposes of duplicate checking. Future improvements
-will do this for tags as well. After setting these two variables to nil, the
-next time you do `M-x delicious-post', both lists will be refreshed.
 
 * Problems
 

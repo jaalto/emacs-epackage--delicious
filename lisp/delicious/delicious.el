@@ -4,7 +4,7 @@
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;; Created 25 October 2004
-;; Version: 0.1 2004-12-24
+;; Version: 0.1 2004-12-25
 ;; Keywords: comm, hypermedia
 
 ;; This program is free software; you can redistribute it and/or
@@ -39,15 +39,6 @@
 ;; Please report any bugs or suggestions to me at
 ;; john@wjsullivan.net. If enough people are interested, perhaps we
 ;; will open an area at http://www.emacswiki.org.
-
-;; Notes to myself
-
-;; (format-time-string "%C%y-%m-%dT%H:%M:%SZ")))
-;; add offline caching of requests so that they can be dumped all at once
-;; write a function to post a buffer full of urls
-;; write something that lets you edit an entry, probably by deleting the old version and posting the new version
-;; I complained before about the BBDB entry system that uses the minibuffer. Should I have at least an option
-;;  for a form-based entry system in a pop-up window?
 
 ;;; Code:
 
@@ -99,20 +90,15 @@ The server uses the current date and time by default."
   "Check to see if URL is a duplicate."
   (unless (and (boundp 'delicious-posts-list)
                (not (null delicious-posts-list)))
-    (message "Refreshing delicious post list from server.")
-    (setq delicious-posts-list (delicious-api-get-all)
-	  delicious-posted-urls '()))
+    (delicious-build-posts-list))
   (if (or (assoc url delicious-posts-list)
 	  (member url delicious-posted-urls))
-      (progn
-	(let
-	    ((edit
-	      (y-or-n-p "This URL is a duplicate.\nIf you post it again, the old tags will be replaced by the new ones.\nPost? ")))
-	  (if (eq edit t)
-	      (setq duplicate nil)
-;	    (setq duplicate t))
-	    (error "Duplicate URL not posted"))
-	  duplicate))))
+      (progn (let ((edit
+                    (y-or-n-p "This URL is a duplicate.\nIf you post it again, the old tags will be replaced by the new ones.\nPost? ")))
+               (if (eq edit t)
+                   (setq duplicate nil)
+                 (error "Duplicate URL not posted"))
+               duplicate))))
 
 (defun delicious-complete-tags ()
   "Get tags table if needed, and do a completing read of tag input until a blank line is entered."
@@ -162,6 +148,13 @@ The server uses the current date and time by default."
   (setq delicious-tags-list (delicious-api-build-tag-completion)
         delicious-tags-local '()))
 
+(defun delicious-build-posts-list ()
+  "Refresh or build the posts list from the server for use in duplicate checking."
+  (interactive)
+  (message "Refreshing delicious posts list from server.")
+  (setq delicious-posts-list (delicious-api-get-all)
+        delicious-posted-urls '()))
+
 (defun delicious-guess-description ()
   "Try some different things to get a default description."
   (or
@@ -189,7 +182,7 @@ The server uses the current date and time by default."
                 else
               do (forward-char)))
       "http://"))
-
+  
 (provide 'delicious)
 
 ;;; delicious.el ends here
