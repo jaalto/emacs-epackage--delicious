@@ -4,7 +4,7 @@
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;; Created 25 October 2004
-;; Version: 0.2 2005-03-31
+;; Version: 0.2 2005-04-10
 ;; Keywords: comm, hypermedia
 
 ;; This program is free software; you can redistribute it and/or
@@ -74,7 +74,7 @@
   "Face for timestamp in search results."
   :group 'delicious)
 
-(defconst delicious-version  "delicious.el/0.2 2005-03-31"
+(defconst delicious-version  "delicious.el/0.2 2005-04-10"
   "The version string for this copy of delicious.el.")
 
 (defun delicious-post (url description &optional tags extended time)
@@ -113,7 +113,8 @@ The server uses the current date and time by default."
         time-string))))
 
 (defun delicious-read-url ()
-  "Read a url from a prompt, suggesting an appropriate default.  Check the input to make sure it is valid and react if it is a duplicate."
+  "Read a url from a prompt, suggesting an appropriate default.
+Check the input to make sure it is valid and react if it is a duplicate."
   (let ((url (delicious-check-input 
               (read-string "(Required) URL: " (delicious-guess-url)) "URL")))
     (delicious-duplicate-url-p url)
@@ -168,7 +169,7 @@ suggest any tags."
                          (mapconcat 'identity tags " "))))
 
 (defun delicious-suggest-tags ()
-  "Suggest tags based on the intersection of the contents of the current buffer and the current list of tags."
+  "Suggest tags based on the contents of the current buffer and the current list of tags."
   (let ((buffer-words (delicious-buffer-words))
         (tags (loop for cell in delicious-tags-list
                     collect (downcase (car cell)) into tags
@@ -232,7 +233,9 @@ suggest any tags."
        (aref gnus-current-headers 1))))
 
 (defun delicious-guess-url ()
-  "Try some different things to guess a url.  If we're in a w3m buffer, use the current url.  If not, use the url under point.  If not that, search through the buffer and see if there is a url to use in the buffer.  If not that, just insert http:// into the prompt."
+  "Try some different things to guess a url.  If we're in a w3m buffer, use the current url.
+If not, use the url under point.  If not that, search through the buffer and see 
+if there is a url to use in the buffer.  If not that, just insert http:// into the prompt."
   ;; if there is a prefix, maybe it should use the kill ring
   (or (if (and (boundp 'w3m-current-url)
                (not (null w3m-current-url))
@@ -250,7 +253,8 @@ suggest any tags."
       "http://"))
 
 (defun delicious-w3m-html (username count tag)
-  "Visit the HTML feed page, in a new-session if a prefix is used, for the del.icio.us USERNAME showing COUNT most recent posts under TAG."
+  "Visit the HTML page for the del.icio.us USERNAME showing COUNT most recent posts under TAG.
+With prefix, visit the page in a new w3m session."
   (interactive "sUsername (RET for yours): \nnNumber of posts (RET for 15): \nsTag (RET for all): ")
   (w3m-browse-url 
    (format "http://%s%s%s" delicious-api-host delicious-api-html 
@@ -258,7 +262,8 @@ suggest any tags."
    (not (null current-prefix-arg))))
 
 (defun delicious-w3m-bookmark-recent (count tag section)
-  "Add your COUNT recent delicious posts under TAG to your w3m bookmarks file. They will be stored under SECTION."
+  "Add your COUNT recent delicious posts under TAG to your w3m bookmarks file.
+They will be stored under SECTION."
   (interactive "nNumber of recent posts to bookmark: \nsTag to filter by: \nsw3m bookmark section to use: ")
   (let ((delicious-list (delicious-api-get-recent tag count)))
     (loop for bookmark in delicious-list
@@ -268,7 +273,8 @@ suggest any tags."
           finally do (message "w3m bookmarks updated."))))
 
 (defun delicious-w3m-export (section &optional tags extended time)
-  "Export your w3m bookmarks from SECTION to del.icio.us, assigning TAGS to each entry. Optionally enter an EXTENDED description and a TIME."
+  "Export your w3m bookmarks from SECTION to del.icio.us, assigning TAGS to each entry. 
+Optionally enter an EXTENDED description and a TIME."
   (interactive (list
                 (delicious-w3m-read-section)
                 (delicious-complete-tags t)
@@ -488,10 +494,6 @@ Display the results in *delicious search results*."
                 (add-to-list 'matches post)))
           delicious-posts-list)
     matches))
-
-
-;; added function delicious-get-posts-from-stored to search posts offline by tag
-          
   
 (provide 'delicious)
          
