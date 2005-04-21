@@ -3,6 +3,10 @@
 	* delicious.el (delicious-add-tags): Fixed to keep the tag
 	completion list updated after each post is made without having to
 	talk to the server. 
+	(delicious-complete-tags): Removed `delicious-tags-local', since
+	we no longer maintain a separate local tags list.
+	(delicious-build-tags-list): Removed `delicious-tags-local', since
+	we no longer maintain a separate local tags list.
 
 2005-04-21  John Sullivan  <john@wjsullivan.net>
 

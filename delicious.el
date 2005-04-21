@@ -164,7 +164,6 @@ suggest any tags."
         if (member tag tags) do (and (message "Duplicate tag ignored.") (sleep-for 1))
         else collect tag into tags
         finally return (progn
-                         (add-to-list 'delicious-tags-local tags)
                          (message "%s" tags)
                          (mapconcat 'identity tags " "))))
 
@@ -206,8 +205,7 @@ suggest any tags."
   "Refresh or build the tags table for use in completion."
   (interactive)
   (message "Refreshing delicious tags list from server.")
-  (setq delicious-tags-list (delicious-api-build-tag-completion)
-        delicious-tags-local '()))
+  (setq delicious-tags-list (delicious-api-build-tag-completion)))
 
 (defun delicious-add-tags (tags)
   "Add TAGS to the local copy of the tags list in DELICIOUS-TAGS-LIST."
