@@ -1,3 +1,7 @@
+2005-04-21  John Sullivan  <john@wjsullivan.net>
+
+	* planner-delicious.el: Added missing (provide).
+
 2005-04-21  johnsu01  <john@wjsullivan.net>
 
 	* delicioapi.el: Docstring fixes to pass checkdoc.

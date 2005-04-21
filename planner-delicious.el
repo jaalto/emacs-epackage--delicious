@@ -64,3 +64,5 @@ DATE format should be %C%y-%m-%dT%H:%M:%SZ. The T and Z are literal."
                    (insert (format "%s\n" extended)))
                  (insert "\n")))
              matching-posts)))))
+
+(provide 'planner-delicious)
