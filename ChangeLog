@@ -1,3 +1,13 @@
+2005-04-21  johnsu01  <john@wjsullivan.net>
+
+	* delicioapi.el: Docstring fixes to pass checkdoc.
+
+	* planner-delicious.el: Added copyright header information.
+
+2005-04-21 johnsu01 <john@wjsullivan.net>
+
+	* delicious.el: Numerous docstring fixes to pass checkdoc.
+
 2005-03-31  johnsu01  <john@wjsullivan.net>
 
 	* delicious.el (delicious-load-posts-file): Fixed a problem that

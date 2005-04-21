@@ -4,7 +4,7 @@
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;; Created 25 October 2004
-;; Version: 0.2 2005-03-30
+;; Version: 0.2 2005-04-21
 ;; Keywords: comm, hypermedia
 
 ;; This program is free software; you can redistribute it and/or
@@ -70,7 +70,7 @@
 (defvar delicious-api-html "/html/"
   "*The path to the del.icio.us HTML feed.  It should begin and end with a slash.")
 
-(defconst delicious-api-version "delicioapi.el/0.2 2005-03-30"
+(defconst delicious-api-version "delicioapi.el/0.2 2005-04-21"
 "The version string for this copy of delicioapi.el.")
 
 (defconst delicious-api-field-match "=\"\\(.*?\\)\""
@@ -115,84 +115,84 @@
 :tag "del.icio.us timeout wait")
 
 (defcustom delicious-api-html-count 15
-"*The number of times to show by default when fetching an HTML del.icio.us feed. The server default is 15."
+"*The number of times to show by default when fetching an HTML del.icio.us feed.  The server default is 15."
 :version "21.3.1"
 :group 'delicious
 :type 'integer
 :tag "HTML item count parameter")
 
 (defcustom delicious-api-html-extended "title"
-"*Either 'title' or 'body'. The server default is `title'. This means that the extended description will just be shown in the title attribute of the link tag. If you want it displayed on its own, use `body'."
+"*Either 'title' or 'body'.  The server default is `title'.  This means that the extended description will just be shown in the title attribute of the link tag.  If you want it displayed on its own, use `body'."
 :version "21.3.1"
 :group 'delicious
 :type 'string
 :tag "HTML extended parameter")
 
 (defcustom delicious-api-html-divclass "delPost"
-"*Class to use for div. The server default is `delPost'."
+"*Class to use for div.  The server default is `delPost'."
 :version "21.3.1"
 :group 'delicious
 :type 'string
 :tag "HTML divclass parameter")
 
 (defcustom delicious-api-html-aclass "delLink"
-"*Class to use for a link. The server default is `delLink'."
+"*Class to use for a link.  The server default is `delLink'."
 :version "21.3.1"
 :group 'delicious
 :type 'string
 :tag "HTML aclass parameter")
 
 (defcustom delicious-api-html-tags nil
-"*Show tags or not. Server default is to show tags. Set this to true if you do NOT want tags."
+"*Show tags or not.  Server default is to show tags.  Set this to true if you do NOT want tags."
 :version "21.3.1"
 :group 'delicious
 :type 'boolean
 :tag "HTML tags parameter")
 
 (defcustom delicious-api-html-tagclass "delTag"
-"*Class to use for tags. Server default is `delTag'."
+"*Class to use for tags.  Server default is `delTag'."
 :version "21.3.1"
 :group 'delicious
 :type 'string
 :tag "HTML tagclass parameter")
 
 (defcustom delicious-api-html-tagsep "/"
-"*String to use for separator. Server default is `/'."
+"*String to use for separator.  Server default is `/'."
 :version "21.3.1"
 :group 'delicious
 :type 'string
 :tag "HTML tagsep parameter")
 
 (defcustom delicious-api-html-tagsepclass "delTagSep"
-"*Class to use for separator. Server default is `delTagSep'."
+"*Class to use for separator.  Server default is `delTagSep'."
 :version "21.3.1"
 :group 'delicious
 :type 'string
 :tag "HTML tagsepclass parameter")
 
 (defcustom delicious-api-html-bullet "raquo"
-"*HTML entity to use for bullet. Set it to empty for no bullet. Server default is `raquo'."
+"*HTML entity to use for bullet.  Set it to empty for no bullet.  Server default is `raquo'."
 :version "21.3.1"
 :group 'delicious
 :type 'string
 :tag "HTML bullet parameter")
 
 (defcustom delicious-api-html-rssbutton "yes"
-"*Add an RSS feed button using CSS. Server default is to show a button."
+"*Add an RSS feed button using CSS.  Server default is to show a button."
 :version "21.3.1"
 :group 'delicious
 :type 'string
 :tag "HTML rssbutton parameter")
 
 (defcustom delicious-api-html-extendeddiv nil
-"*Extended entry in its own div. Server default is `no'."
+"*Extended entry in its own div.  Server default is `no'."
 :version "21.3.1"
 :group 'delicious
 :type 'boolean
 :tag "HTML extendeddiv parameter")
 
 (defcustom delicious-api-html-extendedclass nil
-"*Class to use for extendeddiv. Server default is empty."
+"*Class to use for extendeddiv.  Server default is empty."
 :version "21.3.1"
 :group 'delicious
 :type 'string
@@ -272,7 +272,7 @@
 (let* ((count-fixed (cond
                      ((null count)
                       15)
-                     ((> count 100) 
+                     ((> count 100)
                       100)
                      (t count)))
        (uri (concat "posts/recent?"
@@ -319,10 +319,10 @@ TAG is a tag to filter by.  The dates are the keys."
 (let ((uri (format "posts/delete?url=%s" url)))
   (delicious-send-request (delicious-build-request uri))))
 
-(defun delicious-api-html 
+(defun delicious-api-html
 (&optional username tagname count extended divclass aclass tags tagclass tagsep tagsepclass bullet rssbutton extendeddiv extendedclass)
 "Return results formatted in HTML, according to a long list of options.
-USERNAME is the name of the user whose links you want to fetch. If you don't
+USERNAME is the name of the user whose links you want to fetch.  If you don't
 specify a name, `delicious-api-user' will be used.  If TAGNAME is nil, then
 results from all of the user's tags will be used.  If TAGNAME is passed, only
 posts under that tag will be considered. COUNT is the number of items to show.
@@ -340,8 +340,8 @@ nil, add an RSS feed button using CSS.  It it is non-nil, don't add an RSS feed
 button.  EXTENDEDDIV is an extended entry in its own div.  If it is nil, don't
 use it.  If it is non-nil, do something.  EXTENDEDCLASS is a CSS class to use
 for EXTENDEDDIV."
-(delicious-send-request 
- (delicious-api-build-html-request 
+(delicious-send-request
+ (delicious-api-build-html-request
   (delicious-api-html-uri username tagname count extended divclass aclass tags tagclass tagsep tagsepclass bullet rssbutton extendeddiv extendedclass)))
 (save-excursion
   (with-current-buffer delicious-api-buffer
@@ -355,13 +355,14 @@ for EXTENDEDDIV."
                  (line-end-position))))
       (buffer-substring beginning end)))))
 
-(defun delicious-api-html-uri 
+(defun delicious-api-html-uri
   (&optional username tagname count extended divclass aclass tags tagclass tagsep tagsepclass bullet rssbutton extendeddiv extendedclass)
-  "Assemble the uri for getting the list of recent posts, formatted in HTML, according to a long list of options.
-USERNAME is the name of the user whose links you want to fetch. If you don't
+  "Assemble the uri for getting the list of recent posts, formatted in HTML.
+The long list of options comes from the del.icio.us API.
+USERNAME is the name of the user whose links you want to fetch.  If you don't
 specify a name, `delicious-api-user' will be used.  If TAGNAME is nil, then
 results from all of the user's tags will be used.  If TAGNAME is passed, only
-posts under that tag will be considered. COUNT is the number of items to show.
+posts under that tag will be considered.  COUNT is the number of items to show.
 It defaults to 15 at the server.  EXTENDED is either 'title' or 'body'.  It
 defaults to 'title'.  DIVCLASS is the name of the CSS class to use for the div
 elements.  It defaults to 'delPost'.  ACLASS is the CSS class to use for the
@@ -467,7 +468,7 @@ Output goes to `delicious-api-buffer'."
            (process-send-string "delicious" request)
            (with-current-buffer delicious-api-buffer
              (let ((proc (get-process "delicious")))
-               (setq time-out (run-with-timer delicious-api-timeout nil 
+               (setq time-out (run-with-timer delicious-api-timeout nil
                                               '(lambda () (throw 'error "timeout"))))
                (while (save-excursion
                         (and (memq (process-status proc) '(open run))
@@ -534,7 +535,7 @@ Output goes to `delicious-api-buffer'."
               (loop for post in posts
                     with fields = '("href" "description" "extended" "hash" "tag" "time")
                     collect (loop for field in fields
-                                  if (string-match 
+                                  if (string-match
                                       (concat field "=\"\\(.*?\\)\"") post)
                                   collect (cons field (match-string 1 post))))))
         posts-parsed))))
