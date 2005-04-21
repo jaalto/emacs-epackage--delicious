@@ -4,7 +4,7 @@
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;; Created 25 October 2004
-;; Version: 0.2 2005-04-10
+;; Version: 0.2 2005-04-21
 ;; Keywords: comm, hypermedia
 
 ;; This program is free software; you can redistribute it and/or
@@ -44,17 +44,17 @@
 
 (require 'delicioapi)
 
-(defface delicious-result-href-face 
+(defface delicious-result-href-face
   '((t (:underline t :foreground "DeepSkyBlue1")))
     "Face for links in search results."
     :group 'delicious)
 
-(defface delicious-result-description-face 
+(defface delicious-result-description-face
   '((t (:foreground "SeaGreen2")))
     "Face for links in search results."
     :group 'delicious)
 
-(defface delicious-result-extended-face 
+(defface delicious-result-extended-face
   '((t (:foreground "SeaGreen3")))
     "Face for links in search results."
     :group 'delicious)
@@ -64,7 +64,7 @@
   "Face for the hash in search results."
   :group 'delicious)
 
-(defface delicious-result-tag-face 
+(defface delicious-result-tag-face
   '((t (:foreground "LightCoral")))
     "Face for links in search results."
     :group 'delicious)
@@ -74,12 +74,12 @@
   "Face for timestamp in search results."
   :group 'delicious)
 
-(defconst delicious-version  "delicious.el/0.2 2005-04-10"
+(defconst delicious-version  "delicious.el/0.2 2005-04-21"
   "The version string for this copy of delicious.el.")
 
 (defun delicious-post (url description &optional tags extended time)
   ;; figure out how to get right time-string format
-  "Post a url to your del.icio.us account with arguments URL, DESCRIPTION, TAGS, EXTENDED, and TIME."
+  "Post a url with arguments URL, DESCRIPTION, TAGS, EXTENDED, and TIME."
   (interactive (list
                 (delicious-read-url)
                 (delicious-read-description)
@@ -115,14 +115,14 @@ The server uses the current date and time by default."
 (defun delicious-read-url ()
   "Read a url from a prompt, suggesting an appropriate default.
 Check the input to make sure it is valid and react if it is a duplicate."
-  (let ((url (delicious-check-input 
+  (let ((url (delicious-check-input
               (read-string "(Required) URL: " (delicious-guess-url)) "URL")))
     (delicious-duplicate-url-p url)
     url))
 
 (defun delicious-read-description ()
   "Read a description from a prompt, suggesting an appropriate default."
-  (delicious-check-input 
+  (delicious-check-input
    (read-string "(Required) Description: " (delicious-guess-description)) "Description"))
 
 (defun delicious-check-input (input &optional name)
@@ -147,15 +147,15 @@ Check the input to make sure it is valid and react if it is a duplicate."
                duplicate))))
 
 (defun delicious-complete-tags (&optional nosuggest)
-  "Get tags table if needed. Do a completing read of tag input.  
-Blank line at the prompt ends the input.  If NOSUGGEST is non-nil, don't 
+  "Get tags table if needed.  Do a completing read of tag input.
+Blank line at the prompt ends the input.  If NOSUGGEST is non-nil, don't
 suggest any tags."
   (unless (and (boundp 'delicious-tags-list)
                (not (null delicious-tags-list)))
     (delicious-build-tags-list))
   (loop with suggested-tags = (if nosuggest ""
                                (delicious-suggest-tags))
-        with prompt = (if nosuggest 
+        with prompt = (if nosuggest
                          "%sTags so far: %s\n(Enter one at a time, blank to end.) Tag: "
                        "Suggested Tags: %s\nTags so far: %s\n(Enter one at a time, blank to end.) Tag: ")
         for tag = (completing-read (format prompt suggested-tags tags)
@@ -233,9 +233,11 @@ suggest any tags."
        (aref gnus-current-headers 1))))
 
 (defun delicious-guess-url ()
-  "Try some different things to guess a url.  If we're in a w3m buffer, use the current url.
-If not, use the url under point.  If not that, search through the buffer and see 
-if there is a url to use in the buffer.  If not that, just insert http:// into the prompt."
+  "Try to guess a url based on buffer context.
+If we're in a w3m buffer, use the current url.
+If not, use the url under point.
+If not that, see if there is a url in the buffer.
+If not that, just insert http:// into the prompt."
   ;; if there is a prefix, maybe it should use the kill ring
   (or (if (and (boundp 'w3m-current-url)
                (not (null w3m-current-url))
@@ -253,11 +255,11 @@ if there is a url to use in the buffer.  If not that, just insert http:// into t
       "http://"))
 
 (defun delicious-w3m-html (username count tag)
-  "Visit the HTML page for the del.icio.us USERNAME showing COUNT most recent posts under TAG.
+  "Visit the HTML page for USERNAME showing COUNT most recent posts under TAG.
 With prefix, visit the page in a new w3m session."
   (interactive "sUsername (RET for yours): \nnNumber of posts (RET for 15): \nsTag (RET for all): ")
-  (w3m-browse-url 
-   (format "http://%s%s%s" delicious-api-host delicious-api-html 
+  (w3m-browse-url
+   (format "http://%s%s%s" delicious-api-host delicious-api-html
            (delicious-api-html-uri username tag count))
    (not (null current-prefix-arg))))
 
@@ -273,8 +275,8 @@ They will be stored under SECTION."
           finally do (message "w3m bookmarks updated."))))
 
 (defun delicious-w3m-export (section &optional tags extended time)
-  "Export your w3m bookmarks from SECTION to del.icio.us, assigning TAGS to each entry. 
-Optionally enter an EXTENDED description and a TIME."
+  "Export your w3m bookmarks from w3m SECTION to del.icio.us.
+Optionally assign TAGS, an EXTENDED description, and TIME to the bookmarks."
   (interactive (list
                 (delicious-w3m-read-section)
                 (delicious-complete-tags t)
@@ -314,7 +316,7 @@ Optionally enter an EXTENDED description and a TIME."
    (let ((map (make-sparse-keymap)))
      (define-key map [tab] 'delicious-search-next-result)
      map)
-   "Keymap for `delicious-search-mode'.")
+   "Keymap for function `delicious-search-mode'.")
 
 (define-minor-mode delicious-search-mode
   "Toggle Delicious Search mode.
@@ -322,7 +324,7 @@ With no argument, this command toggles the mode.
 Non-null prefix argument turns on the mode.
 Null prefix argument turns off the mode.
 
-When Delicious Search mode is enabled, the tab key 
+When Delicious Search mode is enabled, the tab key
 advances to the next search result."
   nil
   " Delicious Search"
@@ -358,15 +360,15 @@ Display the results in *delicious search results*."
   (delicious-search-buffer-prep)
   (let ((match-count (loop for post in delicious-posts-list
                            for match = (loop for field in post
-                                             when (string-match search-string 
-                                                                (cdr field)) 
+                                             when (string-match search-string
+                                                                (cdr field))
                                              return post)
                            if match do (delicious-search-insert-match post)
                            count match)))
     (delicious-search-buffer-finish search-string match-count)))
 
 (defun delicious-search-description-regexp (search-string)
-  "Search the descriptions in DELICIOUS-POSTS-LIST for SEARCH-STRING, a regular expression.
+  "Search DELICIOUS-POSTS-LIST for descriptions matching SEARCH-STRING.
 Display the results in *delicious search results*."
   (interactive "sEnter regexp search string: ")
   (delicious-build-posts-list-maybe)
@@ -374,14 +376,14 @@ Display the results in *delicious search results*."
   (let ((match-count (loop for post in delicious-posts-list
                            for match = (loop for field in post
                                              if (equal (car field) "description")
-                                                 when (string-match search-string 
+                                                 when (string-match search-string
                                                                     (cdr field)) return post)
                            if match do (delicious-search-insert-match post)
                            count match)))
   (delicious-search-buffer-finish search-string match-count)))
 
 (defun delicious-search-tags-regexp (search-string)
-  "Search the tags in DELICIOUS-POSTS-LIST for SEARCH-STRING, a regular expression.
+  "Search DELICIOUS-POSTS-LIST for tags matching SEARCH-STRING.
 Display the results in *delicious search results*."
   (interactive "sEnter regexp search string: ")
   (delicious-build-posts-list-maybe)
@@ -389,14 +391,14 @@ Display the results in *delicious search results*."
   (let ((match-count (loop for post in delicious-posts-list
                            for match = (loop for field in post
                                              if (equal (car field) "tag")
-                                                 when (string-match search-string 
+                                                 when (string-match search-string
                                                                     (cdr field)) return post)
                            if match do (delicious-search-insert-match post)
                            count match)))
   (delicious-search-buffer-finish search-string match-count)))
 
 (defun delicious-search-href-regexp (search-string)
-  "Search the links in DELICIOUS-POSTS-LIST for SEARCH-STRING, a regular expression.
+  "Search DELICIOUS-POSTS-LIST for urls matching SEARCH-STRING.
 Display the results in *delicious search results*."
   (interactive "sEnter regexp search string: ")
   (delicious-build-posts-list-maybe)
@@ -404,7 +406,7 @@ Display the results in *delicious search results*."
   (let ((match-count (loop for post in delicious-posts-list
                            for match = (loop for field in post
                                              if (equal (car field) "href")
-                                                 when (string-match search-string 
+                                                 when (string-match search-string
                                                                     (cdr field)) return post)
                            if match do (delicious-search-insert-match post)
                            count match)))
@@ -434,11 +436,13 @@ Display the results in *delicious search results*."
   (delete-region (point-min) (point-max)))
 
 (defun delicious-search-buffer-finish (search-string matches)
-  "Take care of post-search issues."
+  "Report search results in the *delicious search results* buffer.
+SEARCH-STRING is the regexp pattern that was used in the search.
+MATCHES is the number of matches found."
   (with-current-buffer "*delicious search results*"
     (goto-char (point-min))
-    (insert (format "Your search for \"%s\" returned %d results.\n\n" 
-                    search-string matches)) 
+    (insert (format "Your search for \"%s\" returned %d results.\n\n"
+                    search-string matches))
     (view-mode 1)
     (delicious-search-mode 1)))
 
@@ -446,7 +450,7 @@ Display the results in *delicious search results*."
   "Insert POST with the fields propertized."
   (with-current-buffer "*delicious search results*"
     (loop for cell in post
-          do (insert (propertize (cdr cell) 'face 
+          do (insert (propertize (cdr cell) 'face
                                  (intern (concat "delicious-result-" (car cell) "-face")))
                      "\n")
           finally do (insert "\n"))))
@@ -464,7 +468,7 @@ Display the results in *delicious search results*."
     (let* ((home (getenv "HOME"))
            (buffer delicious-posts-file-name)
            (file (concat home "/" buffer)))
-      (set-buffer 
+      (set-buffer
        (get-buffer-create buffer))
       (erase-buffer)
       (prin1 delicious-posts-list (current-buffer))
@@ -484,9 +488,9 @@ Display the results in *delicious search results*."
   (message "Done reading posts."))
 
 (defun delicious-get-posts-from-stored (&optional tag date)
-  "Return a list of posts filtered by TAG."
-;;  on a given DATE.
-;; If no date is supplied, the most recent date with posts will be used.
+  "Return a list of posts filtered by TAG and DATE.
+If no date is supplied, the most recent date with posts will be used."
+;; DATE doesn't actually work yet.
 ;; The list is HREF, DESCRIPTION, EXTENDED, HASH, TAG, and TIME.
   (let ((matches '()))
     (mapc (lambda (post)
