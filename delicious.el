@@ -211,10 +211,13 @@ suggest any tags."
 
 (defun delicious-add-tags (tags)
   "Add TAGS to the local copy of the tags list in DELICIOUS-TAGS-LIST."
-  (loop for tag in tags
-        for tag-count = (cadar (last delicious-tags-list))
-        unless (assoc tag delicious-tags-list)
-          do (setq delicious-tags-list (setcdr (last delicious-tags-list) `(,tag ,(1+ tag-count))))))
+  (let ((tags-list (split-string tags)))
+    (mapc '(lambda (tag)
+             (let ((tag-count (cadar (last delicious-tags-list))))
+               (unless (assoc tag delicious-tags-list)
+                 (let ((new-tag (list tag (1+ tag-count))))
+                   (add-to-list 'delicious-tags-list new-tag t)))))
+          tags-list)))
        
 (defun delicious-build-posts-list ()
   "Refresh or build the posts list from the server for use in duplicate checking."

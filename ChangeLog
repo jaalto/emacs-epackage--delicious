@@ -1,3 +1,9 @@
+2005-04-21  johnsu01  <john@wjsullivan.net>
+
+	* delicious.el (delicious-add-tags): Fixed to keep the tag
+	completion list updated after each post is made without having to
+	talk to the server. 
+
 2005-04-21  John Sullivan  <john@wjsullivan.net>
 
 	* planner-delicious.el: Added missing (provide).
