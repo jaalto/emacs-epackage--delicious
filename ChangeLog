@@ -1,3 +1,10 @@
+2005-04-26  johnsu01  <john@wjsullivan.net>
+
+	* planner-delicious.el (planner-rewrite-delicious-posts): Fixed
+	bug that was causing infinite loop when highlighting. TAG is now a
+	mandatory argument (temporarily), and I've removed DATE until I
+	implement the date filtering. 
+
 2005-04-25  johnsu01  <john@wjsullivan.net>
 
 	* delicious.el (delicious-get-posts-from-stored): Bugfix, added

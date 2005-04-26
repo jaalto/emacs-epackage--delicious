@@ -4,7 +4,7 @@
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;; Created 31 March 2005
-;; Version: 0.1 2005-04-21
+;; Version: 0.1 2005-04-26
 ;; Keywords: comm, hypermedia
 
 ;; This program is free software; you can redistribute it and/or
@@ -29,40 +29,48 @@
 ;; `.emacs' file. This program requires Planner, which is available at Sacha
 ;; Chua's Web site <http://sacha.free.net.ph>.  Please report any bugs or
 ;; suggestions to me at <john@wjsullivan.net>. The newest version of this file
-;; can always be fonud at <http://www.wjsullivan.net>.
+;; can always be found at <http://www.wjsullivan.net>.
+;;
+;; To use this on a Planner page, you need to have:
+;;
+;;   * Delicious
+;;
+;;   <lisp>(planner-rewrite-delicious-posts "whatever-tag")</lisp>
+;;
+;; on the pages where you want your posts to appear. This function rewrites
+;; everything between `* Delicious' and the end of the next closing </lisp>
+;; tag, but should leave everything else alone. You could add this to your
+;; `planner-day-page-template' if you want posts to appear there every day.
 
 ;;; Code:
 
 (require 'delicious)
 
-(defun planner-rewrite-delicious-posts (&optional tag date)
-  "Insert all posts from your account filtered by TAG, from DATE. 
-Into the '* Delicious' section of your planner page. If no DATE
-is specified, the most recent date with posts will be used.
-DATE format should be %C%y-%m-%dT%H:%M:%SZ. The T and Z are literal."
-  (save-excursion 
+(defun planner-rewrite-delicious-posts (tag)
+  "Insert all your posts filtered by TAG into the '* Delicious' section."
+  (save-excursion
     (goto-char (point-min))
-    (re-search-forward "* Delicious")
-    (forward-line 2)
-    (save-excursion
-      (let ((beg (line-beginning-position))
-            (end (if (re-search-forward "^* " (point-max) t)
-                     (line-beginning-position)
-                   (point-max))))
-        (delete-region beg end)))
-    (let ((matching-posts (delicious-get-posts-from-stored tag date)))
-      (ignore 
-       (mapc (lambda (post)
-               (let* ((href (cdr (assoc "href" post)))
-                      (description (cdr (assoc "description" post)))
-                      (extended (cdr (assoc "extended" post))))
-                 (insert (format "[[%s]" href))
-                 (if (null description)
-                     (insert "]\n")
-                   (insert (format "[%s]]\n" description)))
-                 (unless (null extended)
-                   (insert (format "%s\n" extended)))
-                 (insert "\n")))
-             matching-posts)))))
+    (or (re-search-forward "^\* Delicious" (point-max) t)
+        (error "No * Delicious section in this buffer"))
+    (let ((beg (point))
+          (end (re-search-forward "</lisp>" (point-max) t)))
+      (delete-region beg end))
+    (insert 
+     "\n\n"
+     (let ((matching-posts (delicious-get-posts-from-stored tag)))
+       (with-temp-buffer
+         (mapc (lambda (post)
+                 (let ((href (cdr (assoc "href" post)))
+                       (description (cdr (assoc "description" post)))
+                       (extended (cdr (assoc "extended" post))))
+                   (insert (format "[[%s]" href))
+                   (if (null description)
+                       (insert "]\n")
+                     (insert (format "[%s]]\n" description)))
+                   (unless (null extended)
+                     (insert (format "%s\n" extended)))
+                   (insert "\n")))
+               matching-posts)
+         (buffer-string))))))
 
 (provide 'planner-delicious)
