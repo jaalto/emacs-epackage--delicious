@@ -4,7 +4,7 @@
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;; Created 25 October 2004
-;; Version: 0.2 2005-04-21
+;; Version: 0.2 2005-04-25
 ;; Keywords: comm, hypermedia
 
 ;; This program is free software; you can redistribute it and/or
@@ -74,11 +74,11 @@
   "Face for timestamp in search results."
   :group 'delicious)
 
-(defconst delicious-version  "delicious.el/0.2 2005-04-21"
+(defconst delicious-version  "delicious.el/0.2 2005-04-25"
   "The version string for this copy of delicious.el.")
 
 (defun delicious-post (url description &optional tags extended time)
-  ;; figure out how to get right time-string format
+  ; figure out how to get right time-string format
   "Post a url with arguments URL, DESCRIPTION, TAGS, EXTENDED, and TIME."
   (interactive (list
                 (delicious-read-url)
@@ -239,7 +239,7 @@ If we're in a w3m buffer, use the current url.
 If not, use the url under point.
 If not that, see if there is a url in the buffer.
 If not that, just insert http:// into the prompt."
-  ;; if there is a prefix, maybe it should use the kill ring
+  ; if there is a prefix, maybe it should use the kill ring
   (or (if (and (boundp 'w3m-current-url)
                (not (null w3m-current-url))
                (eq major-mode 'w3m-mode))
@@ -493,6 +493,9 @@ MATCHES is the number of matches found."
 If no date is supplied, the most recent date with posts will be used."
 ;; DATE doesn't actually work yet.
 ;; The list is HREF, DESCRIPTION, EXTENDED, HASH, TAG, and TIME.
+  (unless (and (boundp 'delicious-posts-list)
+               delicious-posts-list)
+    (delicious-load-posts-file))
   (let ((matches '()))
     (mapc (lambda (post)
             (if (member tag (split-string (cdr (assoc "tag" post))))

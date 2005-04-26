@@ -1,3 +1,9 @@
+2005-04-25  johnsu01  <john@wjsullivan.net>
+
+	* delicious.el (delicious-get-posts-from-stored): Bugfix, added
+	check to make sure that DELICIOUS-POSTS-LIST exists before
+	searching it.
+
 2005-04-21  johnsu01  <john@wjsullivan.net>
 
 	* delicious.el (delicious-add-tags): Fixed to keep the tag
