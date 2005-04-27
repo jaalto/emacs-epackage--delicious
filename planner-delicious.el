@@ -35,42 +35,56 @@
 ;;
 ;;   * Delicious
 ;;
-;;   <lisp>(planner-rewrite-delicious-posts "whatever-tag")</lisp>
+;;   <lisp>(planner-delicious-insert-posts "tag-regexp" "date-regexp")</lisp>
 ;;
 ;; on the pages where you want your posts to appear. This function rewrites
-;; everything between `* Delicious' and the end of the next closing </lisp>
-;; tag, but should leave everything else alone. You could add this to your
-;; `planner-day-page-template' if you want posts to appear there every day.
+;; everything between `planner-delicious-section' ("* Delicious" by default)
+;; and the beginning of the next section on the page, but should leave
+;; everything else alone. You could add this to your
+;; `planner-day-page-template' if you want posts to appear every day.
+;;
+;; If you don't want to filter by either date or time, just use a regexp that
+;; matches anything, like ".*" for either or both arguments. When constructing
+;; your regexps, keep in mind that tags are stored space-separated, and dates
+;; are stored in a format like `2005-04-23T20:22:55Z'. 
+
+;; The code to rewrite `planner-delicious-section' is based on work by Sacha
+;; Chua in `planner-accomplishments.el'.
 
 ;;; Code:
 
 (require 'delicious)
 
-(defun planner-rewrite-delicious-posts (tag)
-  "Insert all your posts filtered by TAG into the '* Delicious' section."
+(defcustom planner-delicious-section "Delicious"
+  "*Header for the del.icio.us section in a plan page."
+  :version "21.4.1"
+  :type 'string
+  :group 'delicious)
+
+(defun planner-delicious-insert-posts (tag date)
+  "Insert all your posts matching TAG and DATE under `planner-delicious-section'.
+TAG should be a regexp constructed to match the stored space-separated list
+of tags. DATE should be a regexp constructed with the stored date format
+in mind. An example of the stored date format is `2005-04-23T20:22:55Z'." 
   (save-excursion
-    (goto-char (point-min))
-    (or (re-search-forward "^\* Delicious" (point-max) t)
-        (error "No * Delicious section in this buffer"))
-    (let ((beg (point))
-          (end (re-search-forward "</lisp>" (point-max) t)))
-      (delete-region beg end))
-    (insert 
-     "\n\n"
-     (let ((matching-posts (delicious-get-posts-from-stored tag)))
-       (with-temp-buffer
-         (mapc (lambda (post)
-                 (let ((href (cdr (assoc "href" post)))
-                       (description (cdr (assoc "description" post)))
-                       (extended (cdr (assoc "extended" post))))
-                   (insert (format "[[%s]" href))
-                   (if (null description)
-                       (insert "]\n")
-                     (insert (format "[%s]]\n" description)))
-                   (unless (null extended)
-                     (insert (format "%s\n" extended)))
-                   (insert "\n")))
-               matching-posts)
-         (buffer-string))))))
+    (save-restriction
+      (when (planner-narrow-to-section planner-delicious-section)
+        (delete-region (point-min) (point-max))
+        (insert "* " planner-delicious-section "\n\n"
+                (let ((matching-posts 
+                       (delicious-get-posts-from-stored tag date)))
+                  (with-temp-buffer
+                    (mapc (lambda (post)
+                            (let ((href (cdr (assoc "href" post)))
+                                  (description (cdr (assoc "description" post)))
+                                  (extended (cdr (assoc "extended" post))))
+                              (insert (planner-make-link href description) "\n")
+                              (unless (null extended)
+                                (insert (format "%s\n" extended)))
+                              (insert "\n")))
+                          matching-posts)
+                    (buffer-string))) "\n\n")))))
 
 (provide 'planner-delicious)
+
+

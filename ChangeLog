@@ -1,3 +1,25 @@
+2005-04-27  johnsu01  <john@wjsullivan.net>
+
+	* delicious.el (delicious-get-posts-from-stored): Changed TAG to
+	be a regexp. This way the user has more flexibility in searching
+	their tags.
+	(delicious-get-posts-from-stored): TAG and DATE are no longer
+	optional. If the user doesn't want to filter by TAG or DATE, they
+	can just use the appropriate regexp.
+
+	* planner-delicious.el (planner-delicious-insert-posts): Renamed
+	function from (planner-rewrite-delicious-posts). Used
+	(planner-make-link) to simplify code.
+	(planner-delicious-section): New variable so the user can define
+	the title of the section where del.icio.us bookmarks should be
+	inserted. Copied section rewriting code from
+	`planner-accomplishments.el'.
+	(planner-delicious-insert-posts): Added DATE argument again, since
+	it works now.
+
+	* delicious.el (delicious-get-posts-from-stored): Filtering by
+	date now works.
+
 2005-04-26  johnsu01  <john@wjsullivan.net>
 
 	* planner-delicious.el (planner-rewrite-delicious-posts): Fixed

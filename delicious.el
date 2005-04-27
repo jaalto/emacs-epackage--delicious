@@ -488,17 +488,19 @@ MATCHES is the number of matches found."
         (setq delicious-posts-list (read (buffer-string))))))
   (message "Done reading posts."))
 
-(defun delicious-get-posts-from-stored (&optional tag date)
+(defun delicious-get-posts-from-stored (tag date)
   "Return a list of posts filtered by TAG and DATE.
-If no date is supplied, the most recent date with posts will be used."
-;; DATE doesn't actually work yet.
+TAG should be a regexp matching a space-separated group of tags.
+DATE should be a regexp. An example of a stored date string
+is `2005-04-23T20:22:55Z'."
 ;; The list is HREF, DESCRIPTION, EXTENDED, HASH, TAG, and TIME.
   (unless (and (boundp 'delicious-posts-list)
                delicious-posts-list)
     (delicious-load-posts-file))
   (let ((matches '()))
     (mapc (lambda (post)
-            (if (member tag (split-string (cdr (assoc "tag" post))))
+            (if (and (string-match tag (cdr (assoc "tag" post)))
+                     (string-match date (cdr (assoc "time" post))))
                 (add-to-list 'matches post)))
           delicious-posts-list)
     matches))
