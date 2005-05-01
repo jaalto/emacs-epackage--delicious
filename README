@@ -4,7 +4,7 @@
 
 Author: John Sullivan <john@wjsullivan.net>
 Created 25 October 2004
-Version: 0.2 2005-03-31
+Version: 0.2 2005-04-30
 Keywords: comm, hypermedia
 
 This program is free software; you can redistribute it and/or modify it under
@@ -31,6 +31,7 @@ worldwide, without royalty, in any medium, provided this notice is preserved.
 
 - delicioapi.el
 - delicious.el
+- planner-delicious.el
 - ChangeLog
 - ChangeLog.OLD
 - README
@@ -53,6 +54,11 @@ required to load the commands that I have written.
 'delicious.el' contains the front-end interactive functions and commands for
 putting the API functions to productive use, via Emacs. 'delicioapi.el' must be
 loaded for these functions to work. 
+
+'planner-delicious.el' contains functions to integrate with Planner in
+Emacs. It requires Planner, which can be found at
+<http://sacha.free.net.ph>. This is included primarily for testing
+purposes. For instructions, please see the comments at the top of the file.
 
 The del.icio.us API does go through frequent changes; I've made an effort here
 to structure the code so that these changes can be easily accommodated.
@@ -117,8 +123,9 @@ delicious-el will try to guess the URL that you want to enter. If you are in a
 w3m-el buffer, it will suggest the URL of the site you are looking at. If not,
 if there is a URL under the cursor, it will suggest that.  If neither of these
 two things are true, it will scan the current buffer for a URL. It will suggest
-the first one that it finds. If it doesn't find one, it will just put an
-"http://" in the input line for you.
+the first one that it finds. Next, it will check the clipboard and see if there
+is a URL there. If it doesn't find one, it will just put an "http://" in the
+input line for you.
 
 URL is a required field. If you try to enter a blank URL, the program will
 abort. 
@@ -144,9 +151,7 @@ attempts are made here.
 
 Next is the Date/Time prompt. It's not pretty, and will be improved in the
 future. If you don't enter anything here, the current date will be used. If you
-do want to enter the date, the format is indicated in the prompt. An example
-is: `2004-12-11T14:40:00Z'. Note that the `T' and `Z' are actually literal and
-have to be included.
+do want to enter the date, the format is indicated in the prompt.
 
 Once you enter the Date/Time and hit enter, the URL should be posted to the
 server!
@@ -417,6 +422,15 @@ default is 60 seconds. Note that when a connection times out, there is a good
 chance that your transaction with del.icio.us still happened; delicious-el just
 got tired of waiting. So you probably want to check with your browser and see
 if that last post was actually received before you send it again. 
+
+* Keeping Up
+
+Updated versions can be had via darcs at
+<http://www.wjsullivan.net/darcs/delicious-el>. You can also download the
+archive, generally just as current, at
+<http://www.wjsullivan.net/darcs/delicious-el/delicious-el.tar.gz>.
+
+I tend to post ChangeLog entries at <http://www.wjsullivan.net/news>.
 
 * Bugs
 
