@@ -4,7 +4,7 @@
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;; Created 25 October 2004
-;; Version: 0.2 2005-04-25
+;; Version: 0.2 2005-04-30
 ;; Keywords: comm, hypermedia
 
 ;; This program is free software; you can redistribute it and/or
@@ -74,7 +74,7 @@
   "Face for timestamp in search results."
   :group 'delicious)
 
-(defconst delicious-version  "delicious.el/0.2 2005-04-25"
+(defconst delicious-version  "delicious.el/0.2 2005-04-30"
   "The version string for this copy of delicious.el.")
 
 (defun delicious-post (url description &optional tags extended time)
@@ -238,6 +238,7 @@ suggest any tags."
 If we're in a w3m buffer, use the current url.
 If not, use the url under point.
 If not that, see if there is a url in the buffer.
+If not that, use the clipboard if it's a url.
 If not that, just insert http:// into the prompt."
   ; if there is a prefix, maybe it should use the kill ring
   (or (if (and (boundp 'w3m-current-url)
@@ -253,6 +254,8 @@ If not that, just insert http:// into the prompt."
               return (thing-at-point-url-at-point)
                 else
               do (forward-char)))
+      (if (string-match thing-at-point-url-regexp (x-get-selection))
+          (x-get-selection 'CLIPBOARD))
       "http://"))
 
 (defun delicious-w3m-html (username count tag)
