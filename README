@@ -156,6 +156,14 @@ do want to enter the date, the format is indicated in the prompt.
 Once you enter the Date/Time and hit enter, the URL should be posted to the
 server!
 
+- M-x delicious-rename-tag
+
+This will prompt you for an old tag and one or more new tags. As usual, you can
+use tab completion when entering this information. In fact, the old tag you
+enter must match an existing tag. The old tag will be changed to the new tags
+for all posts that had the old tag. After the renaming is done, the local tag
+list will be refreshed from the server.
+
 - M-x delicious-build-posts-list
 
 This command will refresh the local list of your posts from the server. You

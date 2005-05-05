@@ -272,6 +272,20 @@ If not that, just insert http:// into the prompt."
           (x-get-selection 'CLIPBOARD))
       "http://"))
 
+(defun delicious-rename-tag (old-tag new-tag)
+  "Change all instances of OLD-TAG to NEW-TAG.
+NEW-TAG can be multiple tags, space-separated."
+  (interactive (list
+                (delicious-complete-tags t t 1 "Enter old tag: " t)
+                (delicious-complete-tags t "Enter new tag(s) one at a time (blank to end): ")))
+  (if (or (equal old-tag "")
+          (equal new-tag ""))
+      (message "Aborting due to empty input.")
+    (message "Renaming...")
+    (delicious-api-rename old-tag new-tag)
+    (delicious-build-tags-list)
+    (message "Done renaming %s to %s" old-tag new-tag)))
+  
 (defun delicious-w3m-html (username count tag)
   "Visit the HTML page for USERNAME showing COUNT most recent posts under TAG.
 With prefix, visit the page in a new w3m session."
