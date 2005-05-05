@@ -146,26 +146,40 @@ Check the input to make sure it is valid and react if it is a duplicate."
                  (error "Duplicate URL not posted"))
                duplicate))))
 
-(defun delicious-complete-tags (&optional nosuggest)
+(defun delicious-complete-tags (&optional nosuggest sofar quantity prompt-string
+                                          require)
   "Get tags table if needed.  Do a completing read of tag input.
 Blank line at the prompt ends the input.  If NOSUGGEST is non-nil, don't
-suggest any tags."
+suggest any tags. If SOFAR is non-nil, don't show tags entered so far.
+Repeat the read QUANTITY times. If QUANTITY is nil, repeat until a blank
+line is entered. If REQUIRE is non-nil, only a completion match or an empty string
+are accepted as input."
   (unless (and (boundp 'delicious-tags-list)
                (not (null delicious-tags-list)))
     (delicious-build-tags-list))
-  (loop with suggested-tags = (if nosuggest ""
-                               (delicious-suggest-tags))
-        with prompt = (if nosuggest
-                         "%sTags so far: %s\n(Enter one at a time, blank to end.) Tag: "
-                       "Suggested Tags: %s\nTags so far: %s\n(Enter one at a time, blank to end.) Tag: ")
-        for tag = (completing-read (format prompt suggested-tags tags)
-                                   delicious-tags-list)
-        until (equal tag "")
-        if (member tag tags) do (and (message "Duplicate tag ignored.") (sleep-for 1))
-        else collect tag into tags
-        finally return (progn
-                         (message "%s" tags)
-                         (mapconcat 'identity tags " "))))
+  (let* ((base-prompt 
+           (or prompt-string
+               "(Enter one at a time, blank to end.) Tag: "))
+           (suggest-prompt
+            (unless nosuggest
+              (format "Suggested Tags: %s\n" (delicious-suggest-tags))))
+           (sofar-prompt
+            (unless sofar
+              "%sTags so far: %s\n"))
+           (prompt (concat suggest-prompt sofar-prompt base-prompt)))
+    (loop until (or (equal tag "")
+                    (and
+                     (numberp quantity)
+                     (<= quantity 0)))
+          for tag = (completing-read (format prompt suggested-tags tags)
+                                     delicious-tags-list nil require)
+          if (numberp quantity) do (setq quantity (1- quantity))
+          if (member tag tags) do (and (message "Duplicate tag ignored.") 
+                                       (sleep-for 1))
+          else collect tag into tags
+          finally return (progn
+                           (message "%s" tags)
+                           (mapconcat 'identity tags " ")))))
 
 (defun delicious-suggest-tags ()
   "Suggest tags based on the contents of the current buffer and the current list of tags."
