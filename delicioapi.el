@@ -316,7 +316,9 @@ TAG is a tag to filter by.  The dates are the keys."
 
 (defun delicious-api-rename (old-tag new-tag)
 "Rename OLD-TAG to NEW-TAG across all posts."
-(let ((uri (format "tags/rename?&old=%s&new=%s" old-tag new-tag)))
+(let ((uri (format "tags/rename?&old=%s&new=%s" 
+                   (url-hexify-string old-tag)
+                   (url-hexify-string new-tag))))
   (delicious-send-request (delicious-build-request uri))))
 
 (defun delicious-api-delete (url)
