@@ -1,3 +1,24 @@
+2005-05-04  johnsu01  <john@wjsullivan.net>
+
+	* delicioapi.el: Updated FSF address in copyright header.
+	(delicious-api-post): Fixed long lines.
+	(delicious-api-get-tags): Fixed long lines.
+
+	* delicious.el: Updated FSF address in copyright header.
+
+	* README: Explained new rename command. Updated the address of the
+	FSF in the copyright header.
+
+	* delicioapi.el (delicious-api-rename): Added correct URL string-escaping.
+
+	* delicious.el (delicious-complete-tags): Added QUANTITY argument,
+	so that we can use this to only read a specific number of
+	tags. Also added arguments to customize the prompt, and a REQUIRE
+	argument to require a completion match. These are all helpful for
+	reading tags for `delicious-rename-tag'.
+	(delicious-rename-tag): New interactive command to rename all
+	instances of one tag to one or more tags.
+
 2005-05-01  johnsu01  <john@wjsullivan.net>
 
 	* README: Updated documentation.

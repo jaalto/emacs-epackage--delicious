@@ -4,7 +4,7 @@
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;; Created 25 October 2004
-;; Version: 0.2 2005-04-30
+;; Version: 0.2 2005-05-04
 ;; Keywords: comm, hypermedia
 
 ;; This program is free software; you can redistribute it and/or
@@ -20,8 +20,8 @@
 ;; You should have received a copy of the GNU General Public
 ;; License along with this program; if not, a copy is available at
 ;; http://www.wjsullivan.net, or write to the Free
-;; Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
-;; MA 02111-1307 USA
+;; Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+;; MA 02110-1301 USA
 
 ;;; Commentary
 
@@ -74,7 +74,7 @@
   "Face for timestamp in search results."
   :group 'delicious)
 
-(defconst delicious-version  "delicious.el/0.2 2005-04-30"
+(defconst delicious-version  "delicious.el/0.2 2005-05-04"
   "The version string for this copy of delicious.el.")
 
 (defun delicious-post (url description &optional tags extended time)
