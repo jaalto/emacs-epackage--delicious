@@ -219,7 +219,8 @@ are accepted as input."
   "Refresh or build the tags table for use in completion."
   (interactive)
   (message "Refreshing delicious tags list from server.")
-  (setq delicious-tags-list (delicious-api-build-tag-completion)))
+  (setq delicious-tags-list (delicious-api-build-tag-completion))
+  (message "Done."))
 
 (defun delicious-add-tags (tags)
   "Add TAGS to the local copy of the tags list in DELICIOUS-TAGS-LIST."
