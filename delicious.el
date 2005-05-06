@@ -165,13 +165,13 @@ are accepted as input."
               (format "Suggested Tags: %s\n" (delicious-suggest-tags))))
            (sofar-prompt
             (unless sofar
-              "%sTags so far: %s\n"))
+              "Tags so far: %s\n"))
            (prompt (concat suggest-prompt sofar-prompt base-prompt)))
     (loop until (or (equal tag "")
                     (and
                      (numberp quantity)
                      (<= quantity 0)))
-          for tag = (completing-read (format prompt suggested-tags tags)
+          for tag = (completing-read (format prompt tags)
                                      delicious-tags-list nil require)
           if (numberp quantity) do (setq quantity (1- quantity))
           if (member tag tags) do (and (message "Duplicate tag ignored.") 
