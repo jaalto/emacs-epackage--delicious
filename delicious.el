@@ -4,7 +4,7 @@
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;; Created 25 October 2004
-;; Version: 0.2 2005-05-04
+;; Version: 0.2 2005-05-06
 ;; Keywords: comm, hypermedia
 
 ;; This program is free software; you can redistribute it and/or
@@ -74,7 +74,7 @@
   "Face for timestamp in search results."
   :group 'delicious)
 
-(defconst delicious-version  "delicious.el/0.2 2005-05-04"
+(defconst delicious-version  "delicious.el/0.2 2005-05-06"
   "The version string for this copy of delicious.el.")
 
 (defun delicious-post (url description &optional tags extended time)
@@ -520,25 +520,59 @@ MATCHES is the number of matches found."
         (setq delicious-posts-list (read (buffer-string))))))
   (message "Done reading posts."))
 
-(defun delicious-get-posts-from-stored (tag date)
+(defun delicious-get-posts-from-stored (tag date &optional tag-match-type)
   "Return a list of posts filtered by TAG and DATE.
-TAG should be a regexp matching a space-separated group of tags.
-DATE should be a regexp. An example of a stored date string
-is `2005-04-23T20:22:55Z'."
-;; The list is HREF, DESCRIPTION, EXTENDED, HASH, TAG, and TIME.
+TAG is a space-delimited string of tags. DATE is a regexp. 
+TAG-MATCH-TYPE is either 'any' or 'all'. If it's `any', posts with any of the
+tags in TAG are returned. If it's `all' (the default), only posts with all of
+the tags in TAG are returned. An example of a stored date string is
+`2005-04-23T20:22:55Z'."
   (unless (and (boundp 'delicious-posts-list)
                delicious-posts-list)
     (delicious-load-posts-file))
   (let ((matches '()))
     (mapc (lambda (post)
-            (if (and (string-match tag (cdr (assoc "tag" post)))
-                     (string-match date (cdr (assoc "time" post))))
-                (add-to-list 'matches post)))
-          delicious-posts-list)
+	    (when (and (delicious-test-date-regexp post date)
+		       (cond ((or (null tag-match-type)
+				  (eq tag-match-type 'all))
+			      (delicious-test-tag-all post tag))
+			     ((eq tag-match-type 'any)
+			      (delicious-test-tag-any post tag))
+			     (t
+			      (error "Invalid tag match type"))))
+	      (add-to-list 'matches post)))
+	  delicious-posts-list)
     matches))
-  
+
+(defun delicious-test-tag-all (post tag)
+  "Return t if the tag field of POST contains all the tags in TAG.
+TAG is a space-delimited string."
+  (let ((post-tags (split-string (cdr (assoc "tag" post))))
+	(check-tags (split-string tag))
+	(result t))
+    (while (and result 
+		(setq this-tag (pop check-tags)))
+      (unless (member this-tag post-tags)
+	(setq result nil)))
+    result))
+
+(defun delicious-test-tag-any (post tag)
+  "Return t if the tag field of POST contains any of the tags in TAG.
+TAG is a space-delimited string."
+  (let ((post-tags (split-string (cdr (assoc "tag" post))))
+	(check-tags (split-string tag))
+	(result nil))
+    (while (and (null result)
+		(setq this-tag (pop check-tags)))
+      (if (member this-tag post-tags)
+	  (setq result t)))
+    result))
+   
+(defun delicious-test-date-regexp (post date)
+  "Return t if the time field of POST matches regexp DATE."
+  (if (string-match date (cdr (assoc "time" post)))
+      t))
+
 (provide 'delicious)
          
 ;;; delicious.el ends here
-
-

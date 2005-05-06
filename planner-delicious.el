@@ -4,7 +4,7 @@
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;; Created 31 March 2005
-;; Version: 0.1 2005-04-26
+;; Version: 0.1 2005-05-06
 ;; Keywords: comm, hypermedia
 
 ;; This program is free software; you can redistribute it and/or
@@ -35,7 +35,7 @@
 ;;
 ;;   * Delicious
 ;;
-;;   <lisp>(planner-delicious-insert-posts "tag-regexp" "date-regexp")</lisp>
+;;   <lisp>(planner-delicious-insert-posts "tag1 tag2 tag3" "2005.*" 'all)</lisp>
 ;;
 ;; on the pages where you want your posts to appear. This function rewrites
 ;; everything between `planner-delicious-section' ("* Delicious" by default)
@@ -43,10 +43,13 @@
 ;; everything else alone. You could add this to your
 ;; `planner-day-page-template' if you want posts to appear every day.
 ;;
-;; If you don't want to filter by either date or time, just use a regexp that
-;; matches anything, like ".*" for either or both arguments. When constructing
-;; your regexps, keep in mind that tags are stored space-separated, and dates
-;; are stored in a format like `2005-04-23T20:22:55Z'. 
+;; The example above will insert all the posts that have all three tags. If you
+;; instead wanted all of the posts that had any of the three tags, use 'any 
+;; in place of 'all. 
+;;
+;; If you don't want to filter by date, just use a regexp that matches
+;; anything, like ".*". When constructing your date regexp, keep in
+;; mind that dates are stored in a format like `2005-04-23T20:22:55Z'.
 
 ;; The code to rewrite `planner-delicious-section' is based on work by Sacha
 ;; Chua in `planner-accomplishments.el'.
@@ -61,18 +64,21 @@
   :type 'string
   :group 'delicious)
 
-(defun planner-delicious-insert-posts (tag date)
+(defun planner-delicious-insert-posts (tag date &optional tag-match-type)
   "Insert all your posts matching TAG and DATE under `planner-delicious-section'.
-TAG should be a regexp constructed to match the stored space-separated list
-of tags. DATE should be a regexp constructed with the stored date format
-in mind. An example of the stored date format is `2005-04-23T20:22:55Z'." 
+TAG is a space-delimited string. DATE is a regexp. TAG-MATCH-TYPE can be either
+`any' or `all' (the default). If it's `any', then all of the posts with any of
+the tags in TAG will be inserted. If it's `all', then only the posts with all of
+the tags in TAG will be inserted. The date regexp should be constructed with the
+stored date format in mind. An example of the stored date format is 
+`2005-04-23T20:22:55Z'." 
   (save-excursion
     (save-restriction
       (when (planner-narrow-to-section planner-delicious-section)
         (delete-region (point-min) (point-max))
         (insert "* " planner-delicious-section "\n\n"
                 (let ((matching-posts 
-                       (delicious-get-posts-from-stored tag date)))
+                       (delicious-get-posts-from-stored tag date tag-match-type)))
                   (with-temp-buffer
                     (mapc (lambda (post)
                             (let ((href (cdr (assoc "href" post)))

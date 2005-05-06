@@ -1,3 +1,21 @@
+2005-05-06  John Sullivan  <johns@fsf.org>
+
+	* delicious.el (delicious-get-posts-from-stored): Added new
+	argument TAG-MATCH-TYPE. Instead of filtering posts by a regexp
+	for tags, the user can now specify whether they want posts with
+	all of the tags, or with any of the tags. Broke filtering logic
+	into separate functions.
+	(delicious-test-tag-all): New function to test whether a post has
+	all of the given tags.
+	(delicious-test-tag-any): New function to test whether a post has
+	any of the given tags.
+
+	* planner-delicious.el (planner-delicious-insert-posts): Updated
+	to use new format of `delicious-get-posts-from-stored'.
+
+	* delicious.el (delicious-test-date-regexp): New function to find 
+	posts with dates matching a regexp.
+
 2005-05-06  johnsu01  <john@wjsullivan.net>
 
 	* delicious.el (delicious-complete-tags): Fixed mistake in number
