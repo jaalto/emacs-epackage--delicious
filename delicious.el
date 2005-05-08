@@ -269,7 +269,9 @@ If not that, just insert http:// into the prompt."
               return (thing-at-point-url-at-point)
                 else
               do (forward-char)))
-      (if (string-match thing-at-point-url-regexp (x-get-selection 'CLIPBOARD))
+      (if (and (x-get-selection 'CLIPBOARD)
+               (string-match thing-at-point-url-regexp 
+                             (x-get-selection 'CLIPBOARD)))
           (x-get-selection 'CLIPBOARD))
       "http://"))
 
