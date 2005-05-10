@@ -1,3 +1,11 @@
+2005-05-10  John Sullivan  <john@wjsullivan.net>
+
+	* delicioapi.el (delicious-api-parse-timestamp): New function.
+	(delicious-api-get-timestamp): New function to make the API call
+	to get the timestamp of the last update from the server.
+
+	* delicious.el (delicious-build-posts-list): Added "Done" message.
+
 2005-05-08  johnsu01  <john@wjsullivan.net>
 
 	* delicious.el (delicious-guess-url): Fixed bug caused by recent
