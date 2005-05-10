@@ -4,7 +4,7 @@
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;; Created 25 October 2004
-;; Version: 0.2 2005-05-06
+;; Version: 0.2 2005-05-10
 ;; Keywords: comm, hypermedia
 
 ;; This program is free software; you can redistribute it and/or
@@ -74,7 +74,7 @@
   "Face for timestamp in search results."
   :group 'delicious)
 
-(defconst delicious-version  "delicious.el/0.2 2005-05-06"
+(defconst delicious-version  "delicious.el/0.2 2005-05-10"
   "The version string for this copy of delicious.el.")
 
 (defun delicious-post (url description &optional tags extended time)
@@ -236,7 +236,8 @@ are accepted as input."
   "Refresh or build the posts list from the server for use in duplicate checking."
   (interactive)
   (message "Refreshing delicious posts list from server.")
-  (setq delicious-posts-list (delicious-api-get-all)))
+  (setq delicious-posts-list (delicious-api-get-all))
+  (message "Done."))
 
 (defun delicious-guess-description ()
   "Try some different things to get a default description."
