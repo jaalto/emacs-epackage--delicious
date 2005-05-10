@@ -12,7 +12,7 @@
 	changes in url guessing that required something to be in the
 	clipboard before posting. 
 
-2005-05-06  John Sullivan  <johns@fsf.org>
+2005-05-06  John Sullivan  <john@wjsullivan.net>
 
 	* delicious.el (delicious-get-posts-from-stored): Added new
 	argument TAG-MATCH-TYPE. Instead of filtering posts by a regexp
