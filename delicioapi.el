@@ -315,11 +315,11 @@ TAG is a tag to filter by.  The dates are the keys."
 ;;     (delicious-send-request (delicious-build-request uri))))
 
 (defun delicious-api-rename (old-tag new-tag)
-"Rename OLD-TAG to NEW-TAG across all posts."
-(let ((uri (format "tags/rename?&old=%s&new=%s" 
-                   (url-hexify-string old-tag)
-                   (url-hexify-string new-tag))))
-  (delicious-send-request (delicious-build-request uri))))
+  "Rename OLD-TAG to NEW-TAG across all posts."
+  (let ((uri (format "tags/rename?&old=%s&new=%s" 
+		     (url-hexify-string old-tag)
+		     (url-hexify-string new-tag))))
+    (delicious-send-request (delicious-build-request uri))))
 
 (defun delicious-api-delete (url)
   "Delete a URL."
@@ -333,8 +333,8 @@ TAG is a tag to filter by.  The dates are the keys."
     (delicious-api-parse-timestamp)))
 
 (defun delicious-api-html
-(&optional username tagname count extended divclass aclass tags tagclass tagsep tagsepclass bullet rssbutton extendeddiv extendedclass)
-"Return results formatted in HTML, according to a long list of options.
+  (&optional username tagname count extended divclass aclass tags tagclass tagsep tagsepclass bullet rssbutton extendeddiv extendedclass)
+  "Return results formatted in HTML, according to a long list of options.
 USERNAME is the name of the user whose links you want to fetch.  If you don't
 specify a name, `delicious-api-user' will be used.  If TAGNAME is nil, then
 results from all of the user's tags will be used.  If TAGNAME is passed, only
@@ -353,20 +353,20 @@ nil, add an RSS feed button using CSS.  It it is non-nil, don't add an RSS feed
 button.  EXTENDEDDIV is an extended entry in its own div.  If it is nil, don't
 use it.  If it is non-nil, do something.  EXTENDEDCLASS is a CSS class to use
 for EXTENDEDDIV."
-(delicious-send-request
- (delicious-api-build-html-request
-  (delicious-api-html-uri username tagname count extended divclass aclass tags tagclass tagsep tagsepclass bullet rssbutton extendeddiv extendedclass)))
-(save-excursion
-  (with-current-buffer delicious-api-buffer
-    (let ((beginning (progn
-                       (goto-char (point-min))
-                       (re-search-forward "<div")
-                       (line-beginning-position)))
-          (end (progn
-                 (goto-char (point-max))
-                 (re-search-backward "</a>")
-                 (line-end-position))))
-      (buffer-substring beginning end)))))
+  (delicious-send-request
+   (delicious-api-build-html-request
+    (delicious-api-html-uri username tagname count extended divclass aclass tags tagclass tagsep tagsepclass bullet rssbutton extendeddiv extendedclass)))
+  (save-excursion
+    (with-current-buffer delicious-api-buffer
+      (let ((beginning (progn
+			 (goto-char (point-min))
+			 (re-search-forward "<div")
+			 (line-beginning-position)))
+	    (end (progn
+		   (goto-char (point-max))
+		   (re-search-backward "</a>")
+		   (line-end-position))))
+	(buffer-substring beginning end)))))
 
 (defun delicious-api-html-uri
   (&optional username tagname count extended divclass aclass tags tagclass tagsep tagsepclass bullet rssbutton extendeddiv extendedclass)
