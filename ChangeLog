@@ -1,3 +1,12 @@
+2005-05-12  John Sullivan  <john@wjsullivan.net>
+
+	* delicioapi.el (delicious-api-get-timestamp): Use existing
+	XML-parsing functions instead of a special one for
+	timestamp. Function now returns a time value.
+
+	* delicioapi.el (delicious-api-parse-timestamp): Deleted, since
+	we're using the existing XML-parsing functions.
+	
 2005-05-10  John Sullivan  <john@wjsullivan.net>
 
 	* delicioapi.el (delicious-api-parse-timestamp): New function.

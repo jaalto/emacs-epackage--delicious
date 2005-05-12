@@ -4,7 +4,7 @@
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;; Created 25 October 2004
-;; Version: 0.2 2005-05-10
+;; Version: 0.2 2005-05-12
 ;; Keywords: comm, hypermedia
 
 ;; This program is free software; you can redistribute it and/or
@@ -70,7 +70,7 @@
 (defvar delicious-api-html "/html/"
   "*The path to the del.icio.us HTML feed.  It should begin and end with a slash.")
 
-(defconst delicious-api-version "delicioapi.el/0.2 2005-05-10"
+(defconst delicious-api-version "delicioapi.el/0.2 2005-05-12"
 "The version string for this copy of delicioapi.el.")
 
 (defconst delicious-api-field-match "=\"\\(.*?\\)\""
@@ -327,10 +327,17 @@ TAG is a tag to filter by.  The dates are the keys."
     (delicious-send-request (delicious-build-request uri))))
 
 (defun delicious-api-get-timestamp ()
-  "Return the time of the last update from the server."
-  (let ((uri (format "posts/update")))
+  "Return the time of the last update from the server.
+The value returned is a time value."
+  (let ((uri (format "posts/update"))
+	(search-string (delicious-build-search "update time")))
     (delicious-send-request (delicious-build-request uri))
-    (delicious-api-parse-timestamp)))
+    (setq date (caar (delicious-do-search-list (car search-string) 1)))
+    (string-match "\\([0-9]++++\\)-\\([0-9]++\\)-\\([0-9]++\\)T\\([0-9]++\\):\\([0-9]++\\):\\([0-9]++\\)" date)
+    (apply 'encode-time 
+	   (mapcar (lambda (i)
+		     (string-to-int (match-string i date)))
+		   '(6 5 4 3 2 1)))))
 
 (defun delicious-api-html
   (&optional username tagname count extended divclass aclass tags tagclass tagsep tagsepclass bullet rssbutton extendeddiv extendedclass)
@@ -552,16 +559,6 @@ Output goes to `delicious-api-buffer'."
                                       (concat field "=\"\\(.*?\\)\"") post)
                                   collect (cons field (match-string 1 post))))))
         posts-parsed))))
-
-(defun delicious-api-parse-timestamp ()
-  "Parse the `delicious-api-buffer' XML to get the timestamp."
-  (save-excursion
-    (with-current-buffer delicious-api-buffer
-      (goto-char (point-min))
-      (let ((timestamp (progn
-			 (re-search-forward "<update time=\"\\(.*\\)\" />")
-			 (match-string 1))))
-	timestamp))))
 
 (defun delicious-auth ()
   "Return the authorization string using `delicious-api-user' and `delicious-api-password'."
