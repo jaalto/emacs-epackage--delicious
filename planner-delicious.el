@@ -4,7 +4,7 @@
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;; Created 31 March 2005
-;; Version: 0.1 2005-05-06
+;; Version: 0.1 2005-05-18
 ;; Keywords: comm, hypermedia
 
 ;; This program is free software; you can redistribute it and/or
@@ -50,7 +50,10 @@
 ;; If you don't want to filter by date, just use a regexp that matches
 ;; anything, like ".*". When constructing your date regexp, keep in
 ;; mind that dates are stored in a format like `2005-04-23T20:22:55Z'.
-
+;;
+;; There are also two interactive commands,`planner-delicious-insert-posts-any'
+;; and `planner-delicious-insert-posts-all'. Read their doc strings for details.
+;;
 ;; The code to rewrite `planner-delicious-section' is based on work by Sacha
 ;; Chua in `planner-accomplishments.el'.
 
@@ -72,6 +75,10 @@ the tags in TAG will be inserted. If it's `all', then only the posts with all of
 the tags in TAG will be inserted. The date regexp should be constructed with the
 stored date format in mind. An example of the stored date format is 
 `2005-04-23T20:22:55Z'." 
+  (unless (equal major-mode 'planner-mode)
+    (error "This is not a planner buffer"))
+  (unless (string-match planner-delicious-section (buffer-string))
+    (error "No \"%s\" section in this buffer" planner-delicious-section))
   (save-excursion
     (save-restriction
       (when (planner-narrow-to-section planner-delicious-section)
@@ -91,6 +98,22 @@ stored date format in mind. An example of the stored date format is
                           matching-posts)
                     (buffer-string))) "\n\n")))))
 
+(defun planner-delicious-insert-posts-all (tag &optional date)
+  "Insert all your posts matching all of the tags and the date entered.
+If a prefix is given, do not filter by date."
+  (interactive (list (delicious-complete-tags nil nil nil nil t)
+                     (if current-prefix-arg ".*"
+                       (planner-read-date))))
+  (planner-delicious-insert-posts tag date 'all))
+
+(defun planner-delicious-insert-posts-any (tag &optional date)
+  "Insert all your posts matching any of the tags and from the date entered.
+If a prefix is given, do not filter by date."
+  (interactive (list (delicious-complete-tags nil nil nil nil t)
+                     (if current-prefix-arg ".*"
+                       (planner-read-date))))
+  (planner-delicious-insert-posts tag date 'any))
+               
 (provide 'planner-delicious)
 
 

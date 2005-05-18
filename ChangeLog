@@ -1,3 +1,13 @@
+2005-05-18  johnsu01  <john@wjsullivan.net>
+
+	* planner-delicious.el (planner-delicious-insert-posts): Copied
+	some sanity checks from planner-diary.el to make sure we're not
+	mangling an innocent buffer. 
+	(planner-delicious-insert-posts-all): New interactive command to
+	insert posts matching all of a list of tags, and optionally a date.
+	(planner-delicious-insert-posts-any): New interactive command to
+	insert posts matching any of a list of tags, and optionally a date.
+
 2005-05-12  John Sullivan  <john@wjsullivan.net>
 
 	* delicioapi.el (delicious-api-get-timestamp): Use existing
