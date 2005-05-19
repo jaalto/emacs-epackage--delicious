@@ -2,11 +2,17 @@
 
 	* planner-delicious.el (planner-delicious-insert-posts): Copied
 	some sanity checks from planner-diary.el to make sure we're not
-	mangling an innocent buffer. 
+	mangling an innocent buffer.
 	(planner-delicious-insert-posts-all): New interactive command to
-	insert posts matching all of a list of tags, and optionally a date.
+	insert posts matching all of a list of tags, and optionally a
+	date.
 	(planner-delicious-insert-posts-any): New interactive command to
-	insert posts matching any of a list of tags, and optionally a date.
+	insert posts matching any of a list of tags, and optionally a
+	date.
+	(planner-delicious-insert-posts): Added safety check to throw an
+	error when you try to match a tag you have never used before,
+	until I understand the bug. Without this, emacs was locking up in
+	this case.
 
 2005-05-12  John Sullivan  <john@wjsullivan.net>
 
