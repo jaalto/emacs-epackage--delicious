@@ -504,10 +504,6 @@ Wait for up to `delicious-api-timeout' seconds for output. Output goes to
                           (throw 
                            'error 
                            "HTTP error received, see delicious output buffer"))
-                         ((re-search-forward "you have been banned" nil t)
-                          (throw
-                           'error
-                           "You have been banned by the server"))
                          ((not (re-search-forward 
                                 delicious-api-success-match nil t))
                           (throw
