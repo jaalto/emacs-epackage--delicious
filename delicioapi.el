@@ -494,20 +494,24 @@ Wait for up to `delicious-api-timeout' seconds for output. Output goes to
                                               '(lambda () (throw 'error 
                                                                  "timeout"))))
                (while (memq (process-status proc) '(open run))
-                 (accept-process-output proc)
-                 (save-excursion 
-                   (goto-char (point-min))
-                   (cond ((re-search-forward "HTTP/1.1 503" nil t)
-                          (throw 
-                          'error "HTTP 503 error received, server unavailable"))
-                         ((not (re-search-forward "HTTP/1.1 200 OK" nil t))
-                          (throw 
-                           'error 
-                           "HTTP error received, see delicious output buffer"))
-                         ((not (re-search-forward 
-                                delicious-api-success-match nil t))
-                          (throw
-                           'error "Unrecognized output received")))))))
+                 (accept-process-output proc))
+               (save-excursion 
+                 (goto-char (point-min))
+                 (cond ((re-search-forward "HTTP/1.1 503" nil t)
+                        (throw 
+                         'error "HTTP 503 error received, server unavailable"))
+                       ((not (re-search-forward "HTTP/1.1 200 OK" nil t))
+                        (throw 
+                         'error 
+                         "HTTP error received, see delicious output buffer"))
+                       ((re-search-forward "you have been banned" nil t)
+                        (throw
+                         'error
+                         "You have been banned by the server"))
+                       ((not (re-search-forward 
+                              delicious-api-success-match nil t))
+                        (throw
+                         'error "Unrecognized output received"))))))
            (cancel-timer time-out))))
     (cond ((equal error-check "timeout")
            (error 

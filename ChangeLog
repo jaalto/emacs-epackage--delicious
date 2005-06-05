@@ -2,7 +2,8 @@
 
 	* delicioapi.el (delicious-send-request): Fixed error checking so
 	that it doesn't lie and say everything is fine when there is a 503
-	error. Some line length cleanups.
+	error. Some line length cleanups. Added specific error message for
+	when you have been banned by the server.
 
 2005-05-18  johnsu01  <john@wjsullivan.net>
 
