@@ -4,7 +4,7 @@
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;; Created 25 October 2004
-;; Version: 0.2 2005-05-12
+;; Version: 0.2 2005-06-05
 ;; Keywords: comm, hypermedia
 
 ;; This program is free software; you can redistribute it and/or
@@ -478,29 +478,40 @@ for EXTENDEDDIV."
             uri delicious-api-from delicious-api-user-agent (delicious-auth))))
 
 (defun delicious-send-request (request)
-  "Send the REQUEST to the server.  Wait for success, HTTP error, or timeout.
-Output goes to `delicious-api-buffer'."
+  "Send the REQUEST to the server.
+Wait for up to `delicious-api-timeout' seconds for output. Output goes to
+`delicious-api-buffer'. After receiving output, check for HTTP errors."
   (let ((error-check
          (catch 'error
            (unless (null (get-buffer delicious-api-buffer))
              (kill-buffer delicious-api-buffer))
-           (open-network-stream "delicious" delicious-api-buffer delicious-api-host "http")
+           (open-network-stream "delicious" delicious-api-buffer 
+                                delicious-api-host "http")
            (process-send-string "delicious" request)
            (with-current-buffer delicious-api-buffer
              (let ((proc (get-process "delicious")))
                (setq time-out (run-with-timer delicious-api-timeout nil
-                                              '(lambda () (throw 'error "timeout"))))
-               (while (save-excursion
-                        (and (memq (process-status proc) '(open run))
-                             (not (re-search-forward delicious-api-success-match nil t))))
-                 (save-excursion
-                   (if (and (re-search-forward "HTTP/1.1" nil t)
-                            (not (re-search-forward "200 OK" nil t)))
-                       (throw 'error "HTTP error received, see *delicious output*")))
-                 (accept-process-output proc))))
+                                              '(lambda () (throw 'error 
+                                                                 "timeout"))))
+               (while (memq (process-status proc) '(open run))
+                 (accept-process-output proc)
+                 (save-excursion 
+                   (goto-char (point-min))
+                   (cond ((re-search-forward "HTTP/1.1 503" nil t)
+                          (throw 
+                          'error "HTTP 503 error received, server unavailable"))
+                         ((not (re-search-forward "HTTP/1.1 200 OK" nil t))
+                          (throw 
+                           'error 
+                           "HTTP error received, see delicious output buffer"))
+                         ((not (re-search-forward 
+                                delicious-api-success-match nil t))
+                          (throw
+                           'error "Unrecognized output received")))))))
            (cancel-timer time-out))))
     (cond ((equal error-check "timeout")
-           (error "Timed out waiting for response.  Your transaction may still occur, though")
+           (error 
+            "Timed out waiting for response (transaction may still occur)")
            (kill-process (get-process "delicious")))
           (error-check
            (error error-check)))))
