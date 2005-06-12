@@ -4,7 +4,7 @@
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;; Created 25 October 2004
-;; Version: 0.2 2005-05-10
+;; Version: 0.2 2005-06-12
 ;; Keywords: comm, hypermedia
 
 ;; This program is free software; you can redistribute it and/or
@@ -293,11 +293,12 @@ NEW-TAG can be multiple tags, space-separated."
 (defun delicious-w3m-html (username count tag)
   "Visit the HTML page for USERNAME showing COUNT most recent posts under TAG.
 With prefix, visit the page in a new w3m session."
-  (interactive "sUsername (RET for yours): \nnNumber of posts (RET for 15): \nsTag (RET for all): ")
-  (w3m-browse-url
-   (format "http://%s%s%s" delicious-api-host delicious-api-html
-           (delicious-api-html-uri username tag count))
-   (not (null current-prefix-arg))))
+  (interactive "sUsername (RET for yours): \nsNumber of posts (RET for 15): \nsTag (RET for all): ")
+  (let ((count (or (string-to-int count) 15)))
+    (w3m-browse-url
+     (format "http://%s%s%s" delicious-api-host delicious-api-html
+             (delicious-api-html-uri username tag count))
+     (not (null current-prefix-arg)))))
 
 (defun delicious-w3m-bookmark-recent (count tag section)
   "Add your COUNT recent delicious posts under TAG to your w3m bookmarks file.
