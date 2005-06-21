@@ -1,3 +1,13 @@
+2005-06-20  johnsu01  <john@wjsullivan.net>
+
+	* delicious.el (delicious-post-offline): New command, post while
+	offline for batch uploading later.
+	(delicious-post-cache): New command, post the current cache as a batch.
+	(delicious-clear-cache): New command, clear the current cache file.
+
+	* delicioapi.el (delicious-cache-file): New option. Path to cache
+	filename.
+
 2005-06-12  johnsu01  <john@wjsullivan.net>
 
 	* delicious.el (delicious-w3m-html): Fixed so that it actually

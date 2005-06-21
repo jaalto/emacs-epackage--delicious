@@ -4,7 +4,7 @@
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;; Created 25 October 2004
-;; Version: 0.2 2005-06-05
+;; Version: 0.2 2005-06-20
 ;; Keywords: comm, hypermedia
 
 ;; This program is free software; you can redistribute it and/or
@@ -70,7 +70,7 @@
 (defvar delicious-api-html "/html/"
   "*The path to the del.icio.us HTML feed.  It should begin and end with a slash.")
 
-(defconst delicious-api-version "delicioapi.el/0.2 2005-05-12"
+(defconst delicious-api-version "delicioapi.el/0.2 2005-06-20"
 "The version string for this copy of delicioapi.el.")
 
 (defconst delicious-api-field-match "=\"\\(.*?\\)\""
@@ -192,18 +192,25 @@
 :tag "HTML extendeddiv parameter")
 
 (defcustom delicious-api-html-extendedclass nil
-"*Class to use for extendeddiv.  Server default is empty."
+  "*Class to use for extendeddiv.  Server default is empty."
 :version "21.3.1"
 :group 'delicious
 :type 'string
 :tag "HTML extendedclass parameter")
 
 (defcustom delicious-posts-file-name ".delicious"
-"*Filename in $HOME to save delicious posts to."
+  "*Filename in $HOME to save delicious posts to."
 :version "21.4.1"
 :group 'delicious
 :type 'string
 :tag "Delicious posts filename")
+
+(defcustom delicious-cache-file "~/.delicious-cache"
+  "*Path to the file to cache posts for later posting to the server."
+  :version "21.4.1"
+  :group 'delicious
+  :type 'string
+  :tag "Delicious cache filename")
 
 ;; Functions
 
