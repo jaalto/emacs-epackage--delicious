@@ -1,10 +1,10 @@
-;;; delicious.el --- functions to make productive use of the http://del.icio.us API
+;; delicious.el --- functions to make productive use of the http://del.icio.us API
 
 ;; Copyright (C) 2004, 2005 John Sullivan
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;; Created 25 October 2004
-;; Version: 0.2 2005-06-20
+;; Version: 0.2 2005-06-21
 ;; Keywords: comm, hypermedia
 
 ;; This program is free software; you can redistribute it and/or
@@ -74,7 +74,7 @@
   "Face for timestamp in search results."
   :group 'delicious)
 
-(defconst delicious-version  "delicious.el/0.2 2005-06-20"
+(defconst delicious-version  "delicious.el/0.2 2005-06-21"
   "The version string for this copy of delicious.el.")
 
 (defun delicious-post (url description &optional tags extended time)
@@ -352,6 +352,16 @@ Optionally assign TAGS, an EXTENDED description, and TIME to the bookmarks."
 (defvar delicious-search-mode-map
    (let ((map (make-sparse-keymap)))
      (define-key map [tab] 'delicious-search-next-result)
+     (define-key map [(control ?i)] 'delicious-search-next-result)
+     (define-key map [(shift tab)] 'delicious-search-previous-result)
+     (unless (featurep 'xemacs)
+       (define-key map [(shift iso-lefttab)]
+         'delicious-search-previous-result)
+       (define-key map [(shift control ?i)]
+         'delicious-search-previous-result))
+     (define-key map [(meta ?n)] 'delicious-search-next-result)
+     (define-key map [(meta ?p)] 'delicious-search-previous-result)
+     (define-key map [(return)] 'browse-url-at-point)
      map)
    "Keymap for function `delicious-search-mode'.")
 

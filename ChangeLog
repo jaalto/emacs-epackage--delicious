@@ -1,3 +1,11 @@
+2005-06-21  johnsu01  <john@wjsullivan.net>
+
+	* delicious.el (delicious-search-mode-map): Shift-TAB now goes to
+	previous result. M-n now goes to next result, M-p to previous
+	result, while in the search results buffer. RET will browse the
+	link at point.
+
+
 2005-06-20  johnsu01  <john@wjsullivan.net>
 
 	* delicious.el (delicious-post-offline): New command, post while
