@@ -601,7 +601,7 @@ TAG is a space-delimited string."
                         (cons "extended" (or extended nil))
                         (cons "time" (or time nil)))))
         (prin1 post (current-buffer)))
-      (write-file delicious-cache-file)))
+      (save-buffer)))
   (if (y-or-n-p "Post another bookmark? ")
       (call-interactively 'delicious-post-offline)
     (message "Cache saved.")))

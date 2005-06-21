@@ -2,8 +2,12 @@
 
 	* delicious.el (delicious-post-offline): New command, post while
 	offline for batch uploading later.
-	(delicious-post-cache): New command, post the current cache as a batch.
-	(delicious-clear-cache): New command, clear the current cache file.
+	(delicious-post-cache): New command, post the current cache as a
+	batch.
+	(delicious-clear-cache): New command, clear the current cache
+	file.
+	(delicious-post-offline): Small change to make sure a backup of
+	the cache file is created when it's changed.
 
 	* delicioapi.el (delicious-cache-file): New option. Path to cache
 	filename.
