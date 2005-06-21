@@ -4,7 +4,7 @@
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;; Created 25 October 2004
-;; Version: 0.2 2005-06-12
+;; Version: 0.2 2005-06-20
 ;; Keywords: comm, hypermedia
 
 ;; This program is free software; you can redistribute it and/or
@@ -74,7 +74,7 @@
   "Face for timestamp in search results."
   :group 'delicious)
 
-(defconst delicious-version  "delicious.el/0.2 2005-05-10"
+(defconst delicious-version  "delicious.el/0.2 2005-06-20"
   "The version string for this copy of delicious.el.")
 
 (defun delicious-post (url description &optional tags extended time)
@@ -498,6 +498,8 @@ MATCHES is the number of matches found."
                (not (null delicious-posts-list)))
     (delicious-build-posts-list)))
 
+;; Offline and cached status handling
+
 (defun delicious-save-posts ()
   "Write posts to `delicious-posts-file-name' in your $HOME directory."
   (interactive)
@@ -523,6 +525,8 @@ MATCHES is the number of matches found."
         (insert-file-contents file)
         (setq delicious-posts-list (read (buffer-string))))))
   (message "Done reading posts."))
+
+;; Searching posts stored offline
 
 (defun delicious-get-posts-from-stored (tag date &optional tag-match-type)
   "Return a list of posts filtered by TAG and DATE.
@@ -576,6 +580,66 @@ TAG is a space-delimited string."
   "Return t if the time field of POST matches regexp DATE."
   (if (string-match date (cdr (assoc "time" post)))
       t))
+
+;; Posting while offline
+
+(defun delicious-post-offline (url description &optional tags extended time)
+  "Input bookmarks to post later."
+  (interactive (list
+                (delicious-read-url)
+                (delicious-read-description)
+                (delicious-complete-tags)
+                (delicious-read-extended-description)
+                (delicious-read-time-string)))
+  (save-window-excursion
+    (save-excursion
+      (find-file delicious-cache-file)
+      (goto-char (point-max))
+      (let ((post (list (cons "href" url)
+                        (cons "description" description)
+                        (cons "tag" (or tags nil))
+                        (cons "extended" (or extended nil))
+                        (cons "time" (or time nil)))))
+        (prin1 post (current-buffer)))
+      (write-file delicious-cache-file)))
+  (if (y-or-n-p "Post another bookmark? ")
+      (call-interactively 'delicious-post-offline)
+    (message "Cache saved.")))
+
+(defun delicious-post-cache (&optional cache-file)
+  "Post bookmarks from `delicious-cache-file', or CACHE-FILE if non-nil."
+  (interactive)
+  (save-window-excursion
+    (save-excursion
+      (find-file (or cache-file delicious-cache-file))
+      (goto-char (point-min))
+      (while (not (eobp))
+        (let* ((delicious-cache-post (read (current-buffer)))
+               (href (cdr (elt delicious-cache-post 0)))
+               (description (cdr (elt delicious-cache-post 1)))
+               (tags (cdr (elt delicious-cache-post 2)))
+               (extended (cdr (elt delicious-cache-post 3)))
+               (time (cdr (elt delicious-cache-post 4))))
+          (delicious-api-post href description tags extended time)
+          (message "%s posted." description)
+          (sleep-for 2)))))
+  (when (y-or-n-p "Clear cache now? ")
+    (save-excursion
+      (let ((buf (or cache-file delicious-cache-file)))
+        (find-file buf)
+        (kill-buffer (current-buffer))
+        (delete-file buf)))
+    (message "Cache cleared.")))
+
+(defun delicious-clear-cache (&optional cache-file)
+  "Kill buffer visiting `delicious-cache-file' or CACHE-FILE, and delete file."
+  (interactive)
+  (save-excursion
+    (let ((buf (or cache-file delicious-cache-file)))
+      (find-file buf)
+      (kill-buffer (current-buffer))
+      (delete-file buf)))
+  (message "Cache cleared."))
 
 (provide 'delicious)
          
