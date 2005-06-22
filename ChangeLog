@@ -1,3 +1,9 @@
+2005-06-22  johnsu01  <john@wjsullivan.net>
+
+	* delicioapi.el (delicious-api-success-match): Fixed bug in
+	regular expression to match successful output. The error was
+	preventing `delicious-api-get-timestamp' from working properly.
+
 2005-06-21  johnsu01  <john@wjsullivan.net>
 
 	* delicious.el (delicious-search-mode-map): Shift-TAB now goes to

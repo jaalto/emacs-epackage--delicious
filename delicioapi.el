@@ -4,7 +4,7 @@
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;; Created 25 October 2004
-;; Version: 0.2 2005-06-20
+;; Version: 0.2 2005-06-22
 ;; Keywords: comm, hypermedia
 
 ;; This program is free software; you can redistribute it and/or
@@ -70,14 +70,15 @@
 (defvar delicious-api-html "/html/"
   "*The path to the del.icio.us HTML feed.  It should begin and end with a slash.")
 
-(defconst delicious-api-version "delicioapi.el/0.2 2005-06-20"
+(defconst delicious-api-version "delicioapi.el/0.2 2005-06-22"
 "The version string for this copy of delicioapi.el.")
 
 (defconst delicious-api-field-match "=\"\\(.*?\\)\""
 "Regular expression to match a field.")
 
-(defconst delicious-api-success-match "\\(</.*>\\)\\|\\(<result code=\"done\" />\\)"
-"Regular expression to match the various successful result tags.")
+(defconst delicious-api-success-match 
+  "\\(</.*>\\)\\|\\(<result code=\"done\" />\\)\\|\\(<.* />\\)"
+  "Regular expression to match the various successful result tags.")
 
 ;; Customization
 
