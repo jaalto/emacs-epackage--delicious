@@ -1,3 +1,9 @@
+2005-06-30  John Sullivan  <john@wjsullivan.net>
+
+	* delicious.el (delicious-read-time-string): Now explicitly return
+	the current date and time as the timestamp if nothing is entered
+	at the date prompt, instead of depending on the server.
+
 2005-06-22  johnsu01  <john@wjsullivan.net>
 
 	* delicioapi.el (delicious-api-success-match): Fixed bug in

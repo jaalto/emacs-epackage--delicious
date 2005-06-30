@@ -102,9 +102,10 @@
 
 (defun delicious-read-time-string ()
   "Read a date string from a prompt and format it properly for the server.
-The server uses the current date and time by default."
+ Use the current date and time if nothing entered."
   (let ((date (read-string "(Optional) Date/Time [yyyy-mm-dd hh:mm:ss]: ")))
-    (unless (equal date "")
+    (if (equal date "")
+	(setq date (format-time-string "%Y-%m-%dT%H:%M:%SZ" (current-time)))
       (unless (string-match "^\\([1-9][0-9][0-9][0-9]\\).\\([0-1][0-9]\\).\\([0-9][0-9]\\).\\([0-9][0-9]\\).\\([0-5][0-9]\\).\\([0-5][0-9]\\)" date)
         (message "Incorrect time string format.")
         (sleep-for 1)
