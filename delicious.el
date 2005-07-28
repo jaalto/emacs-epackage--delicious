@@ -401,6 +401,8 @@ Optionally assign TAGS, an EXTENDED description, and TIME to the bookmarks."
      (define-key map [(meta ?n)] 'delicious-search-next-result)
      (define-key map [(meta ?p)] 'delicious-search-previous-result)
      (define-key map [(return)] 'browse-url-at-point)
+     (define-key map [(space)] 'scroll-up)
+     (define-key map [(delete)] 'scroll-down)
      map)
    "Keymap for function `delicious-search-mode'.")
 
@@ -518,7 +520,6 @@ Display the results in *delicious search results*."
   (unless (equal (buffer-name) "*delicious search results*")
     (switch-to-buffer-other-window
      (get-buffer-create "*delicious search results*")))
-  (view-mode -1)
   (delete-region (point-min) (point-max)))
 
 (defun delicious-search-buffer-finish (search-string matches)
@@ -529,8 +530,7 @@ MATCHES is the number of matches found."
     (goto-char (point-min))
     (insert (format "Your search for \"%s\" returned %d results.\n\n"
                     search-string matches))
-    (view-mode 1)
-    (delicious-search-mode 1)))
+      (delicious-search-mode 1)))
 
 (defun delicious-search-insert-match (post)
   "Insert POST with the fields propertized."
