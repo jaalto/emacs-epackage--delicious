@@ -137,9 +137,11 @@ If OFFLINE is non-nil, don't update the local timestamp."
       (let ((time-string (replace-match "\\1-\\2-\\3T\\4:\\5:\\6Z" t nil date)))
         time-string))))
 
-(defun delicious-read-url ()
+(defun delicious-read-url (&optional offline)
   "Read a url from a prompt, suggesting an appropriate default.
-Check the input to make sure it is valid and react if it is a duplicate."
+Check the input to make sure it is valid and react if it is a duplicate.
+If OFFLINE is non-nil, don't query the server for any information."
+  (delicious-build-posts-list offline)
   (let ((url (delicious-check-input
               (read-string "(Required) URL: " (delicious-guess-url)) "URL")))
     (delicious-duplicate-url-p url)
