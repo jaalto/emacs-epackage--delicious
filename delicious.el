@@ -129,7 +129,7 @@ If OFFLINE is non-nil, don't update the local timestamp."
  Use the current date and time if nothing entered."
   (let ((date (read-string "(Optional) Date/Time [yyyy-mm-dd hh:mm:ss]: ")))
     (if (equal date "")
-	(setq date (format-time-string "%Y-%m-%dT%H:%M:%SZ" (current-time)))
+	(setq date (delicious-format-time))
       (unless (string-match "^\\([1-9][0-9][0-9][0-9]\\).\\([0-1][0-9]\\).\\([0-9][0-9]\\).\\([0-9][0-9]\\).\\([0-5][0-9]\\).\\([0-5][0-9]\\)" date)
         (message "Incorrect time string format.")
         (sleep-for 1)
@@ -675,6 +675,102 @@ TAG is a space-delimited string."
       (kill-buffer (current-buffer))
       (delete-file buf)))
   (message "Cache cleared."))
+
+(defun delicious-build-tags-list (&optional offline)
+  "Build the `delicious-tags-list' table of tags and and index number,
+for use in completion. If OFFLINE is non-nil, don't query the server."
+  (delicious-build-posts-list offline)
+  (save-window-excursion
+    (save-excursion
+      (delicious-get-posts-buffer)
+      (re-search-forward delicious-timestamp) ; skip over the timestamp
+      (setq delicious-tags-list
+            (let ((index 0)
+                  (tags-table '()))
+              (while (not (eobp))
+                (let* 
+                    ((post (read (current-buffer)))
+                     (tags (split-string (cdr (assoc "tag" post)))))
+                  (mapc
+                   (lambda (tag) ; collect tags if new
+                     (unless (assoc tag tags-table)
+                       (add-to-list 'tags-table (list tag index))
+                       (setq index (1+ index))))
+                   tags)))
+              tags-table)))))
+      
+(defun delicious-refresh-p ()
+  "Return t if server timestamp is newer than local timestamp."
+  (let ((server-timestamp (delicious-api-get-timestamp))
+        (local-timestamp 
+         (save-window-excursion
+           (save-excursion
+             (delicious-get-posts-buffer)
+             (delicious-get-local-timestamp-value)))))
+    (time-less-p local-timestamp server-timestamp)))
+ 
+(defun delicious-get-posts-buffer ()
+  "Switch to a buffer containing `delicious-posts-file-name'."
+  (let* ((home (getenv "HOME"))
+         (posts-file (concat home "/" delicious-posts-file-name)))
+    (find-file posts-file)
+    (goto-char (point-min))))
+
+(defconst delicious-timestamp
+  (concat
+   "\\([1-9][0-9]\\{3\\}\\)-" ;year
+   "\\([0-1][0-9]\\)-" ;month
+   "\\([0-3][0-9]\\)T" ;day
+   "\\([0-2][0-9]\\):" ;hour
+   "\\([0-5][0-9]\\):" ;minute
+   "\\([0-5][0-9]\\)Z") ;second
+  "Regular expression matching the timestamp format.")
+
+(defun delicious-get-local-timestamp ()
+  "Return the timestamp recorded in the local posts as a string."
+  (let ((local-timestamp 
+         (if (re-search-forward delicious-timestamp nil t)
+             (match-string 0))))
+    local-timestamp))
+
+(defun delicious-get-local-timestamp-value ()
+  "Return the timestamp recorded in the local posts as a time value.
+Return '(0) if there is no timestamp."
+  (let* ((local-timestamp (delicious-get-local-timestamp))
+         (time-value 
+          (if (null local-timestamp)
+              (list 0)
+            (string-match delicious-timestamp local-timestamp)
+            (encode-time
+             (string-to-int
+              (match-string 6 local-timestamp)) ;seconds
+             (string-to-int
+              (match-string 5 local-timestamp)) ;minutes
+             (string-to-int
+              (match-string 4 local-timestamp)) ;hours
+             (string-to-int
+              (match-string 3 local-timestamp)) ;days
+             (string-to-int
+              (match-string 2 local-timestamp)) ;month
+             (string-to-int
+              (match-string 1 local-timestamp)))))) ;year
+    time-value))
+         
+(defun delicious-update-timestamp ()
+  "Update or create the local timestamp in `delicious-posts-file-name'."
+  (save-window-excursion
+    (save-excursion
+      (delicious-get-posts-buffer)
+      (let ((time (delicious-format-time)))
+        (if (looking-at delicious-timestamp)
+            (replace-match time)
+        (insert time)))
+      (save-buffer))))
+
+(defun delicious-format-time (&optional time)
+  "Return TIME as a del.icio.us timestamp.
+If TIME is not provided, use the server timestamp."
+  (format-time-string "%Y-%m-%dT%H:%M:%SZ" (or time (delicious-api-get-timestamp))))
 
 (provide 'delicious)
          
