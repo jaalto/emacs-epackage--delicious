@@ -252,12 +252,23 @@ are accepted as input. if OFFLINE is non-nil, don't contact the server."
           do (forward-word 1)
           finally return words)))
        
-(defun delicious-build-posts-list ()
-  "Refresh or build the posts list from the server for use in duplicate checking."
+(defun delicious-build-posts-list (&optional offline)
+  "Load local copy of posts, then update if server timestamp is newer.
+If OFFLINE is non-nil, don't query the server."
   (interactive)
-  (message "Refreshing delicious posts list from server.")
-  (setq delicious-posts-list (delicious-api-get-all))
-  (message "Done."))
+  (message "Building delicious posts list.")
+  (save-window-excursion
+    (save-excursion
+      (delicious-get-posts-buffer)
+      (unless offline
+        (when (delicious-refresh-p)
+          (delete-region (point-min) (point-max))
+          (insert (delicious-format-time (delicious-api-get-timestamp)))
+          (mapc '(lambda (post)
+                   (prin1 post (current-buffer)))
+                (delicious-api-get-all))
+          (save-buffer)))
+    (message "Done."))))
 
 (defun delicious-guess-description ()
   "Try some different things to get a default description."
