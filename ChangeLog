@@ -1,3 +1,85 @@
+2005-07-28  johnsu01  <john@wjsullivan.net>
+
+	* delicious.el (delicious-search-tags): Moved actual searching
+	into new function `delicious-posts-matching-tags'.
+
+	* README: Removed descriptions for `delicious-load-posts' and
+	`delicious-save-posts'. Updated description of HTTP error
+	handling.
+
+	* delicious.el (delicious-save-posts): Removed command, because we
+	now always have a local copy of the posts.
+
+2005-07-26  johnsu01  <john@wjsullivan.net>
+
+	* delicious.el (delicious-search-tags): Modified to work offline,
+	use the .delicious buffer, and not use CL.
+
+2005-07-25  johnsu01  <john@wjsullivan.net>
+
+	* delicious.el (delicious-search-description-regexp): Modified to
+	search buffer instead of variable. Now reports an error if it
+	finds a post with no description in it, as this shouldn't happen.
+
+2005-07-18  johnsu01  <john@wjsullivan.net>
+
+	* delicious.el (delicious-guess-url): Don't check the clipboard if
+	we're not in X.
+	(delicious-post): Moved local adding of posts to
+	`delicious-post-local'. Moved addition of tags to the completion
+	table to `delicious-rebuild-tags-maybe'.
+	(delicious-read-url): Changed to accommodate split of
+	`delicious-duplicate-url-p' into two separate functions. Added
+	argument so if we are offline, we call
+	`delicious-build-posts-list' accordingly.
+	(delicious-duplicate-url-p): Move prompt for posting into separate
+	function `delicious-post-duplicate-p'. If it is a duplicate,
+	return the post.
+	(delicious-post-duplicate-p): New function to ask for confirmation
+	for a duplicate post. In the future this will display some
+	information about the current copy of the post.
+	(delicious-build-posts-list): Changed to build the posts list in a
+	buffer. Also, we now check timestamps on the server and locally to
+	see whether we need to rebuild the list, if we are online.
+	(delicious-load-posts-file): Removed, we don't need it
+	anymore. The local post list is loaded as soon as we try to post.
+	(delicious-build-tags-list): Changed to build the tag completion
+	table from the local posts, instead of through an api call to the
+	server. Added OFFLINE argument.
+	(delicious-refresh-p): New function to tell us whether the
+	server's posts are newer than ours.
+	(delicious-get-local-timestamp): New function to read the
+	timestamp from the local file.
+	(delicious-get-local-timestamp-value): New function to convert the
+	local timestamp into a time value.
+	(delicious-format-time): Turn time value into a delicious
+	timestamp.
+	(delicious-post-local): New function to append a post to the local
+	copy.
+	(delicious-post-cache): Now adds each post to the local copy as
+	well.
+	(delicious-tags-list): Global variable, tags table for completion.
+
+2005-07-12  johnsu01  <john@wjsullivan.net>
+
+	* delicious.el (delicious-update-timestamp): Changed to use
+	`delicious-get-posts-buffer'.
+	(delicious-get-local-timestamp): Changed to use
+	`delicious-get-posts-buffer'.
+	
+
+2005-07-12  John Sullivan  <john@wjsullivan.net>
+
+	* delicious.el (delicious-update-timestamp): New function to add a
+	timestamp to the front of the posts data file. If a timestamp is
+	already there, we update it.
+	(delicious-timestamp): New constant to hold the regular expression
+	matching the timestamp format.
+	(delicious-get-local-timestamp): New function to read the saved
+	timestamp.
+	(delicious-get-posts-buffer): New function to either load the
+	posts file if it is not already loaded, or switch to it if it is.
+	
 2005-06-30  John Sullivan  <john@wjsullivan.net>
 
 	* delicious.el (delicious-read-time-string): Now explicitly return
@@ -16,7 +98,9 @@
 	previous result. M-n now goes to next result, M-p to previous
 	result, while in the search results buffer. RET will browse the
 	link at point.
-
+	(delicious-search-buffer-prep): Entering delicious-search-mode no
+	longer involves entering View mode.
+	(delicious-search-buffer-finish): Removed view mode from here too.
 
 2005-06-20  johnsu01  <john@wjsullivan.net>
 
