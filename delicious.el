@@ -185,16 +185,15 @@ If OFFLINE is non-nil, don't query the server for any information."
     (error "Duplicate URL not posted")))
 
 (defun delicious-complete-tags (&optional nosuggest sofar quantity prompt-string
-                                          require)
+                                          require offline)
   "Get tags table if needed.  Do a completing read of tag input.
 Blank line at the prompt ends the input.  If NOSUGGEST is non-nil, don't
 suggest any tags. If SOFAR is non-nil, don't show tags entered so far.
 Repeat the read QUANTITY times. If QUANTITY is nil, repeat until a blank
 line is entered. If REQUIRE is non-nil, only a completion match or an empty string
-are accepted as input."
-  (unless (and (boundp 'delicious-tags-list)
-               (not (null delicious-tags-list)))
-    (delicious-build-tags-list))
+are accepted as input. if OFFLINE is non-nil, don't contact the server."
+  (unless delicious-tags-list
+    (setq delicious-tags-list (delicious-build-tags-list)))
   (let* ((base-prompt 
            (or prompt-string
                "(Enter one at a time, blank to end.) Tag: "))
