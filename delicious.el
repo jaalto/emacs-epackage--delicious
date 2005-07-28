@@ -251,23 +251,6 @@ are accepted as input. if OFFLINE is non-nil, don't contact the server."
             end
           do (forward-word 1)
           finally return words)))
-
-(defun delicious-build-tags-list ()
-  "Refresh or build the tags table for use in completion."
-  (interactive)
-  (message "Refreshing delicious tags list from server.")
-  (setq delicious-tags-list (delicious-api-build-tag-completion))
-  (message "Done."))
-
-(defun delicious-add-tags (tags)
-  "Add TAGS to the local copy of the tags list in DELICIOUS-TAGS-LIST."
-  (let ((tags-list (split-string tags)))
-    (mapc '(lambda (tag)
-             (let ((tag-count (cadar (last delicious-tags-list))))
-               (unless (assoc tag delicious-tags-list)
-                 (let ((new-tag (list tag (1+ tag-count))))
-                   (add-to-list 'delicious-tags-list new-tag t)))))
-          tags-list)))
        
 (defun delicious-build-posts-list ()
   "Refresh or build the posts list from the server for use in duplicate checking."
