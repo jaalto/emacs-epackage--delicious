@@ -442,78 +442,145 @@ advances to the next search result."
 
 (defun delicious-search-posts-regexp (search-string)
   "Search DELICIOUS-POSTS-LIST for SEARCH-STRING, a regular expression.
-Display the results in *delicious search results*."
+Display the results in *delicious search results*.
+If given a prefix, operate offline."
   (interactive "sEnter regexp search string: ")
-  (delicious-build-posts-list-maybe)
-  (delicious-search-buffer-prep)
-  (let ((match-count (loop for post in delicious-posts-list
-                           for match = (loop for field in post
-                                             when (string-match search-string
-                                                                (cdr field))
-                                             return post)
-                           if match do (delicious-search-insert-match post)
-                           count match)))
+  (delicious-build-posts-list current-prefix-arg)
+  (delicious-get-posts-buffer)
+  (re-search-forward delicious-timestamp) ; skip timestamp
+  (let ((match)(matches)(match-count 0))
+    (while (not (eobp))
+      (let ((post (read (current-buffer))))
+        (mapc
+         '(lambda (field)
+            (if (string-match search-string (cdr field))
+                (setq match post)))
+         post)
+        (when match
+          (setq match-count (1+ match-count))
+          (add-to-list 'matches match))
+        (setq match nil)))
+    (delicious-search-buffer-prep)
+    (mapc 
+     '(lambda (post) 
+        (delicious-search-insert-match post))
+     matches)
     (delicious-search-buffer-finish search-string match-count)))
 
 (defun delicious-search-description-regexp (search-string)
   "Search DELICIOUS-POSTS-LIST for descriptions matching SEARCH-STRING.
-Display the results in *delicious search results*."
+Display the results in *delicious search results*.
+If given a prefix, operate offline."
   (interactive "sEnter regexp search string: ")
-  (delicious-build-posts-list-maybe)
-  (delicious-search-buffer-prep)
-  (let ((match-count (loop for post in delicious-posts-list
-                           for match = (loop for field in post
-                                             if (equal (car field) "description")
-                                                 when (string-match search-string
-                                                                    (cdr field)) return post)
-                           if match do (delicious-search-insert-match post)
-                           count match)))
-  (delicious-search-buffer-finish search-string match-count)))
+  (delicious-build-posts-list current-prefix-arg)
+  (delicious-get-posts-buffer)
+  (re-search-forward delicious-timestamp) ; skip timestamp
+  (let ((match)(matches)(match-count 0))
+    (while (not (eobp))
+      (let* ((post (read (current-buffer)))
+             (desc (or (cdr (assoc "description" post))
+                       (error "Malformed bookmark missing description %s"
+                              post))))
+        (if (string-match search-string desc)
+            (setq match post))
+        (when match
+          (setq match-count (1+ match-count))
+          (add-to-list 'matches match))
+        (setq match nil)))
+    (delicious-search-buffer-prep)
+    (mapc
+     '(lambda (post)
+        (delicious-search-insert-match post))
+     matches)
+    (delicious-search-buffer-finish search-string match-count)))
 
 (defun delicious-search-tags-regexp (search-string)
   "Search DELICIOUS-POSTS-LIST for tags matching SEARCH-STRING.
-Display the results in *delicious search results*."
+Display the results in *delicious search results*.
+If given a prefix, operate offline."
   (interactive "sEnter regexp search string: ")
-  (delicious-build-posts-list-maybe)
-  (delicious-search-buffer-prep)
-  (let ((match-count (loop for post in delicious-posts-list
-                           for match = (loop for field in post
-                                             if (equal (car field) "tag")
-                                                 when (string-match search-string
-                                                                    (cdr field)) return post)
-                           if match do (delicious-search-insert-match post)
-                           count match)))
-  (delicious-search-buffer-finish search-string match-count)))
+  (delicious-build-posts-list current-prefix-arg)
+  (delicious-get-posts-buffer)
+  (re-search-forward delicious-timestamp) ; skip timestamp
+  (let ((match)(matches)(match-count 0))
+    (while (not (eobp))
+      (let* ((post (read (current-buffer)))
+             (tags (or (cdr (assoc "tag" post))
+                       "")))
+        (if (string-match search-string tags)
+            (setq match post))
+        (when match
+          (setq match-count (1+ match-count))
+          (add-to-list 'matches match))
+        (setq match nil)))
+    (delicious-search-buffer-prep)
+    (mapc
+     '(lambda (post)
+        (delicious-search-insert-match post))
+     matches)
+    (delicious-search-buffer-finish search-string match-count)))
 
 (defun delicious-search-href-regexp (search-string)
   "Search DELICIOUS-POSTS-LIST for urls matching SEARCH-STRING.
-Display the results in *delicious search results*."
+Display the results in *delicious search results*.
+If given a prefix, operate offline."
   (interactive "sEnter regexp search string: ")
-  (delicious-build-posts-list-maybe)
-  (delicious-search-buffer-prep)
-  (let ((match-count (loop for post in delicious-posts-list
-                           for match = (loop for field in post
-                                             if (equal (car field) "href")
-                                                 when (string-match search-string
-                                                                    (cdr field)) return post)
-                           if match do (delicious-search-insert-match post)
-                           count match)))
-  (delicious-search-buffer-finish search-string match-count)))
+  (delicious-build-posts-list current-prefix-arg)
+  (delicious-get-posts-buffer)
+  (re-search-forward delicious-timestamp) ; skip timestamp
+  (let ((match)(matches)(match-count 0))
+    (while (not (eobp))
+      (let* ((post (read (current-buffer)))
+             (href (or (cdr (assoc "href" post))
+                       (error "Malformed bookmark missing href %s" post))))
+        (if (string-match search-string href)
+            (setq match post))
+        (when match
+          (setq match-count (1+ match-count))
+          (add-to-list 'matches match))
+        (setq match nil)))
+    (delicious-search-buffer-prep)
+    (mapc
+     '(lambda (post)
+        (delicious-search-insert-match post))
+     matches)
+    (delicious-search-buffer-finish search-string match-count)))
+
+(defun delicious-posts-matching-tags (tags)
+  "Return a list of posts with TAGS."
+  (let ((match)(matches)(match-count 0))
+    (save-window-excursion
+      (delicious-build-posts-list current-prefix-arg)
+      (delicious-get-posts-buffer)
+      (re-search-forward delicious-timestamp) ; skip timestamp
+      (while (not (eobp))
+        (let* ((post (read (current-buffer)))
+               (tags (split-string tags))
+               (post-tags (or (cdr (assoc "tag" post)) " ")))
+          (setq match post)
+          (mapc
+           '(lambda (tag)
+              (unless (string-match tag post-tags)
+                (setq match nil)))
+              tags)
+          (when match
+            (setq match-count (1+ match-count))
+            (add-to-list 'matches match))
+          (setq match nil))))
+    matches))
 
 (defun delicious-search-tags (tags)
-  "Display all posts with TAGS, which can include regular expression syntax."
+  "Display all posts with TAGS, which can include regular expression syntax.
+If given a prefix, operate offline."
   (interactive (list (delicious-complete-tags t)))
-  (delicious-build-posts-list-maybe)
-  (delicious-search-buffer-prep)
-  (let* ((tags (split-string tags " "))
-         (matches (loop for post in delicious-posts-list
-                        for match = (loop for tag in tags
-                                          with post-tags = (cdr (assoc "tag" post))
-                                          unless (string-match tag post-tags)
-                                              return 1)
-                        unless (equal match 1) do (delicious-search-insert-match post)
-                        count (not match))))
-    (delicious-search-buffer-finish tags matches)))
+  (let* ((matches (delicious-posts-matching-tags tags))
+         (match-count (length matches)))
+    (delicious-search-buffer-prep)
+    (mapc
+     '(lambda (post)
+        (delicious-search-insert-match post))
+     matches)
+    (delicious-search-buffer-finish tags match-count)))
 
 (defun delicious-search-buffer-prep ()
   "Prepare a *delicious search results* buffer for output."
