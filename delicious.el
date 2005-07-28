@@ -77,6 +77,9 @@
 (defconst delicious-version  "delicious.el/0.2 2005-06-21"
   "The version string for this copy of delicious.el.")
 
+(defconst delicious-tags-list '()
+  "Table of tags for use in completion.")
+
 (defun delicious-post (url description &optional tags extended time)
   ; figure out how to get right time-string format
   "Post a url with arguments URL, DESCRIPTION, TAGS, EXTENDED, and TIME."
