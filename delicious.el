@@ -670,11 +670,11 @@ TAG is a space-delimited string."
 ;; Posting while offline
 
 (defun delicious-post-offline (url description &optional tags extended time)
-  "Input bookmarks to post later."
+  "Input bookmarks to post later. Don't contact the server for anything."
   (interactive (list
-                (delicious-read-url)
+                (delicious-read-url t)
                 (delicious-read-description)
-                (delicious-complete-tags)
+                (delicious-complete-tags nil nil nil nil nil t)
                 (delicious-read-extended-description)
                 (delicious-read-time-string)))
   (save-window-excursion
