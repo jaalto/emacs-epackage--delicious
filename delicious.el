@@ -312,9 +312,11 @@ If not that, just insert http:// into the prompt."
 (defun delicious-rename-tag (old-tag new-tag)
   "Change all instances of OLD-TAG to NEW-TAG.
 NEW-TAG can be multiple tags, space-separated."
-  (interactive (list
-                (delicious-complete-tags t t 1 "Enter old tag: " t)
-                (delicious-complete-tags t "Enter new tag(s) one at a time (blank to end): ")))
+  (interactive 
+   (list
+    (delicious-complete-tags t t 1 "Enter old tag: " t)
+    (delicious-complete-tags
+     t "Enter new tag(s) one at a time (blank to end): ")))
   (if (or (equal old-tag "")
           (equal new-tag ""))
       (message "Aborting due to empty input.")
@@ -326,7 +328,8 @@ NEW-TAG can be multiple tags, space-separated."
 (defun delicious-w3m-html (username count tag)
   "Visit the HTML page for USERNAME showing COUNT most recent posts under TAG.
 With prefix, visit the page in a new w3m session."
-  (interactive "sUsername (RET for yours): \nsNumber of posts (RET for 15): \nsTag (RET for all): ")
+  (interactive 
+   "sUsername (RET for yours): \nsNumber of posts (RET for 15): \nsTag (RET for all): ")
   (let ((count (or (string-to-int count) 15)))
     (w3m-browse-url
      (format "http://%s%s%s" delicious-api-host delicious-api-html
@@ -336,7 +339,8 @@ With prefix, visit the page in a new w3m session."
 (defun delicious-w3m-bookmark-recent (count tag section)
   "Add your COUNT recent delicious posts under TAG to your w3m bookmarks file.
 They will be stored under SECTION."
-  (interactive "nNumber of recent posts to bookmark: \nsTag to filter by: \nsw3m bookmark section to use: ")
+  (interactive
+   "nNumber of recent posts to bookmark: \nsTag to filter by: \nsw3m bookmark section to use: ")
   (let ((delicious-list (delicious-api-get-recent tag count)))
     (loop for bookmark in delicious-list
           for url = (cdr (assoc "href" bookmark))
@@ -359,17 +363,19 @@ Optionally assign TAGS, an EXTENDED description, and TIME to the bookmarks."
         (insert-file-contents w3m-bookmark-file)
         (goto-char (point-min))
         (re-search-forward section-string)
-        (let* ((links (loop until (looking-at w3m-bookmark-section-delimiter)
-                            do (re-search-forward item-start)
-                            for link = (progn
-                                         (re-search-forward thing-at-point-url-regexp)
-                                         (match-string 0))
-                            do (re-search-forward ">")
-                            for title = (buffer-substring (point) (- (re-search-forward "</a>")  4))
-                            for link = (cons link title)
-                            collect link into links
-                            do (beginning-of-line 2)
-                            finally return links)))
+        (let* ((links 
+                (loop until (looking-at w3m-bookmark-section-delimiter)
+                      do (re-search-forward item-start)
+                      for link = (progn
+                                   (re-search-forward thing-at-point-url-regexp)
+                                   (match-string 0))
+                      do (re-search-forward ">")
+                      for title = (buffer-substring 
+                                   (point) (- (re-search-forward "</a>")  4))
+                      for link = (cons link title)
+                      collect link into links
+                      do (beginning-of-line 2)
+                      finally return links)))
           (loop for cell in links
                 for link = (car cell)
                 for title = (cdr cell)
@@ -530,8 +536,10 @@ MATCHES is the number of matches found."
   "Insert POST with the fields propertized."
   (with-current-buffer "*delicious search results*"
     (loop for cell in post
-          do (insert (propertize (cdr cell) 'face
-                                 (intern (concat "delicious-result-" (car cell) "-face")))
+          do (insert 
+              (propertize (cdr cell) 'face
+                          (intern 
+                           (concat "delicious-result-" (car cell) "-face")))
                      "\n")
           finally do (insert "\n"))))
 
