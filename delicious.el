@@ -91,17 +91,38 @@
                 (delicious-read-time-string)))
   (message "Waiting for server.")
   (delicious-api-post url description tags extended time)
-  (loop with post = (list `("href" . ,url)
-                          `("description" . ,description)
-                          `("tag" . ,tags)
-                          `("extended" . ,extended)
-                          `("time" . ,time))
-        for cell in post
-        unless (equal (cdr cell) "")
-            collect cell into cells
-        finally do (add-to-list 'delicious-posts-list cells t)
-        finally do (delicious-add-tags tags))
-  (message "URL posted."))
+  (let ((post (list
+               (cons "href" url)
+               (cons "description" description)
+               (cons "tag" tags)
+               (cons "extended" extended)
+               (cons "time" time))))
+    (delicious-post-local post)
+    (message "URL posted.")))
+
+(defun delicious-post-local (post &optional offline)
+  "Add POST to the local copy.
+If OFFLINE is non-nil, don't update the local timestamp."
+    (save-window-excursion
+      (save-excursion
+        (delicious-get-posts-buffer)
+        (unless offline (delicious-update-timestamp))
+        (goto-char (point-max))
+        (prin1 post (current-buffer))
+        (let ((tags (cdr (assoc "href" post))))
+          (delicious-rebuild-tags-maybe tags))
+        (save-buffer))))
+
+(defun delicious-rebuild-tags-maybe (tags)
+  "If any tags in the space separated string TAGS are new, rebuild tags table."
+  (let ((tags-list (split-string tags))
+        (new))
+    (mapc 
+     (lambda (tag)
+       (unless (assoc tag delicious-tags-list)
+         (setq new t)))
+     tags-list)
+    (if new (delicious-build-tags-list))))
 
 (defun delicious-read-time-string ()
   "Read a date string from a prompt and format it properly for the server.
