@@ -183,25 +183,6 @@ posting with delicious-post are added to the completion list, so the only
 reason to refresh the list is if something funny happens and the list gets
 corrupted, or if you add tags using another interface.
 
-- M-x delicious-save-posts
-
-This command will save whatever posts are currently cached (if everything is
-working properly, this is all of your posts) to a file in your home
-directory. This file is called `.delicious' by default, but you can change the
-name by altering the value of `delicious-posts-file-name'. Currently, this
-function does not make a backup copy before saving or warn you that there is
-already a file there. It just clobbers. I'll make it a little safer in the
-future, but since presumably you have all of your posts stored on the
-del.icio.us server, I don't foresee any real disasters. This command gives you
-a reasonable way to back up your del.icio.us posts. You can't recover them yet,
-but I will soon have the function written to create posts from a file like this
-one, and then you will be able to recover them.
-
-- M-x delicious-load-posts
-
-This command will load your posts from the file named by
-`delicious-posts-file-name' into the variable `delicious-posts-list'. 
-
 * Interactive search commands
 
 Although some filtering can be done via the API, I have started implementing
@@ -415,10 +396,8 @@ now. So far, I've implemented these features:
 - HTTP errors
 
 Currently, it is not uncommon for the del.icio.us server to be temporarily
-unavailable. I'm working on better HTTP error-handling, so that the specific
-error will be reported to you. There's some code here to do that now, but it
-does not seem to be working well. The best solution to this currently is to
-open <http://del.icio.us> in your browser and see what error is coming up. 
+unavailable. delicious-el should report any specific errors it receives. If you
+want more information, check the contents of the *delicious output* buffer.
 
 - Server timeouts
 
@@ -438,11 +417,10 @@ Updated versions can be had via darcs at
 archive, generally just as current, at
 <http://www.wjsullivan.net/darcs/delicious-el/delicious-el.tar.gz>.
 
-I tend to post ChangeLog entries at <http://www.wjsullivan.net/news>.
+There is a Web page with updated information about the project at
+<http://www.wjsullivan.net/code/delicious-el.html>.
 
 * Bugs
 
-Please report any bugs or suggestions to me at <john@wjsullivan.net>. If enough
-people are interested, perhaps we will open an area at
-<http://www.emacswiki.org>.
+Please report any bugs or suggestions to me at <john@wjsullivan.net>.
 
