@@ -144,7 +144,8 @@ If OFFLINE is non-nil, don't query the server for any information."
   (delicious-build-posts-list offline)
   (let ((url (delicious-check-input
               (read-string "(Required) URL: " (delicious-guess-url)) "URL")))
-    (delicious-duplicate-url-p url)
+    (if (delicious-duplicate-url-p url)
+        (delicious-post-duplicate-p url))
     url))
 
 (defun delicious-read-description ()
@@ -163,15 +164,25 @@ If OFFLINE is non-nil, don't query the server for any information."
   (read-string "(Optional) Extended Description: "))
 
 (defun delicious-duplicate-url-p (url)
-  "Check to see if URL is a duplicate."
-  (delicious-build-posts-list-maybe)
-  (if (assoc `(href . ,url) delicious-posts-list)
-      (progn (let ((edit
-                    (y-or-n-p "This URL is a duplicate.\nIf you post it again, the old tags will be replaced by the new ones.\nPost? ")))
-               (if (eq edit t)
-                   (setq duplicate nil)
-                 (error "Duplicate URL not posted"))
-               duplicate))))
+  "Check to see if URL is a duplicate. If so, return the post."
+  (save-window-excursion
+    (save-excursion
+     (delicious-get-posts-buffer)
+     (re-search-forward delicious-timestamp)
+     (let ((dup))
+       (while (and (not (eobp))
+                   (not dup))
+         (let ((post (read (current-buffer))))
+           (if (member (cons "href" url) post)
+               (setq dup post))))
+       dup))))
+
+(defun delicious-post-duplicate-p (url)
+  "Return t if existing post should be replaced with URL."
+  (unless 
+      (y-or-n-p 
+       "This URL is a duplicate.\nIf you post it again, the old tags will be replaced by the new ones.\nPost? ")
+    (error "Duplicate URL not posted")))
 
 (defun delicious-complete-tags (&optional nosuggest sofar quantity prompt-string
                                           require)
