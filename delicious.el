@@ -610,39 +610,7 @@ MATCHES is the number of matches found."
                      "\n")
           finally do (insert "\n"))))
 
-(defun delicious-build-posts-list-maybe ()
-  "Do the inital load of DELICIOUS-POSTS-LIST if needed."
-  (unless (and (boundp 'delicious-posts-list)
-               (not (null delicious-posts-list)))
-    (delicious-build-posts-list)))
-
 ;; Offline and cached status handling
-
-(defun delicious-save-posts ()
-  "Write posts to `delicious-posts-file-name' in your $HOME directory."
-  (interactive)
-  (save-excursion
-    (let* ((home (getenv "HOME"))
-           (buffer delicious-posts-file-name)
-           (file (concat home "/" buffer)))
-      (set-buffer
-       (get-buffer-create buffer))
-      (erase-buffer)
-      (prin1 delicious-posts-list (current-buffer))
-      (write-file file)
-      (kill-buffer buffer)
-      (message "del.icio.us posts successfully saved to %s" file))))
-
-(defun delicious-load-posts-file ()
-  "Read posts from `delicious-posts-file-name' into DELICIOUS-POSTS-LIST."
-  (interactive)
-  (save-excursion
-    (with-temp-buffer
-      (let* ((home (getenv "HOME"))
-             (file (concat home "/" delicious-posts-file-name)))
-        (insert-file-contents file)
-        (setq delicious-posts-list (read (buffer-string))))))
-  (message "Done reading posts."))
 
 ;; Searching posts stored offline
 
