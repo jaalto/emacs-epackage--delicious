@@ -707,6 +707,7 @@ TAG is a space-delimited string."
                (extended (cdr (elt delicious-cache-post 3)))
                (time (cdr (elt delicious-cache-post 4))))
           (delicious-api-post href description tags extended time)
+          (delicious-post-local delicious-cache-post)
           (message "%s posted." description)
           (sleep-for 2)))))
   (when (y-or-n-p "Clear cache now? ")
