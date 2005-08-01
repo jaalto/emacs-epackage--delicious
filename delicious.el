@@ -633,32 +633,15 @@ MATCHES is the number of matches found."
                      "\n")
           finally do (insert "\n"))))
 
-;; Offline and cached status handling
-
-;; Searching posts stored offline
-
-(defun delicious-get-posts-from-stored (tag date &optional tag-match-type)
-  "Return a list of posts filtered by TAG and DATE.
-TAG is a space-delimited string of tags. DATE is a regexp. 
-TAG-MATCH-TYPE is either 'any' or 'all'. If it's `any', posts with any of the
-tags in TAG are returned. If it's `all' (the default), only posts with all of
-the tags in TAG are returned. An example of a stored date string is
-`2005-04-23T20:22:55Z'."
-  (unless (and (boundp 'delicious-posts-list)
-               delicious-posts-list)
-    (delicious-load-posts-file))
-  (let ((matches '()))
-    (mapc (lambda (post)
-	    (when (and (delicious-test-date-regexp post date)
-		       (cond ((or (null tag-match-type)
-				  (eq tag-match-type 'all))
-			      (delicious-test-tag-all post tag))
-			     ((eq tag-match-type 'any)
-			      (delicious-test-tag-any post tag))
-			     (t
-			      (error "Invalid tag match type"))))
-	      (add-to-list 'matches post)))
-	  delicious-posts-list)
+(defun delicious-posts-matching-date (posts search-date)
+  "Out of POSTS, return those that match regexp SEARCH-DATE."
+  (let ((matches))
+    (mapc
+     (lambda (post)
+       (let ((post-date (cdr (assoc "time" post))))
+         (if (string-match search-date post-date)
+             (add-to-list 'matches post))))
+     posts)
     matches))
 
 (defun delicious-test-tag-all (post tag)
