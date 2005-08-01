@@ -67,36 +67,17 @@
   :type 'string
   :group 'delicious)
 
-(defun planner-delicious-insert-posts (tag date &optional tag-match-type)
-  "Insert all your posts matching TAG and DATE under `planner-delicious-section'.
-TAG is a space-delimited string. DATE is a regexp. TAG-MATCH-TYPE can be either
-`any' or `all' (the default). If it's `any', then all of the posts with any of
-the tags in TAG will be inserted. If it's `all', then only the posts with all of
-the tags in TAG will be inserted. The date regexp should be constructed with the
-stored date format in mind. An example of the stored date format is 
-`2005-04-23T20:22:55Z'." 
-  (unless (equal major-mode 'planner-mode)
-    (error "This is not a planner buffer"))
-  (unless (string-match planner-delicious-section (buffer-string))
-    (error "No \"%s\" section in this buffer" planner-delicious-section))
-  (save-excursion
-    (save-restriction
-      (when (planner-narrow-to-section planner-delicious-section)
-        (delete-region (point-min) (point-max))
-        (insert "* " planner-delicious-section "\n\n"
-                (let ((matching-posts 
-                       (delicious-get-posts-from-stored tag date tag-match-type)))
-                  (with-temp-buffer
-                    (mapc (lambda (post)
-                            (let ((href (cdr (assoc "href" post)))
-                                  (description (cdr (assoc "description" post)))
-                                  (extended (cdr (assoc "extended" post))))
-                              (insert (planner-make-link href description) "\n")
-                              (unless (null extended)
-                                (insert (format "%s\n" extended)))
-                              (insert "\n")))
-                          matching-posts)
-                    (buffer-string))) "\n\n")))))
+(defun planner-delicious-append-posts (posts)
+  "Append POSTS to `planner-delicious-section'."
+  (planner-narrow-to-section planner-delicious-section)
+  (goto-char (point-max))
+  (mapc
+   (lambda (post)
+     (let* ((href (cdr (assoc "href" post)))
+            (desc (cdr (assoc "description" post)))
+            (link (planner-make-link href desc)))
+       (insert "\n" link "\n\n")))
+   posts))
 
 (defun planner-delicious-insert-posts-all (tag &optional date)
   "Insert all your posts matching all of the tags and the date entered.
