@@ -58,15 +58,16 @@
 
 (defun planner-delicious-append-posts (posts)
   "Append POSTS to `planner-delicious-section'."
-  (planner-narrow-to-section planner-delicious-section)
-  (goto-char (point-max))
-  (mapc
-   (lambda (post)
-     (let* ((href (cdr (assoc "href" post)))
-            (desc (cdr (assoc "description" post)))
-            (link (planner-make-link href desc)))
-       (insert "\n" link "\n\n")))
-   posts))
+  (if (null (planner-narrow-to-section planner-delicious-section))
+      (error "No delicious section on this page")
+    (goto-char (point-max))
+    (mapc
+     (lambda (post)
+       (let* ((href (cdr (assoc "href" post)))
+              (desc (cdr (assoc "description" post)))
+              (link (planner-make-link href desc)))
+         (insert "\n" link "\n\n")))
+     posts)))
 
 (defun planner-delicious-insert-posts-all (tag &optional search-date)
   "Insert all your posts matching all of the tags and the date entered.
