@@ -1,3 +1,27 @@
+2005-08-01  johnsu01  <john@wjsullivan.net>
+
+	* planner-delicious.el (planner-delicious-read-date): New function
+	to prompt for date pattern.
+	(planner-delicious-insert-posts): Removed. Replaced by separate
+	functions `planner-delicious-insert-posts-any' and
+	`planner-delicious-insert-posts-all'.
+
+	* delicious.el (delicious-test-tag-any): Deleted, replaced by
+	`delicious-posts-matching-any'.
+	(delicious-test-tag-all): Deleted, replaced by
+	`delicious-posts-matching-tags'.
+	(delicious-get-posts-from-stored): Removed. Getting posts from the
+	stored file happens automatically when appropriate now.
+	(delicious-posts-matching-date): New name for
+	`delicious-test-date-regexp'. Also now accepts a list of posts to
+	check instead of just one.
+
+2005-07-31  johnsu01  <john@wjsullivan.net>
+
+	* planner-delicious.el (planner-delicious-append-posts): New function.
+
+	* delicious.el (delicious-posts-matching-tags-any): New function.
+
 2005-07-28  johnsu01  <john@wjsullivan.net>
 
 	* delicious.el (delicious-search-tags): Moved actual searching
