@@ -594,8 +594,7 @@ If given a prefix, operate offline."
     matches))
 
 (defun delicious-search-tags (tags)
-  "Display all posts with TAGS, which can include regular expression syntax.
-If given a prefix, operate offline."
+  "Display all posts with TAGS. If given a prefix, operate offline."
   (interactive (list (delicious-complete-tags t)))
   (let* ((matches (delicious-posts-matching-tags tags))
          (match-count (length matches)))
