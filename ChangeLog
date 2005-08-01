@@ -5,6 +5,8 @@
 	(planner-delicious-insert-posts): Removed. Replaced by separate
 	functions `planner-delicious-insert-posts-any' and
 	`planner-delicious-insert-posts-all'.
+	(planner-delicious-append-posts): Error if there is no delicious
+	section on the page.
 
 	* delicious.el (delicious-test-tag-any): Deleted, replaced by
 	`delicious-posts-matching-any'.
