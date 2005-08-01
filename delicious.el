@@ -570,6 +570,29 @@ If given a prefix, operate offline."
             (setq match nil)))))
     matches))
 
+(defun delicious-posts-matching-tags-any (tags)
+  "Return a list of posts with any of TAGS."
+  (let ((match)(matches)(match-count 0))
+    (save-window-excursion
+      (delicious-build-posts-list current-prefix-arg)
+      (delicious-get-posts-buffer)
+      (re-search-forward delicious-timestamp) ; skip timestamp
+      (while (not (eobp))
+        (let* ((post (read (current-buffer)))
+               (tags (split-string tags))
+               (post-tags (split-string
+                           (or (cdr (assoc "tag" post)) " "))))
+          (while (and tags
+                      (null match))
+            (let ((tag (pop tags)))
+              (if (member tag post-tags)
+                  (setq match post))))
+          (when match
+            (setq match-count (1+ match-count))
+            (add-to-list 'matches match)
+            (setq match nil)))))
+    matches))
+
 (defun delicious-search-tags (tags)
   "Display all posts with TAGS, which can include regular expression syntax.
 If given a prefix, operate offline."
