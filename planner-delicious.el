@@ -35,27 +35,16 @@
 ;;
 ;;   * Delicious
 ;;
-;;   <lisp>(planner-delicious-insert-posts "tag1 tag2 tag3" "2005.*" 'all)</lisp>
+;; on the pages where you want your posts to appear. These functions append
+;; links to the end of `planner-delicious-section', which is ("* Delicious" by
+;; default). You could add this to your `planner-day-page-template' if you want
+;; posts to appear every day.
 ;;
-;; on the pages where you want your posts to appear. This function rewrites
-;; everything between `planner-delicious-section' ("* Delicious" by default)
-;; and the beginning of the next section on the page, but should leave
-;; everything else alone. You could add this to your
-;; `planner-day-page-template' if you want posts to appear every day.
-;;
-;; The example above will insert all the posts that have all three tags. If you
-;; instead wanted all of the posts that had any of the three tags, use 'any 
-;; in place of 'all. 
-;;
-;; If you don't want to filter by date, just use a regexp that matches
-;; anything, like ".*". When constructing your date regexp, keep in
+;; When constructing your date regexp, keep in
 ;; mind that dates are stored in a format like `2005-04-23T20:22:55Z'.
 ;;
-;; There are also two interactive commands,`planner-delicious-insert-posts-any'
-;; and `planner-delicious-insert-posts-all'. Read their doc strings for details.
-;;
-;; The code to rewrite `planner-delicious-section' is based on work by Sacha
-;; Chua in `planner-accomplishments.el'.
+;; The two interactive commands to use are `planner-delicious-insert-posts-any'
+;; and `planner-delicious-insert-posts-all'. Read their docstrings for details.
 
 ;;; Code:
 
