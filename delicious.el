@@ -556,17 +556,18 @@ If given a prefix, operate offline."
       (while (not (eobp))
         (let* ((post (read (current-buffer)))
                (tags (split-string tags))
-               (post-tags (or (cdr (assoc "tag" post)) " ")))
+               (post-tags (split-string
+                           (or (cdr (assoc "tag" post)) " "))))
           (setq match post)
           (mapc
            '(lambda (tag)
-              (unless (string-match tag post-tags)
+              (unless (member tag post-tags)
                 (setq match nil)))
               tags)
           (when match
             (setq match-count (1+ match-count))
-            (add-to-list 'matches match))
-          (setq match nil))))
+            (add-to-list 'matches match)
+            (setq match nil)))))
     matches))
 
 (defun delicious-search-tags (tags)
