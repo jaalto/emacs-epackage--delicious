@@ -644,36 +644,7 @@ MATCHES is the number of matches found."
      posts)
     matches))
 
-(defun delicious-test-tag-all (post tag)
-  "Return t if the tag field of POST contains all the tags in TAG.
-TAG is a space-delimited string."
-  (let ((post-tags (split-string (cdr (assoc "tag" post))))
-	(check-tags (split-string tag))
-	(result t))
-    (while (and result 
-		(setq this-tag (pop check-tags)))
-      (unless (member this-tag post-tags)
-	(setq result nil)))
-    result))
-
-(defun delicious-test-tag-any (post tag)
-  "Return t if the tag field of POST contains any of the tags in TAG.
-TAG is a space-delimited string."
-  (let ((post-tags (split-string (cdr (assoc "tag" post))))
-	(check-tags (split-string tag))
-	(result nil))
-    (while (and (null result)
-		(setq this-tag (pop check-tags)))
-      (if (member this-tag post-tags)
-	  (setq result t)))
-    result))
-   
-(defun delicious-test-date-regexp (post date)
-  "Return t if the time field of POST matches regexp DATE."
-  (if (string-match date (cdr (assoc "time" post)))
-      t))
-
-;; Posting while offline
+;;; Posting while offline
 
 (defun delicious-post-offline (url description &optional tags extended time)
   "Input bookmarks to post later. Don't contact the server for anything."
