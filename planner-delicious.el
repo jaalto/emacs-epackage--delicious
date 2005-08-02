@@ -63,7 +63,7 @@
   :type 'string
   :group 'delicious)
 
-(defun planner-delicious-append-posts (posts)
+(defun planner-delicious-append (posts)
   "Append POSTS to `planner-delicious-section'."
   (if (null (planner-narrow-to-section planner-delicious-section))
       (error "No delicious section on this page")
@@ -76,8 +76,45 @@
          (insert "\n" link "\n\n")))
      posts)))
 
-(defun planner-delicious-insert-posts-all (tag &optional search-date)
-  "Insert all your posts matching all of the tags and the date entered.
+(defun planner-delicious-rewrite (posts)
+  "Erase `planner-delicious-section' and insert POSTS."
+  (if (null (planner-narrow-to-section planner-delicious-section))
+      (error "No delicious section on this page")
+    (let ((beg (point))
+          (end (point-max)))
+      (delete-region beg end))
+    (mapc
+     (lambda (post)
+       (let* ((href (cdr (assoc "href" post)))
+              (desc (cdr (assoc "description" post)))
+              (link (planner-make-link href desc)))
+         (insert "\n" link "\n\n")))
+     posts)))
+
+(defun planner-delicious-modify-section (posts method)
+  "METHOD can be rewrite or append."
+  (cond ((eq method 'append)
+         (planner-delicious-append posts))
+        ((eq method 'rewrite)
+         (planner-delicious-rewrite posts))
+        (t
+         (error "Unknown modification method %s" method))))
+
+(defun planner-delicious-read-date ()
+  "Input a date."
+  (let ((date (read-string "Date (a regexp pattern): ")))
+    date))
+
+(defun planner-delicious-rewrite-posts-match-all (tags &optional search-date)
+  "Replace `planner-delicious-section' contents with posts matching all TAGS.
+If a prefix is given, do not filter by date."
+  (interactive (list (delicious-complete-tags nil nil nil nil t)
+                     (unless current-prefix-arg
+                       (planner-delicious-read-date))))
+  (planner-delicious-posts-match-all tags 'rewrite search-date))
+
+(defun planner-delicious-append-posts-match-all (tags &optional search-date)
+  "Append all your posts matching all of the tags and the date entered.
 If a prefix is given, do not filter by date."
   (interactive (list (delicious-complete-tags nil nil nil nil t)
                      (unless current-prefix-arg
