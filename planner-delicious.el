@@ -128,10 +128,18 @@ If a prefix is given, do not filter by date."
       (let ((matches (delicious-posts-matching-tags tags)))
         (when search-date
           (setq matches (delicious-posts-matching-date matches search-date)))
-        (planner-delicious-append-posts matches)))))
+        (planner-delicious-modify-section matches modification)))))
 
-(defun planner-delicious-insert-posts-any (tag &optional search-date)
-  "Insert all your posts matching any of TAGS with date matching SEARCH-DATE.
+(defun planner-delicious-append-posts-match-any (tags &optional search-date)
+  "Append all your posts matching any of TAGS with date matching SEARCH-DATE.
+If a prefix is given, do not filter by date."
+    (interactive (list (delicious-complete-tags nil nil nil nil t)
+                     (unless current-prefix-arg
+                       (planner-delicious-read-date))))
+    (planner-delicious-posts-match-any tags 'append search-date))
+              
+(defun planner-delicious-rewrite-posts-match-any (tags &optional search-date)
+  "Replace `planner-delicious-section' contents with posts matching any of TAGS.
 If a prefix is given, do not filter by date."
   (interactive (list (delicious-complete-tags nil nil nil nil t)
                      (unless current-prefix-arg
@@ -145,12 +153,7 @@ If a prefix is given, do not filter by date."
       (let ((matches (delicious-posts-matching-tags-any tags)))
         (when search-date
           (setq matches (delicious-posts-matching-date matches search-date)))
-        (planner-delicious-append-posts matches)))))
-
-(defun planner-delicious-read-date ()
-  "Input a date."
-  (let ((date (read-string "Date (a regexp pattern): ")))
-    date))
+        (planner-delicious-modify-section matches modification)))))
 
 (provide 'planner-delicious)
 
