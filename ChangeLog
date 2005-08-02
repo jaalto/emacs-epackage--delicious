@@ -3,10 +3,21 @@
 	* planner-delicious.el (planner-delicious-read-date): New function
 	to prompt for date pattern.
 	(planner-delicious-insert-posts): Removed. Replaced by separate
-	functions `planner-delicious-insert-posts-any' and
-	`planner-delicious-insert-posts-all'.
+	functions for rewriting and appending.
 	(planner-delicious-append-posts): Error if there is no delicious
 	section on the page.
+	(planner-delicious-append): Name change.
+	(planner-delicious-rewrite): New function to rewrite the section.
+	(planner-delicious-modify-section): New function to call the
+	appropriate modification function.
+	(planner-delicious-rewrite-posts-match-all): Name change. Move
+	matching and modification functions out.
+	(planner-delicious-append-posts-match-all): Name change. Move
+	matching and modification functions out.
+	(planner-delicious-append-posts-match-any): Name change. Move
+	matching and modification functions out.
+	(planner-delicious-rewrite-posts-match-any): Name change. Move
+	matching and modification functions out.
 
 	* delicious.el (delicious-test-tag-any): Deleted, replaced by
 	`delicious-posts-matching-any'.
