@@ -119,9 +119,13 @@ If a prefix is given, do not filter by date."
   (interactive (list (delicious-complete-tags nil nil nil nil t)
                      (unless current-prefix-arg
                        (planner-delicious-read-date))))
+  (planner-delicious-posts-match-all tags 'append search-date))
+
+(defun planner-delicious-posts-match-all (tags modification
+                                               &optional search-date)
   (save-excursion
     (save-restriction
-      (let ((matches (delicious-posts-matching-tags tag)))
+      (let ((matches (delicious-posts-matching-tags tags)))
         (when search-date
           (setq matches (delicious-posts-matching-date matches search-date)))
         (planner-delicious-append-posts matches)))))
@@ -132,9 +136,13 @@ If a prefix is given, do not filter by date."
   (interactive (list (delicious-complete-tags nil nil nil nil t)
                      (unless current-prefix-arg
                        (planner-delicious-read-date))))
+  (planner-delicious-posts-match-any tags 'rewrite search-date))
+
+(defun planner-delicious-posts-match-any (tags modification
+                                               &optional search-date)
   (save-excursion
     (save-restriction
-      (let ((matches (delicious-posts-matching-tags-any tag)))
+      (let ((matches (delicious-posts-matching-tags-any tags)))
         (when search-date
           (setq matches (delicious-posts-matching-date matches search-date)))
         (planner-delicious-append-posts matches)))))
