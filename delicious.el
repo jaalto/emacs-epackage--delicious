@@ -252,17 +252,28 @@ are accepted as input. if OFFLINE is non-nil, don't contact the server."
           do (forward-word 1)
           finally return words)))
        
-(defun delicious-build-posts-list (&optional offline)
+(defun delicious-build-posts-list (&optional offline force )
   "Load local copy of posts, then update if server timestamp is newer.
-If OFFLINE is non-nil, don't query the server."
+If OFFLINE is non-nil, don't query the server.
+If FORCE is non-nil, or if a prefix is given interactively, skip the
+timestamp comparison and force a refresh from the server."
   (interactive)
-  (message "Building delicious posts list.")
+  (if (and offline force)
+      (error "Can't force an update while offline"))
+  (cond (offline
+          (message "Building posts list locally"))
+        (force
+         (message "Forcing update from server of posts"))
+        (t
+         (message "Building posts list from last-modified source")))
   (save-window-excursion
     (save-excursion
       (delicious-get-posts-buffer)
       (unless offline
-        (when (delicious-refresh-p)
-          (delete-region (point-min) (point-max))
+        (when (or force
+                  current-prefix-arg
+                  (delicious-refresh-p))
+          (erase-buffer)
           (insert (delicious-format-time (delicious-api-get-timestamp)))
           (mapc '(lambda (post)
                    (prin1 post (current-buffer)))
