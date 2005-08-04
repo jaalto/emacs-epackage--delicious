@@ -4,7 +4,7 @@
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;; Created 25 October 2004
-;; Version: 0.2 2005-08-01
+;; Version: 0.2 2005-08-04
 ;; Keywords: comm, hypermedia
 
 ;; This program is free software; you can redistribute it and/or
@@ -74,7 +74,7 @@
   "Face for timestamp in search results."
   :group 'delicious)
 
-(defconst delicious-version  "delicious.el/0.2 2005-08-01"
+(defconst delicious-version  "delicious.el/0.2 2005-08-04"
   "The version string for this copy of delicious.el.")
 
 (defconst delicious-tags-list '()
@@ -111,7 +111,8 @@ If OFFLINE is non-nil, don't update the local timestamp."
         (prin1 post (current-buffer))
         (let ((tags (cdr (assoc "href" post))))
           (delicious-rebuild-tags-maybe tags))
-        (save-buffer))))
+        (save-buffer)
+        (bury-buffer))))
 
 (defun delicious-rebuild-tags-maybe (tags)
   "If any tags in the space separated string TAGS are new, rebuild tags table."
@@ -278,7 +279,8 @@ timestamp comparison and force a refresh from the server."
           (mapc '(lambda (post)
                    (prin1 post (current-buffer)))
                 (delicious-api-get-all))
-          (save-buffer)))
+          (save-buffer)
+          (bury-buffer)))
     (message "Done."))))
 
 (defun delicious-guess-description ()
@@ -805,7 +807,8 @@ Return '(0) if there is no timestamp."
         (if (looking-at delicious-timestamp)
             (replace-match time)
         (insert time)))
-      (save-buffer))))
+      (save-buffer)
+      (bury-buffer))))
 
 (defun delicious-format-time (&optional time)
   "Return TIME as a del.icio.us timestamp.

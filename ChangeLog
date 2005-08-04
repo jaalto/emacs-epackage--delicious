@@ -1,3 +1,12 @@
+2005-08-04  johnsu01  <john@wjsullivan.net>
+
+	* delicious.el (delicious-update-timestamp): Bury the
+	delicious-posts-buffer when we're done.
+	(delicious-build-posts-list): Bury the delicious-posts-buffer when
+	we're done.
+	(delicious-post-local): Bury the delicious-posts-buffer when we're
+	done.
+
 2005-08-03  johnsu01  <john@wjsullivan.net>
 
 	* delicious.el (delicious-build-posts-list): Added FORCE argument
