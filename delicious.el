@@ -639,13 +639,35 @@ MATCHES is the number of matches found."
 (defun delicious-search-insert-match (post)
   "Insert POST with the fields propertized."
   (with-current-buffer "*delicious search results*"
-    (loop for cell in post
-          do (insert 
-              (propertize (cdr cell) 'face
-                          (intern 
-                           (concat "delicious-result-" (car cell) "-face")))
-                     "\n")
-          finally do (insert "\n"))))
+    (dolist (cell post)
+      (let ((map (make-sparse-keymap))
+            (field (car cell))
+            (content (cdr cell))
+            face)
+        (cond ((string= field "href")
+               (define-key map [mouse-2] 'browse-url-at-point)
+               (define-key map [(control ?m)] 'browse-url-at-point)
+               (setq face 'delicious-result-href-face))
+              ((string= field "description")
+               (setq face 'delicious-result-description-face))
+              ((string= field "hash")
+               (setq face 'delicious-result-hash-face))
+              ((string= field "tag")
+               (define-key map [mouse-2] 
+                 '(lambda () (interactive) 
+                    (delicious-search-tags (word-at-point))))
+               (define-key map [(control ?m)] 
+                 '(lambda () (interactive) 
+                    (delicious-search-tags (word-at-point))))
+               (setq face 'delicious-result-tag-face))
+              ((string= field "time")
+               (setq face 'delicious-result-time-face))
+              ((string= field "extended")
+               (setq face 'delicious-result-extended-face)))
+        (setq content (propertize content 'face face 'keymap map))
+        (unless (string= field "hash")
+          (insert content "\n"))))
+    (insert "\n")))
 
 (defun delicious-posts-matching-date (posts search-date)
   "Out of POSTS, return those that match regexp SEARCH-DATE."
