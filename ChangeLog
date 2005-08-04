@@ -6,6 +6,12 @@
 	we're done.
 	(delicious-post-local): Bury the delicious-posts-buffer when we're
 	done.
+	(delicious-search-insert-match): Make links clickable. Stop
+	displaying the hash, no one cares about it. Buttonize tags, with
+	the action of listing all the posts with that tag.
+	(delicious-search-mode-map): Remove binding for return, since
+	we're handling that as text property now.
+	(delicious-search-mode-map): Fixed bindings for delete and space.
 
 2005-08-03  johnsu01  <john@wjsullivan.net>
 
