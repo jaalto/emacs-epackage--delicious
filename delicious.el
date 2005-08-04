@@ -261,11 +261,11 @@ timestamp comparison and force a refresh from the server."
   (if (and offline force)
       (error "Can't force an update while offline"))
   (cond (offline
-          (message "Building posts list locally"))
-        (force
-         (message "Forcing update from server of posts"))
+          (message "Reading local posts list..."))
+        ((or force current-prefix-arg)
+         (message "Reading posts from server..."))
         (t
-         (message "Building posts list from last-modified source")))
+         (message "Reading posts from last-modified source...")))
   (save-window-excursion
     (save-excursion
       (delicious-get-posts-buffer)

@@ -6,6 +6,8 @@
 	sure that both FORCE and OFFLINE aren't non-nil at the same
 	time. Prefix argument causes the same behavior as FORCE when used
 	interactively.
+	(delicious-build-posts-list): Small changes to update messages,
+	fix message displayed when a prefix is used.
 
 2005-08-01  johnsu01  <john@wjsullivan.net>
 
