@@ -1,5 +1,11 @@
 2005-08-04  johnsu01  <john@wjsullivan.net>
 
+	* README: Removed description of delicious-build-tags-list, since
+	we don't have that command anymore. Add note about how to force a
+	post refresh from the server. Improved the searching section in
+	light of recent changes and gave more explanation for what to do
+	in the event of an HTTP error.
+
 	* delicious.el (delicious-update-timestamp): Bury the
 	delicious-posts-buffer when we're done.
 	(delicious-build-posts-list): Bury the delicious-posts-buffer when

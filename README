@@ -172,37 +172,34 @@ bothering the server too much. There isn't much reason to use this command,
 because any posts made during your current session are recorded locally. But if
 you suspect that something has gone wrong, you can use this command to refresh
 from the server. Or, if you add posts from an external interface like your
-non-emacs web browser, it would be useful to refresh the local list.
+non-emacs web browser, it would be useful to refresh the local list. 
 
-- M-x delicious-build-tags-list
-
-This command will refresh the local list of the tags you have used from the
-server. You shouldn't use this often, because the reason tags are cached
-locally is to avoid bothering the server too much. Any new tags you use while
-posting with delicious-post are added to the completion list, so the only
-reason to refresh the list is if something funny happens and the list gets
-corrupted, or if you add tags using another interface.
+Normally, we use whichever copy of the posts is newer. If your local list has
+become corrupt and you need to insist on fetching a new one from the server,
+use C-u M-x delicious-build-posts-list to skip the timestamp comparison and go
+straight to the server.
 
 * Interactive search commands
 
-Although some filtering can be done via the API, I have started implementing
-some search features that operate on the local copy of your posts list. This
-enables us to have much more powerful searching, means you aren't dependent on
-your internet connection to be able to search your posts (assuming you have a
-local copy of them stored, which can be done in memory now and in a file
-shortly), and minimizes load on the del.icio.us server.
+Although some filtering can be done via the API, we have some search features
+that operate on the local copy of your posts list. This enables us to have much
+more powerful searching, means you aren't dependent on your internet connection
+to be able to search your posts, and minimizes load on the del.icio.us server.
 
 All of the search commands will display their results in a "*delicious search
-results*" buffer, which is displayed in Emacs's View mode and Delicious Search
-mode. The default is for this buffer to open in a window other than the active
-one, or for a second window to be created if none is available. Being in View
-mode, the buffer is read-only and has many nice shortcuts for speedy
-navigation. Delicious Search mode will also add some useful shortcuts in the
-future---for now, it just binds <TAB> to skip to the next URL, looping back to
-the beginning of the buffer if there are no more URLs. 
+results*" buffer, which is displayed in Delicious Search mode. The default is
+for this buffer to open in a window other than the active one, or for a second
+window to be created if none is available. Delicious Search mode will also add
+more useful shortcuts in the future. While in the results, buffer, use C-h m to
+see the current bindings.
 
 Results are currently unsorted. At least, no intentional sorting is
 applied. That will change in the future. 
+
+Links and tags are clickable, with either the return key or middle click of the
+mouse. Clicking on a link will load the link in your default Emacs web
+browser. Clicking on a tag will peform a new search displaying all the posts
+that have that tag.
 
 The basic search command is:
 
@@ -239,11 +236,9 @@ you like, and you can use <TAB>, <SPC>, or '?' to use Emacs minibuffer
 completion based on your previously used tags. Just hit enter at the prompt
 when you are done. A search will be done for all of the posts that have all of
 those tags. The results will be displayed the same as the other search
-commands. It is possible to use regular expression syntax within each tag, as
-that is the way the match is determined internally, but you may run into
-problems with some of the regexp characters and the completion commands. The
-order of the tags is not considered important when determining matches. You do
-not need to account for whitespace between tags with this method.
+commands. The order of the tags is not considered important when determining
+matches. You do not need to account for whitespace between tags with this
+method.
 
 * Useful noninteractive functions
 
@@ -397,7 +392,13 @@ now. So far, I've implemented these features:
 
 Currently, it is not uncommon for the del.icio.us server to be temporarily
 unavailable. delicious-el should report any specific errors it receives. If you
-want more information, check the contents of the *delicious output* buffer.
+want more information, check the contents of the *delicious output*
+buffer. Errors with the server are very often temporary. You can resubmit your
+post by doing C-x ESC ESC (the default binding for repeat-complex-command) and
+using the up arrow to move back to the delicious-post command in your history,
+and hitting enter. If you are still getting a server error, then you can use
+delicious-post-offline to save the post to your cache. Later on, use
+delicious-post-cache to send the post to the server.
 
 - Server timeouts
 
