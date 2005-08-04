@@ -415,9 +415,8 @@ Optionally assign TAGS, an EXTENDED description, and TIME to the bookmarks."
          'delicious-search-previous-result))
      (define-key map [(meta ?n)] 'delicious-search-next-result)
      (define-key map [(meta ?p)] 'delicious-search-previous-result)
-     (define-key map [(return)] 'browse-url-at-point)
-     (define-key map [(space)] 'scroll-up)
-     (define-key map [(delete)] 'scroll-down)
+     (define-key map [(? )] 'scroll-up)
+     (define-key map "\C-?" 'scroll-down)
      map)
    "Keymap for function `delicious-search-mode'.")
 
