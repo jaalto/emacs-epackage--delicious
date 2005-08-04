@@ -46,18 +46,18 @@
 
 (defface delicious-result-href-face
   '((t (:underline t :foreground "DeepSkyBlue1")))
-    "Face for links in search results."
-    :group 'delicious)
+  "Face for links in search results."
+  :group 'delicious)
 
 (defface delicious-result-description-face
   '((t (:foreground "SeaGreen2")))
-    "Face for links in search results."
-    :group 'delicious)
+  "Face for links in search results."
+  :group 'delicious)
 
 (defface delicious-result-extended-face
   '((t (:foreground "SeaGreen3")))
-    "Face for links in search results."
-    :group 'delicious)
+  "Face for links in search results."
+  :group 'delicious)
 
 (defface delicious-result-hash-face
   '((t (:foreground "DodgerBlue4")))
@@ -66,8 +66,8 @@
 
 (defface delicious-result-tag-face
   '((t (:foreground "LightCoral")))
-    "Face for links in search results."
-    :group 'delicious)
+  "Face for links in search results."
+  :group 'delicious)
 
 (defface delicious-result-time-face
   '((t (:foreground "DodgerBlue4")))
@@ -81,7 +81,6 @@
   "Table of tags for use in completion.")
 
 (defun delicious-post (url description &optional tags extended time)
-  ; figure out how to get right time-string format
   "Post a url with arguments URL, DESCRIPTION, TAGS, EXTENDED, and TIME."
   (interactive (list
                 (delicious-read-url)
@@ -168,15 +167,15 @@ If OFFLINE is non-nil, don't query the server for any information."
   "Check to see if URL is a duplicate. If so, return the post."
   (save-window-excursion
     (save-excursion
-     (delicious-get-posts-buffer)
-     (re-search-forward delicious-timestamp)
-     (let ((dup))
-       (while (and (not (eobp))
-                   (not dup))
-         (let ((post (read (current-buffer))))
-           (if (member (cons "href" url) post)
-               (setq dup post))))
-       dup))))
+      (delicious-get-posts-buffer)
+      (re-search-forward delicious-timestamp)
+      (let ((dup))
+	(while (and (not (eobp))
+		    (not dup))
+	  (let ((post (read (current-buffer))))
+	    (if (member (cons "href" url) post)
+		(setq dup post))))
+	dup))))
 
 (defun delicious-post-duplicate-p (url)
   "Return t if existing post should be replaced with URL."
@@ -196,15 +195,15 @@ are accepted as input. if OFFLINE is non-nil, don't contact the server."
   (unless delicious-tags-list
     (setq delicious-tags-list (delicious-build-tags-list)))
   (let* ((base-prompt 
-           (or prompt-string
-               "(Enter one at a time, blank to end.) Tag: "))
-           (suggest-prompt
-            (unless nosuggest
-              (format "Suggested Tags: %s\n" (delicious-suggest-tags))))
-           (sofar-prompt
-            (unless sofar
-              "Tags so far: %s\n"))
-           (prompt (concat suggest-prompt sofar-prompt base-prompt)))
+	  (or prompt-string
+	      "(Enter one at a time, blank to end.) Tag: "))
+	 (suggest-prompt
+	  (unless nosuggest
+	    (format "Suggested Tags: %s\n" (delicious-suggest-tags))))
+	 (sofar-prompt
+	  (unless sofar
+	    "Tags so far: %s\n"))
+	 (prompt (concat suggest-prompt sofar-prompt base-prompt)))
     (loop until (or (equal tag "")
                     (and
                      (numberp quantity)
@@ -248,8 +247,8 @@ are accepted as input. if OFFLINE is non-nil, don't contact the server."
           with words = '()
           for word = (downcase (current-word))
           if (not (member word words))
-            collect word into words
-            end
+	  collect word into words
+	  end
           do (forward-word 1)
           finally return words)))
        
@@ -262,7 +261,7 @@ timestamp comparison and force a refresh from the server."
   (if (and offline force)
       (error "Can't force an update while offline"))
   (cond (offline
-          (message "Reading local posts list..."))
+	 (message "Reading local posts list..."))
         ((or force current-prefix-arg)
          (message "Reading posts from server..."))
         (t
@@ -281,7 +280,7 @@ timestamp comparison and force a refresh from the server."
                 (delicious-api-get-all))
           (delicious-save-buffer)
           (bury-buffer)))
-    (message "Done."))))
+      (message "Done."))))
 
 (defun delicious-guess-description ()
   "Try some different things to get a default description."
@@ -300,7 +299,6 @@ If not, use the url under point.
 If not that, see if there is a url in the buffer.
 If not that, use the clipboard if it's a url.
 If not that, just insert http:// into the prompt."
-  ; if there is a prefix, maybe it should use the kill ring
   (or (if (and (boundp 'w3m-current-url)
                (not (null w3m-current-url))
                (eq major-mode 'w3m-mode))
@@ -310,15 +308,15 @@ If not that, just insert http:// into the prompt."
       (save-excursion
         (goto-char (point-min))
         (loop until (eobp)
-         if (thing-at-point-looking-at thing-at-point-url-regexp)
+	      if (thing-at-point-looking-at thing-at-point-url-regexp)
               return (thing-at-point-url-at-point)
-                else
+	      else
               do (forward-char)))
       (if (and
            (eq window-system 'X)
            (x-get-selection 'CLIPBOARD)
-               (string-match thing-at-point-url-regexp 
-                             (x-get-selection 'CLIPBOARD)))
+	   (string-match thing-at-point-url-regexp 
+			 (x-get-selection 'CLIPBOARD)))
           (x-get-selection 'CLIPBOARD))
       "http://"))
 
@@ -404,21 +402,21 @@ Optionally assign TAGS, an EXTENDED description, and TIME to the bookmarks."
 ;;;_+ Searching 
 
 (defvar delicious-search-mode-map
-   (let ((map (make-sparse-keymap)))
-     (define-key map [tab] 'delicious-search-next-result)
-     (define-key map [(control ?i)] 'delicious-search-next-result)
-     (define-key map [(shift tab)] 'delicious-search-previous-result)
-     (unless (featurep 'xemacs)
-       (define-key map [(shift iso-lefttab)]
-         'delicious-search-previous-result)
-       (define-key map [(shift control ?i)]
-         'delicious-search-previous-result))
-     (define-key map [(meta ?n)] 'delicious-search-next-result)
-     (define-key map [(meta ?p)] 'delicious-search-previous-result)
-     (define-key map [(? )] 'scroll-up)
-     (define-key map "\C-?" 'scroll-down)
-     map)
-   "Keymap for function `delicious-search-mode'.")
+  (let ((map (make-sparse-keymap)))
+    (define-key map [tab] 'delicious-search-next-result)
+    (define-key map [(control ?i)] 'delicious-search-next-result)
+    (define-key map [(shift tab)] 'delicious-search-previous-result)
+    (unless (featurep 'xemacs)
+      (define-key map [(shift iso-lefttab)]
+	'delicious-search-previous-result)
+      (define-key map [(shift control ?i)]
+	'delicious-search-previous-result))
+    (define-key map [(meta ?n)] 'delicious-search-next-result)
+    (define-key map [(meta ?p)] 'delicious-search-previous-result)
+    (define-key map [(? )] 'scroll-up)
+    (define-key map "\C-?" 'scroll-down)
+    map)
+  "Keymap for function `delicious-search-mode'.")
 
 (define-minor-mode delicious-search-mode
   "Toggle Delicious Search mode.
@@ -568,20 +566,20 @@ If given a prefix, operate offline."
       (delicious-get-posts-buffer)
       (re-search-forward delicious-timestamp) ; skip timestamp
       (while (not (eobp))
-        (let* ((post (read (current-buffer)))
-               (tags (split-string tags))
-               (post-tags (split-string
-                           (or (cdr (assoc "tag" post)) " "))))
-          (setq match post)
-          (mapc
-           '(lambda (tag)
-              (unless (member tag post-tags)
-                (setq match nil)))
-              tags)
-          (when match
-            (setq match-count (1+ match-count))
-            (add-to-list 'matches match)
-            (setq match nil)))))
+	(let* ((post (read (current-buffer)))
+	       (tags (split-string tags))
+	       (post-tags (split-string
+			   (or (cdr (assoc "tag" post)) " "))))
+	  (setq match post)
+	  (mapc
+	   '(lambda (tag)
+	      (unless (member tag post-tags)
+		(setq match nil)))
+	   tags)
+	  (when match
+	    (setq match-count (1+ match-count))
+	    (add-to-list 'matches match)
+	    (setq match nil)))))
     matches))
 
 (defun delicious-posts-matching-tags-any (tags)
@@ -634,7 +632,7 @@ MATCHES is the number of matches found."
     (goto-char (point-min))
     (insert (format "Your search for \"%s\" returned %d results.\n\n"
                     search-string matches))
-      (delicious-search-mode 1)))
+    (delicious-search-mode 1)))
 
 (defun delicious-search-insert-match (post)
   "Insert POST with the fields propertized."
@@ -753,16 +751,16 @@ for use in completion. If OFFLINE is non-nil, don't query the server."
             (let ((index 0)
                   (tags-table '()))
               (while (not (eobp))
-                (let* 
-                    ((post (read (current-buffer)))
-                     (tags (split-string (cdr (assoc "tag" post)))))
-                  (mapc
-                   (lambda (tag) ; collect tags if new
-                     (unless (assoc tag tags-table)
-                       (add-to-list 'tags-table (list tag index))
-                       (setq index (1+ index))))
-                   tags)))
-              tags-table)))))
+		(let* 
+		    ((post (read (current-buffer)))
+		     (tags (split-string (cdr (assoc "tag" post)))))
+		  (mapc
+		   (lambda (tag)	; collect tags if new
+		     (unless (assoc tag tags-table)
+		       (add-to-list 'tags-table (list tag index))
+		       (setq index (1+ index))))
+		   tags)))
+	      tags-table)))))
       
 (defun delicious-refresh-p ()
   "Return t if server timestamp is newer than local timestamp."
@@ -787,12 +785,12 @@ for use in completion. If OFFLINE is non-nil, don't query the server."
 
 (defconst delicious-timestamp
   (concat
-   "\\([1-9][0-9]\\{3\\}\\)-" ;year
-   "\\([0-1][0-9]\\)-" ;month
-   "\\([0-3][0-9]\\)T" ;day
-   "\\([0-2][0-9]\\):" ;hour
-   "\\([0-5][0-9]\\):" ;minute
-   "\\([0-5][0-9]\\)Z") ;second
+   "\\([1-9][0-9]\\{3\\}\\)-"		;year
+   "\\([0-1][0-9]\\)-"			;month
+   "\\([0-3][0-9]\\)T"			;day
+   "\\([0-2][0-9]\\):"			;hour
+   "\\([0-5][0-9]\\):"			;minute
+   "\\([0-5][0-9]\\)Z")			;second
   "Regular expression matching the timestamp format.")
 
 (defun delicious-get-local-timestamp ()
