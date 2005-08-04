@@ -18,7 +18,11 @@
 	(delicious-search-mode-map): Remove binding for return, since
 	we're handling that as text property now.
 	(delicious-search-mode-map): Fixed bindings for delete and space.
-
+	(delicious-save-buffer): New function to save the
+	delicious-posts-buffer, so we can set some local variables while
+	doing it. Changed every appearance of save-buffer to this new
+	function.
+	
 2005-08-03  johnsu01  <john@wjsullivan.net>
 
 	* delicious.el (delicious-build-posts-list): Added FORCE argument

@@ -103,16 +103,16 @@
 (defun delicious-post-local (post &optional offline)
   "Add POST to the local copy.
 If OFFLINE is non-nil, don't update the local timestamp."
-    (save-window-excursion
-      (save-excursion
-        (delicious-get-posts-buffer)
-        (unless offline (delicious-update-timestamp))
-        (goto-char (point-max))
-        (prin1 post (current-buffer))
-        (let ((tags (cdr (assoc "href" post))))
-          (delicious-rebuild-tags-maybe tags))
-        (save-buffer)
-        (bury-buffer))))
+  (save-window-excursion
+    (save-excursion
+      (delicious-get-posts-buffer)
+      (unless offline (delicious-update-timestamp))
+      (goto-char (point-max))
+      (prin1 post (current-buffer))
+      (let ((tags (cdr (assoc "href" post))))
+	(delicious-rebuild-tags-maybe tags))
+      (delicious-save-buffer)
+      (bury-buffer))))
 
 (defun delicious-rebuild-tags-maybe (tags)
   "If any tags in the space separated string TAGS are new, rebuild tags table."
@@ -279,7 +279,7 @@ timestamp comparison and force a refresh from the server."
           (mapc '(lambda (post)
                    (prin1 post (current-buffer)))
                 (delicious-api-get-all))
-          (save-buffer)
+          (delicious-save-buffer)
           (bury-buffer)))
     (message "Done."))))
 
@@ -700,7 +700,7 @@ MATCHES is the number of matches found."
                         (cons "extended" (or extended nil))
                         (cons "time" (or time nil)))))
         (prin1 post (current-buffer)))
-      (save-buffer)))
+      (delicious-save-buffer)))
   (if (y-or-n-p "Post another bookmark? ")
       (call-interactively 'delicious-post-offline)
     (message "Cache saved.")))
@@ -781,6 +781,10 @@ for use in completion. If OFFLINE is non-nil, don't query the server."
     (find-file posts-file)
     (goto-char (point-min))))
 
+(defun delicious-save-buffer ()
+  (let ((require-final-newline nil))
+    (save-buffer)))
+
 (defconst delicious-timestamp
   (concat
    "\\([1-9][0-9]\\{3\\}\\)-" ;year
@@ -829,8 +833,8 @@ Return '(0) if there is no timestamp."
       (let ((time (delicious-format-time)))
         (if (looking-at delicious-timestamp)
             (replace-match time)
-        (insert time)))
-      (save-buffer)
+	  (insert time)))
+      (delicious-save-buffer)
       (bury-buffer))))
 
 (defun delicious-format-time (&optional time)
