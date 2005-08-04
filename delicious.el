@@ -401,6 +401,8 @@ Optionally assign TAGS, an EXTENDED description, and TIME to the bookmarks."
   (let* ((completions (w3m-bookmark-sections)))
     (completing-read "Section to export (required): " completions nil t)))
 
+;;;_+ Searching 
+
 (defvar delicious-search-mode-map
    (let ((map (make-sparse-keymap)))
      (define-key map [tab] 'delicious-search-next-result)
@@ -657,7 +659,7 @@ MATCHES is the number of matches found."
      posts)
     matches))
 
-;;; Posting while offline
+;;;_+ Posting while offline
 
 (defun delicious-post-offline (url description &optional tags extended time)
   "Input bookmarks to post later. Don't contact the server for anything."
