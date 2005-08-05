@@ -109,7 +109,7 @@ If OFFLINE is non-nil, don't update the local timestamp."
       (delicious-get-posts-buffer)
       (unless offline (delicious-update-timestamp))
       (goto-char (point-max))
-      (prin1 post (current-buffer))
+      (pp post (current-buffer))
       (let ((tags (cdr (assoc "href" post))))
 	(delicious-rebuild-tags-maybe tags))
       (delicious-save-buffer)
@@ -172,11 +172,13 @@ If OFFLINE is non-nil, don't query the server for any information."
       (delicious-get-posts-buffer)
       (re-search-forward delicious-timestamp)
       (let ((dup))
-	(while (and (not (eobp))
-		    (not dup))
-	  (let ((post (read (current-buffer))))
-	    (if (member (cons "href" url) post)
-		(setq dup post))))
+	(while (not (or dup
+                        (eq
+                         (condition-case nil
+                             (let ((post (read (current-buffer))))
+                               (if (member (cons "href" url) post)
+                                   (setq dup post)))
+                           (end-of-file t)) t))))
 	dup))))
 
 (defun delicious-post-duplicate-p (url)
@@ -278,7 +280,7 @@ timestamp comparison and force a refresh from the server."
           (erase-buffer)
           (insert (delicious-format-time (delicious-api-get-timestamp)))
           (mapc '(lambda (post)
-                   (prin1 post (current-buffer)))
+                   (pp post (current-buffer)))
                 (delicious-api-get-all))
           (delicious-save-buffer)
           (bury-buffer)))
@@ -463,17 +465,19 @@ If given a prefix, operate offline."
   (delicious-get-posts-buffer)
   (re-search-forward delicious-timestamp) ; skip timestamp
   (let ((match)(matches)(match-count 0))
-    (while (not (eobp))
-      (let ((post (read (current-buffer))))
-        (mapc
-         '(lambda (field)
-            (if (string-match search-string (cdr field))
-                (setq match post)))
-         post)
-        (when match
-          (setq match-count (1+ match-count))
-          (add-to-list 'matches match))
-        (setq match nil)))
+    (while (not (eq 
+                 (condition-case nil
+                     (let ((post (read (current-buffer))))
+                       (mapc
+                        '(lambda (field)
+                           (if (string-match search-string (cdr field))
+                               (setq match post)))
+                        post)
+                       (when match
+                         (setq match-count (1+ match-count))
+                         (add-to-list 'matches match))
+                       (setq match nil))
+                   (end-of-file t)) t)))
     (delicious-search-buffer-prep)
     (mapc 
      '(lambda (post) 
@@ -490,17 +494,22 @@ If given a prefix, operate offline."
   (delicious-get-posts-buffer)
   (re-search-forward delicious-timestamp) ; skip timestamp
   (let ((match)(matches)(match-count 0))
-    (while (not (eobp))
-      (let* ((post (read (current-buffer)))
-             (desc (or (cdr (assoc "description" post))
-                       (error "Malformed bookmark missing description %s"
-                              post))))
-        (if (string-match search-string desc)
-            (setq match post))
-        (when match
-          (setq match-count (1+ match-count))
-          (add-to-list 'matches match))
-        (setq match nil)))
+    (while (not (eq
+                 (condition-case nil
+                     (let* ((post (read (current-buffer)))
+                            (desc 
+                             (or 
+                              (cdr (assoc "description" post))
+                              (error
+                               "Malformed bookmark missing description %s"
+                               post))))
+                       (if (string-match search-string desc)
+                           (setq match post))
+                       (when match
+                         (setq match-count (1+ match-count))
+                         (add-to-list 'matches match))
+                       (setq match nil))
+                   (end-of-file t)) t)))
     (delicious-search-buffer-prep)
     (mapc
      '(lambda (post)
@@ -517,16 +526,18 @@ If given a prefix, operate offline."
   (delicious-get-posts-buffer)
   (re-search-forward delicious-timestamp) ; skip timestamp
   (let ((match)(matches)(match-count 0))
-    (while (not (eobp))
-      (let* ((post (read (current-buffer)))
-             (tags (or (cdr (assoc "tag" post))
-                       "")))
-        (if (string-match search-string tags)
-            (setq match post))
-        (when match
-          (setq match-count (1+ match-count))
-          (add-to-list 'matches match))
-        (setq match nil)))
+    (while (not (eq
+                 (condition-case nil
+                     (let* ((post (read (current-buffer)))
+                            (tags (or (cdr (assoc "tag" post))
+                                      "")))
+                       (if (string-match search-string tags)
+                           (setq match post))
+                       (when match
+                         (setq match-count (1+ match-count))
+                         (add-to-list 'matches match))
+                       (setq match nil))
+                   (end-of-file t)) t)))
     (delicious-search-buffer-prep)
     (mapc
      '(lambda (post)
@@ -543,16 +554,20 @@ If given a prefix, operate offline."
   (delicious-get-posts-buffer)
   (re-search-forward delicious-timestamp) ; skip timestamp
   (let ((match)(matches)(match-count 0))
-    (while (not (eobp))
-      (let* ((post (read (current-buffer)))
-             (href (or (cdr (assoc "href" post))
-                       (error "Malformed bookmark missing href %s" post))))
-        (if (string-match search-string href)
-            (setq match post))
-        (when match
-          (setq match-count (1+ match-count))
-          (add-to-list 'matches match))
-        (setq match nil)))
+    (while (not (eq
+                 (condition-case nil
+                     (let* ((post (read (current-buffer)))
+                            (href 
+                             (or (cdr (assoc "href" post))
+                                 (error 
+                                  "Malformed bookmark missing href %s" post))))
+                       (if (string-match search-string href)
+                           (setq match post))
+                       (when match
+                         (setq match-count (1+ match-count))
+                         (add-to-list 'matches match))
+                       (setq match nil))
+                   (end-of-file t)) t)))
     (delicious-search-buffer-prep)
     (mapc
      '(lambda (post)
@@ -567,21 +582,23 @@ If given a prefix, operate offline."
       (delicious-build-posts-list current-prefix-arg)
       (delicious-get-posts-buffer)
       (re-search-forward delicious-timestamp) ; skip timestamp
-      (while (not (eobp))
-	(let* ((post (read (current-buffer)))
-	       (tags (split-string tags))
-	       (post-tags (split-string
-			   (or (cdr (assoc "tag" post)) " "))))
-	  (setq match post)
-	  (mapc
-	   '(lambda (tag)
-	      (unless (member tag post-tags)
-		(setq match nil)))
-	   tags)
-	  (when match
-	    (setq match-count (1+ match-count))
-	    (add-to-list 'matches match)
-	    (setq match nil)))))
+      (while (not (eq
+                   (condition-case nil
+                       (let* ((post (read (current-buffer)))
+                              (tags (split-string tags))
+                              (post-tags (split-string
+                                          (or (cdr (assoc "tag" post)) " "))))
+                         (setq match post)
+                         (mapc
+                          '(lambda (tag)
+                             (unless (member tag post-tags)
+                               (setq match nil)))
+                          tags)
+                         (when match
+                           (setq match-count (1+ match-count))
+                           (add-to-list 'matches match)
+                           (setq match nil)))
+                     (end-of-file t)) t))))
     matches))
 
 (defun delicious-posts-matching-tags-any (tags)
@@ -591,20 +608,22 @@ If given a prefix, operate offline."
       (delicious-build-posts-list current-prefix-arg)
       (delicious-get-posts-buffer)
       (re-search-forward delicious-timestamp) ; skip timestamp
-      (while (not (eobp))
-        (let* ((post (read (current-buffer)))
-               (tags (split-string tags))
-               (post-tags (split-string
-                           (or (cdr (assoc "tag" post)) " "))))
-          (while (and tags
-                      (null match))
-            (let ((tag (pop tags)))
-              (if (member tag post-tags)
-                  (setq match post))))
-          (when match
-            (setq match-count (1+ match-count))
-            (add-to-list 'matches match)
-            (setq match nil)))))
+      (while (not (eq
+                   (condition-case nil
+                       (let* ((post (read (current-buffer)))
+                              (tags (split-string tags))
+                              (post-tags (split-string
+                                          (or (cdr (assoc "tag" post)) " "))))
+                         (while (and tags
+                                     (null match))
+                           (let ((tag (pop tags)))
+                             (if (member tag post-tags)
+                                 (setq match post))))
+                         (when match
+                           (setq match-count (1+ match-count))
+                           (add-to-list 'matches match)
+                           (setq match nil)))
+                     (end-of-file t)) t))))
     matches))
 
 (defun delicious-search-tags (tags)
@@ -752,16 +771,19 @@ for use in completion. If OFFLINE is non-nil, don't query the server."
       (setq delicious-tags-list
             (let ((index 0)
                   (tags-table '()))
-              (while (not (eobp))
-		(let* 
-		    ((post (read (current-buffer)))
-		     (tags (split-string (cdr (assoc "tag" post)))))
-		  (mapc
-		   (lambda (tag)	; collect tags if new
-		     (unless (assoc tag tags-table)
-		       (add-to-list 'tags-table (list tag index))
-		       (setq index (1+ index))))
-		   tags)))
+              (while (not 
+                      (eq
+                       (condition-case nil
+                           (let* 
+                               ((post (read (current-buffer)))
+                                (tags (split-string (cdr (assoc "tag" post)))))
+                             (mapc
+                              (lambda (tag)	; collect tags if new
+                                (unless (assoc tag tags-table)
+                                  (add-to-list 'tags-table (list tag index))
+                                  (setq index (1+ index))))
+                              tags))
+                         (end-of-file t)) t)))
 	      tags-table)))))
       
 (defun delicious-refresh-p ()
