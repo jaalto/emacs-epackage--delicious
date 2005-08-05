@@ -339,7 +339,13 @@ NEW-TAG can be multiple tags, space-separated."
     (delicious-api-rename old-tag new-tag)
     (delicious-build-tags-list)
     (message "Done renaming %s to %s" old-tag new-tag)))
-  
+
+(defun delicious-delete-post (href)
+  "Delete the post with URL HREF."
+  (interactive "sEnter URL to delete: ")
+  (delicious-api-delete href)
+  (message "%s deleted." href))
+
 (defun delicious-w3m-html (username count tag)
   "Visit the HTML page for USERNAME showing COUNT most recent posts under TAG.
 With prefix, visit the page in a new w3m session."
