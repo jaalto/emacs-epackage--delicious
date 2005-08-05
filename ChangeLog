@@ -1,4 +1,29 @@
+2005-08-05  johnsu01  <john@wjsullivan.net>
+
+	* delicious.el (delicious-build-tags-list): Added condition-case
+	for EOF in `delicious-posts-buffer'.
+	(delicious-duplicate-url-p): Added condition-case for EOF in
+	`delicious-posts-buffer'.
+	(delicious-search-posts-regexp): Added condition-case.
+	(delicious-delete-post): New bare-bones function to delete a
+	post. More work on this to come.
+	(delicious-search-description-regexp): Added condition-case.
+	(delicious-search-tags-regexp): Added condition-case.
+	(delicious-search-href-regexp): Added condition-case.
+	(delicious-posts-matching-tags-any): Added condition-case.
+	(delicious-search-hash): Added condition-case.
+	(delicious-post-local): Switched to pretty printing. You shouldn't
+	be visiting the `delicious-posts-buffer' anyway, but now it looks
+	nice.
+	(delicious-build-posts-list): Switch to pretty printing.
+
 2005-08-04  johnsu01  <john@wjsullivan.net>
+
+	* delicious.el (delicious-search-insert-match): Add a hash
+	property to each bit of text in the search results buffer, so that
+	we can easily know which post it came from. We can do fun things
+	with this later.
+	(delicious-search-hash): New function to find a post by its hash.
 
 	* README: Removed description of delicious-build-tags-list, since
 	we don't have that command anymore. Add note about how to force a
