@@ -4,7 +4,7 @@
 
 Author: John Sullivan <john@wjsullivan.net>
 Created 25 October 2004
-Version: 0.2 2005-05-04
+Version: 0.2 2005-08-05
 Keywords: comm, hypermedia
 
 This program is free software; you can redistribute it and/or modify it under
@@ -164,6 +164,13 @@ enter must match an existing tag. The old tag will be changed to the new tags
 for all posts that had the old tag. After the renaming is done, the local tag
 list will be refreshed from the server.
 
+- M-x delicious-delete-post
+
+Use this to delete a post by entering its URL. Currently this command is dumb;
+there is no completion, and it won't check to see if the post exists before
+trying to delete it. But it works to delete things, and there will be time for
+improvements later.
+
 - M-x delicious-build-posts-list
 
 This command will refresh the local list of your posts from the server. You
@@ -239,6 +246,10 @@ those tags. The results will be displayed the same as the other search
 commands. The order of the tags is not considered important when determining
 matches. You do not need to account for whitespace between tags with this
 method.
+
+- M-x delicious-search-hash
+
+You can search for a post by its hash field, if you really want to.
 
 * Useful noninteractive functions
 
