@@ -1,7 +1,7 @@
 2005-08-05  johnsu01  <john@wjsullivan.net>
 
-	* README: Added brief description of delete command, and
-	delicious-search-hash.
+	* README: Added brief description of delete command,
+	delicious-search-hash, and delicious-post-offline.
 
 	* delicious.el (delicious-build-tags-list): Added condition-case
 	for EOF in `delicious-posts-buffer'.

@@ -156,6 +156,14 @@ do want to enter the date, the format is indicated in the prompt.
 Once you enter the Date/Time and hit enter, the URL should be posted to the
 server!
 
+- M-x delicious-post-offline
+
+This works the same as the normal post command, but instead of sending your
+request to the server, it will save it to disk. You can do multiple posts this
+way, and they will all be stored. Then when you are online and ready to upload
+the posts to the server, call M-x delicious-post-cache to send them all. You'll
+be prompted to clear the cache after the posts have been sent.
+
 - M-x delicious-rename-tag
 
 This will prompt you for an old tag and one or more new tags. As usual, you can
