@@ -4,7 +4,7 @@
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;; Created 25 October 2004
-;; Version: 0.2 2005-08-05
+;; Version: 0.2 2005-08-07
 ;; Keywords: comm, hypermedia
 
 ;; This program is free software; you can redistribute it and/or
@@ -74,11 +74,31 @@
   "Face for timestamp in search results."
   :group 'delicious)
 
-(defconst delicious-version  "delicious.el/0.2 2005-08-05"
+(defconst delicious-version  "delicious.el/0.2 2005-08-07"
   "The version string for this copy of delicious.el.")
 
 (defconst delicious-tags-list '()
   "Table of tags for use in completion.")
+
+(defcustom delicious-xsel-prog nil
+"*The full path to a program that returns the X mouse selection, like xsel."
+:version "21.3.1"
+:group 'delicious
+:type 'string
+:tag "del.icio.us xsel program name")
+
+(defcustom delicious-guess-url-methods 
+  '(delicious-guess-check-point 
+    delicious-guess-check-w3m 
+    delicious-guess-check-buffer
+    delicious-guess-check-selection
+    delicious-guess-check-xsel
+    delicious-guess-check-default)
+"*The list of methods to try, in order, to guess a URL to post."
+:version "21.3.1"
+:group 'delicious
+:type 'hook
+:tag "del.icio.us URL guess methods")
 
 ;;;_+ Posting
 
@@ -297,32 +317,53 @@ timestamp comparison and force a refresh from the server."
        (aref gnus-current-headers 1))))
 
 (defun delicious-guess-url ()
-  "Try to guess a url based on buffer context.
-If we're in a w3m buffer, use the current url.
-If not, use the url under point.
-If not that, see if there is a url in the buffer.
-If not that, use the clipboard if it's a url.
-If not that, just insert http:// into the prompt."
-  (or (if (and (boundp 'w3m-current-url)
-               (not (null w3m-current-url))
-               (eq major-mode 'w3m-mode))
-          w3m-current-url)
-      (if (thing-at-point-looking-at thing-at-point-url-regexp)
-          (thing-at-point-url-at-point))
-      (save-excursion
-        (goto-char (point-min))
-        (loop until (eobp)
-	      if (thing-at-point-looking-at thing-at-point-url-regexp)
-              return (thing-at-point-url-at-point)
-	      else
-              do (forward-char)))
-      (if (and
-           (eq window-system 'X)
-           (x-get-selection 'CLIPBOARD)
-	   (string-match thing-at-point-url-regexp 
-			 (x-get-selection 'CLIPBOARD)))
-          (x-get-selection 'CLIPBOARD))
-      "http://"))
+  (let ((methods delicious-guess-url-methods)
+        (guess))
+    (while (and methods 
+                (not guess))
+      (setq guess (funcall (pop methods))))
+    guess))
+
+(defun delicious-guess-check-w3m ()
+  "If we're in a w3m buffer, use the current URL."
+  (if (and (boundp 'w3m-current-url)
+           w3m-current-url
+           (eq major-mode 'w3m-mode))
+      w3m-current-url))
+
+(defun delicious-guess-check-point ()
+  "If point is on a URL, return it."
+  (if (thing-at-point-looking-at thing-at-point-url-regexp)
+      (thing-at-point-url-at-point)))
+
+(defun delicious-guess-check-buffer ()
+  "Check the buffer for a URL and return it."
+  (save-excursion
+    (goto-char (point-min))
+    (if (re-search-forward thing-at-point-url-regexp nil t)
+        (match-string 0))))
+
+(defun delicious-guess-check-selection ()
+  "Check the X selection for a URL and return it."
+  (let ((selection)(url))
+    (when (eq window-system 'x)
+      (setq selection (condition-case nil
+                          (x-get-selection)
+                        (error "No `PRIMARY' selection") nil))
+      (when (and selection
+                 (string-match thing-at-point-url-regexp selection))
+        (setq url (match-string-no-properties 0 selection))))))
+
+(defun delicious-guess-check-xsel ()
+  "Check output of `delicious-xsel-prog' for a URL."
+  (when delicious-xsel-prog
+    (let ((selection (shell-command-to-string delicious-xsel-prog)))
+      (if (string-match thing-at-point-url-regexp selection)
+          (match-string 0 selection)))))
+
+(defun delicious-guess-check-default ()
+  "Return some text to use for the URL guess."
+  "http://")
 
 (defun delicious-rename-tag (old-tag new-tag)
   "Change all instances of OLD-TAG to NEW-TAG.

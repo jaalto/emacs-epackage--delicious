@@ -1,3 +1,20 @@
+2005-08-07  johnsu01  <john@wjsullivan.net>
+
+	* delicious.el (delicious-guess-url-methods): Customize this to
+	set which methods and what order you would like URL guessing to
+	use, for posting.
+	(delicious-xsel-prog): New customization option.
+	(delicious-guess-url): Changed this function to use a hook
+	variable instead.
+	(delicious-guess-check-w3m): New function for guessing.
+	(delicious-guess-check-point): New function for guessing.
+	(delicious-guess-check-buffer): New function for guessing.
+	(delicious-guess-check-selection): New function for guessing.
+	(delicious-guess-check-xsel): New function for guessing.
+	(delicious-guess-check-default): New function to return some text
+	for guessing, with the idea that this will be used when nothing
+	else matches.
+
 2005-08-05  johnsu01  <john@wjsullivan.net>
 
 	* README: Added brief description of delete command,
