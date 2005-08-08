@@ -765,22 +765,28 @@ MATCHES is the number of matches found."
   "Display the post with a hash matching SEARCH-HASH.
 If given a prefix, work offline only."
   (interactive "sEnter the hash: ")
-  (let ((match) (matches) (match-count 0))
-    (save-window-excursion
-      (delicious-build-posts-list current-prefix-arg)
-      (delicious-get-posts-buffer)
-      (re-search-forward delicious-timestamp) ; skip timestamp
-      (while (not (or match 
-                      (eq (condition-case nil
-                              (let* ((post (read (current-buffer)))
-                                     (hash (cdr (assoc "hash" post))))
-                                (when (string= hash search-hash)
-                                  (setq match post)
-                                  (setq match-count 1)))
-                            (end-of-file t)) t)))))
+  (let ((match) (match-count 0))
+    (setq match (delicious-post-matching-hash search-hash current-prefix-arg))
+    (if match (setq match-count 1))
     (delicious-search-buffer-prep)
     (delicious-search-insert-match match)
     (delicious-search-buffer-finish search-hash match-count)))
+
+(defun delicious-post-matching-hash (search-hash offline)
+  (let ((match))
+    (save-window-excursion
+      (delicious-build-posts-list offline)
+      (delicious-get-posts-buffer)
+      (re-search-forward delicious-timestamp)
+    (while (not (or match 
+                    (eq (condition-case nil
+                            (let* ((post (read (current-buffer)))
+                                   (hash (cdr (assoc "hash" post))))
+                              (when (string= hash search-hash)
+                                (setq match post)
+                                (setq match-count 1)))
+                          (end-of-file t)) t))))
+    match)))
 
 (defun delicious-search-add-tags (tags update)
   "Add tags to the post under point in Delicious Search mode."
