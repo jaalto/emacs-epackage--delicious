@@ -797,8 +797,8 @@ If UPDATE is non-nil, update the post's timestamp."
          (post (progn
                  (save-window-excursion
                    (delicious-get-posts-buffer)
-                   (re-search-forward hash)
-                   (re-search-backward "href")
+                   (search-forward hash)
+                   (search-backward "href")
                    (beginning-of-line)
                    (read (current-buffer)))))
          (current-tags (cdr (assoc "tag" post)))
