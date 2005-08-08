@@ -385,7 +385,18 @@ NEW-TAG can be multiple tags, space-separated."
   "Delete the post with URL HREF."
   (interactive "sEnter URL to delete: ")
   (delicious-api-delete href)
+  (delicious-delete-post-locally href)
   (message "%s deleted." href))
+
+(defun delicious-delete-post-locally (href)
+  "Delete the first local copy of the post with URL HREF."
+  (save-window-excursion
+    (delicious-get-posts-buffer)
+    (re-search-forward (regexp-quote href))
+    (beginning-of-line)
+    (delete-region (point) (scan-sexps (point) 1))
+    (delete-blank-lines)
+    (delicious-update-timestamp)))
 
 (defun delicious-w3m-html (username count tag)
   "Visit the HTML page for USERNAME showing COUNT most recent posts under TAG.
@@ -790,8 +801,8 @@ If given a prefix, work offline only."
          (new-tags (concat current-tags " " tags)))
     (delicious-post href desc new-tags extended time)
     (message "%s is now tagged:\n%s" href new-tags)
+    (delicious-delete-post-locally href)
     ;; update display of tags in current buffer
-    ;; do we need to remove the old version of the post?
     ))
 
 ;;;_+ Posting while offline
