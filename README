@@ -259,6 +259,32 @@ method.
 
 You can search for a post by its hash field, if you really want to.
 
+* Delicious Search Mode
+
+There are some additional commands conveniently available to you while in a
+Delicious Search mode buffer. 
+
+- M-x delicious-search-add-tags
+
+When you are over the list of tags for a post, this command is bound to
+'a'. You will be prompted for successive tags. Enter as many as you want, with
+a blank line to end. You will be prompted to see whether the timestamp should
+be updated with the current time, or whether the original timestamp for the
+post should be preserved. After that, the post will be resubmitted to the
+server with the new tags and the search buffer will be updated.
+
+- M-x delicious-search-delete-tags
+
+When you are over the list of tags for a post, this command is bound to
+`d'. This works the same as delicious-search-add-tags, except that all the tags
+you enter will be deleted from the current post.
+
+- M-x delicious-search-who-else
+
+When you are over any field of a post, this command is bound to `w'. It will
+open a page with your default browser showing all of the other del.icio.us
+users who have bookmarked this URL.
+
 * Useful noninteractive functions
 
 Noninteractive functions can't be called directly with M-x in Emacs. You can
