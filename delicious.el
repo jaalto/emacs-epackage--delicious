@@ -779,7 +779,7 @@ If given a prefix, work offline only."
     (delicious-search-insert-match match)
     (delicious-search-buffer-finish search-hash match-count)))
 
-(defun delicious-post-matching-hash (search-hash offline)
+(defun delicious-post-matching-hash (search-hash &optional offline)
   (let ((match))
     (save-window-excursion
       (delicious-build-posts-list offline)
