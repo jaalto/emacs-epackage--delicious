@@ -789,7 +789,8 @@ If given a prefix, work offline only."
     match)))
 
 (defun delicious-search-add-tags (tags update)
-  "Add tags to the post under point in Delicious Search mode."
+  "Add TAGS to the post under point in Delicious Search mode.
+If UPDATE is non-nil, update the post's timestamp."
   (interactive (list (delicious-complete-tags t t nil nil nil)
                      (y-or-n-p "Update timestamp? ")))
   (let* ((hash (get-text-property (point) 'hash))
