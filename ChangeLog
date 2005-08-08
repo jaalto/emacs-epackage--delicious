@@ -18,6 +18,11 @@
 	Search mode to browse to a page showing who else has bookmarked
 	this URL. Bound to `w' in Delicious Search mode when you are over
 	any field in a record.
+	(delicious-post): Compute the hash so we have a copy of it to
+	store locally.
+	(delicious-post-local): Oops, fix the argument passed to
+	delicious-rebuild-tags-maybe.
+	(delicious-post-offline): Compute the hash.
 
 2005-08-07  johnsu01  <john@wjsullivan.net>
 
