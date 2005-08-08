@@ -739,6 +739,7 @@ MATCHES is the number of matches found."
                    '(lambda () (interactive) 
                       (delicious-search-tags (word-at-point))))
                  (define-key map [(?a)] 'delicious-search-add-tags)
+                 (define-key map [(?d)] 'delicious-search-delete-tags)
                  (setq face 'delicious-result-tag-face))
                 ((string= field "time")
                  (setq face 'delicious-result-time-face))
@@ -806,6 +807,67 @@ If given a prefix, work offline only."
     ;; update display of tags in current buffer
     ))
 
+(defun delicious-search-delete-tags (tags update)
+  "Delete TAGS from the post under point in Delicious Search mode.
+If UPDATE is non-nil, update the post's timestamp."
+  (interactive (list (delicious-complete-tags t t nil nil nil)
+                     (y-or-n-p "Update timestamp? ")))
+  (let* ((hash (get-text-property (point) 'hash))
+         (post (delicious-post-matching-hash hash t))
+         (old-tags (split-string (cdr (assoc "tag" post))))
+         (href (cdr (assoc "href" post)))
+         (desc (cdr (assoc "description" post)))
+         (extended (or (cdr (assoc "extended" post)) ""))
+         (old-time (cdr (assoc "time" post)))
+         (new-time (if update (delicious-format-time (current-time))
+                     old-time))
+         (delete-tags (split-string tags))
+         (new-tags))
+    (mapc
+     (lambda (tag)
+       (unless (member tag delete-tags)
+         (setq new-tags (concat tag " " new-tags))))
+     old-tags)
+    (setq new-tags (substring new-tags 0 -1))   
+    (delicious-post href desc new-tags extended new-time t)
+    (with-current-buffer delicious-posts-file-name
+      (delicious-rebuild-tags-maybe new-tags))
+    (let* ((new-fields (list (cons "tag" new-tags)
+                            (cons "time" new-time)))
+           (edit-post (delicious-edit-post-locally hash new-fields))
+           (beg (search-backward href))
+           (end (search-forward old-time)))
+      (delete-region beg end)
+      (delicious-search-insert-match edit-post)
+      (delete-blank-lines)
+      (search-backward new-tags))))
+
+(defun delicious-edit-post-locally (hash fields)
+  "Replace old information in local copy of post with HASH using FIELDS.
+FIELDS is a list of cons cells, with each cell being a field name and content.
+Returns the updated post."
+  (save-window-excursion
+    (delicious-get-posts-buffer)
+    (search-forward hash)
+    (goto-char (line-end-position))
+    (up-list -1)
+    (let ((beg (point))
+          (end (scan-sexps (point) 1))
+          (post (read (current-buffer))))
+      (delete-region beg end)
+      (mapc
+       (lambda (cell)
+         (let ((target (car cell))
+               (content (cdr cell)))
+           (setcdr (assoc target post) content)))
+       fields)
+      (pp post (current-buffer)) 
+     (delete-blank-lines)
+     (backward-sexp)
+     (setq post (read (current-buffer)))
+     (delicious-update-timestamp)
+     post)))
+  
 ;;;_+ Posting while offline
 
 (defun delicious-post-offline (url description &optional tags extended time)
