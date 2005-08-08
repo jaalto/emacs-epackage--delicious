@@ -102,8 +102,9 @@
 
 ;;;_+ Posting
 
-(defun delicious-post (url description &optional tags extended time)
-  "Post a url with arguments URL, DESCRIPTION, TAGS, EXTENDED, and TIME."
+(defun delicious-post (url description &optional tags extended time nolocal)
+  "Post a url with arguments URL, DESCRIPTION, TAGS, EXTENDED, and TIME.
+If NOLOCAL is non-nil, don't add the post to the local list."
   (interactive (list
                 (delicious-read-url)
                 (delicious-read-description)
@@ -118,7 +119,7 @@
                (cons "tag" tags)
                (cons "extended" extended)
                (cons "time" time))))
-    (delicious-post-local post)
+    (unless nolocal (delicious-post-local post))
     (message "URL posted.")))
 
 (defun delicious-post-local (post &optional offline)
