@@ -726,6 +726,7 @@ MATCHES is the number of matches found."
                  (define-key map [(control ?m)] 
                    '(lambda () (interactive) 
                       (delicious-search-tags (word-at-point))))
+                 (define-key map [(?a)] 'delicious-search-add-tags)
                  (setq face 'delicious-result-tag-face))
                 ((string= field "time")
                  (setq face 'delicious-result-time-face))
@@ -767,6 +768,31 @@ If given a prefix, work offline only."
     (delicious-search-buffer-prep)
     (delicious-search-insert-match match)
     (delicious-search-buffer-finish search-hash match-count)))
+
+(defun delicious-search-add-tags (tags update)
+  "Add tags to the post under point in Delicious Search mode."
+  (interactive (list (delicious-complete-tags t t nil nil nil)
+                     (y-or-n-p "Update timestamp? ")))
+  (let* ((hash (get-text-property (point) 'hash))
+         (post (progn
+                 (save-window-excursion
+                   (delicious-get-posts-buffer)
+                   (re-search-forward hash)
+                   (re-search-backward "href")
+                   (beginning-of-line)
+                   (read (current-buffer)))))
+         (current-tags (cdr (assoc "tag" post)))
+         (href (cdr (assoc "href" post)))
+         (desc (cdr (assoc "description" post)))
+         (extended (or (cdr (assoc "extended" post)) ""))
+         (time (if update (delicious-format-time (current-time))
+                 (cdr (assoc "time" post))))
+         (new-tags (concat current-tags " " tags)))
+    (delicious-post href desc new-tags extended time)
+    (message "%s is now tagged:\n%s" href new-tags)
+    ;; update display of tags in current buffer
+    ;; do we need to remove the old version of the post?
+    ))
 
 ;;;_+ Posting while offline
 
