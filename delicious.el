@@ -726,8 +726,10 @@ MATCHES is the number of matches found."
           (cond ((string= field "href")
                  (define-key map [mouse-2] 'browse-url-at-point)
                  (define-key map [(control ?m)] 'browse-url-at-point)
+                 (define-key map [(?w)] 'delicious-search-who-else)
                  (setq face 'delicious-result-href-face))
                 ((string= field "description")
+                 (define-key map [(?w)] 'delicious-search-who-else)
                  (setq face 'delicious-result-description-face))
                 ((string= field "hash")
                  (setq face 'delicious-result-hash-face))
@@ -740,10 +742,13 @@ MATCHES is the number of matches found."
                       (delicious-search-tags (word-at-point))))
                  (define-key map [(?a)] 'delicious-search-add-tags)
                  (define-key map [(?d)] 'delicious-search-delete-tags)
+                 (define-key map [(?w)] 'delicious-search-who-else)
                  (setq face 'delicious-result-tag-face))
                 ((string= field "time")
+                 (define-key map [(?w)] 'delicious-search-who-else)
                  (setq face 'delicious-result-time-face))
                 ((string= field "extended")
+                 (define-key map [(?w)] 'delicious-search-who-else)
                  (setq face 'delicious-result-extended-face)))
           (setq content (propertize content 'hash hash 'face face 'keymap map))
           (unless (string= field "hash")
@@ -858,6 +863,13 @@ If UPDATE is non-nil, update the post's timestamp."
       (delete-blank-lines)
       (search-backward new-tags))))
 
+(defun delicious-search-who-else ()
+  "Browse to the del.icio.us URL showing who else has bookmarked this post."
+  (interactive)
+  (let* ((hash (get-text-property (point) 'hash))
+         (url (format "http://%s/url/%s" delicious-api-host hash)))
+    (browse-url url)))
+
 (defun delicious-edit-post-locally (hash fields)
   "Replace old information in local copy of post with HASH using FIELDS.
 FIELDS is a list of cons cells, with each cell being a field name and content.
@@ -883,7 +895,7 @@ Returns the updated post."
      (setq post (read (current-buffer)))
      (delicious-update-timestamp)
      post)))
-  
+
 ;;;_+ Posting while offline
 
 (defun delicious-post-offline (url description &optional tags extended time)
