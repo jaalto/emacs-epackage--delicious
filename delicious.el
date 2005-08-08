@@ -809,11 +809,19 @@ If UPDATE is non-nil, update the post's timestamp."
          (new-time (if update (delicious-format-time (current-time))
                      old-time))
          (new-tags (concat current-tags " " tags)))
-    (delicious-post href desc new-tags extended time)
-    (message "%s is now tagged:\n%s" href new-tags)
-    (delicious-delete-post-locally href)
-    ;; update display of tags in current buffer
-    ))
+    (delicious-post href desc new-tags extended new-time t)
+    (with-current-buffer delicious-posts-file-name
+      (delicious-rebuild-tags-maybe new-tags))
+    ;; rewrite the old record with the new record
+    (let* ((new-fields (list (cons "tag" new-tags)
+                            (cons "time" new-time)))
+           (edit-post (delicious-edit-post-locally hash new-fields))
+           (beg (search-backward href))
+           (end (search-forward old-time)))
+      (delete-region beg end)
+      (delicious-search-insert-match edit-post)
+      (delete-blank-lines)
+      (search-backward new-tags))))
 
 (defun delicious-search-delete-tags (tags update)
   "Delete TAGS from the post under point in Delicious Search mode.
