@@ -869,7 +869,9 @@ If UPDATE is non-nil, update the post's timestamp."
   "Browse to the del.icio.us URL showing who else has bookmarked this post."
   (interactive)
   (let* ((hash (get-text-property (point) 'hash))
-         (url (format "http://%s/url/%s" delicious-api-host hash)))
+         (post (delicious-post-matching-hash hash))
+         (href (cdr (assoc "href" post)))
+         (url (format "http://%s/url?url=%s" delicious-api-host href)))
     (browse-url url)))
 
 (defun delicious-edit-post-locally (hash fields)
