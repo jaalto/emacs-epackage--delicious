@@ -133,7 +133,7 @@ If OFFLINE is non-nil, don't update the local timestamp."
       (unless offline (delicious-update-timestamp))
       (goto-char (point-max))
       (pp post (current-buffer))
-      (let ((tags (cdr (assoc "href" post))))
+      (let ((tags (cdr (assoc "tag" post))))
 	(delicious-rebuild-tags-maybe tags))
       (delicious-save-buffer)
       (bury-buffer))))
