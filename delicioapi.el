@@ -219,7 +219,7 @@
 ;; temporarily disabled at the del.icio.us. server.
 
 (defun delicious-api-post (url &optional description tags extended time)
-"Post a URL to your del.icio.us account.  
+  "Post a URL to your del.icio.us account.  
 You must include a DESCRIPTION (string).  TAGS (space separated string), 
 EXTENDED (extra description string) and TIME (in the format %C%y-%m-%dT%H:%M:%SZ) 
 are optional additions."
@@ -236,10 +236,10 @@ are optional additions."
 (defun delicious-api-get-tags ()
   "Return a hash table of your tags and the number of your entries under each tag.
 The keys are the tags."
-(let ((uri "tags/get?")
-      (search (delicious-build-search "count" "tag")))
-  (delicious-send-request (delicious-build-request uri))
-  (delicious-do-search-hash (car search) 2)))
+  (let ((uri "tags/get?")
+        (search (delicious-build-search "count" "tag")))
+    (delicious-send-request (delicious-build-request uri))
+    (delicious-do-search-hash (car search) 2)))
 
 ;; (defun delicious-api-get-subscriptions ()
 ;;   "Return a list of your inbox subscriptions. The list is tag and user."
