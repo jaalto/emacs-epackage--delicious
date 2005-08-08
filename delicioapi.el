@@ -223,14 +223,15 @@
 You must include a DESCRIPTION (string).  TAGS (space separated string), 
 EXTENDED (extra description string) and TIME (in the format %C%y-%m-%dT%H:%M:%SZ) 
 are optional additions."
-(let* ((description (url-hexify-string description))
-       (tags (url-hexify-string tags))
-       (extended (url-hexify-string extended))
-       (time (url-hexify-string time))
-       (post-url (format 
-                  "posts/add?&url=%s&description=%s&tags=%s&extended=%s&dt=%s"
-                         url description tags extended time)))
-  (delicious-send-request (delicious-build-request post-url))))
+  (let* ((url (url-hexify-string url))
+         (description (url-hexify-string description))
+         (tags (url-hexify-string tags))
+         (extended (url-hexify-string extended))
+         (time (url-hexify-string time))
+         (post-url (format 
+                    "posts/add?&url=%s&description=%s&tags=%s&extended=%s&dt=%s"
+                    url description tags extended time)))
+    (delicious-send-request (delicious-build-request post-url))))
 
 (defun delicious-api-get-tags ()
   "Return a hash table of your tags and the number of your entries under each tag.

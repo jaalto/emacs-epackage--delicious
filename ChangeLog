@@ -1,5 +1,9 @@
 2005-08-08  johnsu01  <john@wjsullivan.net>
 
+	* delicioapi.el (delicious-api-post): Oops, I was escaping all the
+	fields but the URL. Escape the URL, so addresses with ampersands
+	and things in them will work.
+
 	* delicious.el (delicious-edit-post-locally): New internal
 	function to update specific fields in a local copy of a post.
 	(delicious-post): New NOLOCAL argument to stop local addition of
