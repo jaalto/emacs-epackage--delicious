@@ -1,3 +1,20 @@
+2005-08-08  johnsu01  <john@wjsullivan.net>
+
+	* delicious.el (delicious-edit-post-locally): New internal
+	function to update specific fields in a local copy of a post.
+	(delicious-post): New NOLOCAL argument to stop local addition of
+	posts. Needed to prevent duplication when we are editing posts in
+	Delicious Search mode.
+	(delicious-complete-tags): Ugly hack to remove trailing space on
+	tags, until I get time to rewrite this loop.
+	(delicious-search-delete-tags): New function to delete tags from a
+	post. Bound to `d' in Delicious Search mode when you are over the
+	tags line.
+	(delicious-search-who-else): New interactive command in Delicious
+	Search mode to browse to a page showing who else has bookmarked
+	this URL. Bound to `w' in Delicious Search mode when you are over
+	any field in a record.
+
 2005-08-07  johnsu01  <john@wjsullivan.net>
 
 	* delicious.el (delicious-guess-url-methods): Customize this to
@@ -14,6 +31,11 @@
 	(delicious-guess-check-default): New function to return some text
 	for guessing, with the idea that this will be used when nothing
 	else matches.
+	(delicious-search-add-tags): New function to easily add more tags
+	to a post while on the tags field in the *delicious search
+	results* buffer. It is bound to 'a'.
+	(delicious-delete-post-locally): New function to delete a post
+	from the local copy.
 
 2005-08-05  johnsu01  <john@wjsullivan.net>
 
