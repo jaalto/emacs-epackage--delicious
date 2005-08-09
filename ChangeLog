@@ -4,6 +4,13 @@
 	OFFLINE argument optional.
 	(delicious-search-who-else): Changed to use the url?url form,
 	because Joshua says we can't rely on the md5 hash.
+	(delicious-read-time-string): Use the current time if no time
+	string is entered. Didn't I do this before?
+	(delicious-complete-tags): Forgot to respect the offline argument
+	when building the tags list.
+	(delicious-build-tags-list): Forgot here too.
+	(delicious-save-buffer): Bury the buffer here, so we don't have to
+	do it twenty other places.
 
 	* delicioapi.el (delicious-api-post): Oops, I was escaping all the
 	fields but the URL. Escape the URL, so addresses with ampersands

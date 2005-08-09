@@ -219,7 +219,7 @@ Blank line at the prompt ends the input.  If NOSUGGEST is non-nil, don't
 suggest any tags. If SOFAR is non-nil, don't show tags entered so far.
 Repeat the read QUANTITY times. If QUANTITY is nil, repeat until a blank
 line is entered. If REQUIRE is non-nil, only a completion match or an empty string
-are accepted as input. if OFFLINE is non-nil, don't contact the server."
+are accepted as input. If OFFLINE is non-nil, don't contact the server."
   (unless delicious-tags-list
     (setq delicious-tags-list (delicious-build-tags-list t)))
   (let* ((base-prompt 
