@@ -152,14 +152,16 @@ If OFFLINE is non-nil, don't update the local timestamp."
   "Read a date string from a prompt and format it properly for the server.
  Use the current date and time if nothing entered."
   (let ((date (read-string "(Optional) Date/Time [yyyy-mm-dd hh:mm:ss]: ")))
-    (if (equal date "")
-	(setq date (delicious-format-time))
-      (unless (string-match "^\\([1-9][0-9][0-9][0-9]\\).\\([0-1][0-9]\\).\\([0-9][0-9]\\).\\([0-9][0-9]\\).\\([0-5][0-9]\\).\\([0-5][0-9]\\)" date)
+    (if (equal date "") (setq date (delicious-format-time (current-time))))
+      (unless 
+          (string-match
+           "^\\([1-9][0-9][0-9][0-9]\\).\\([0-1][0-9]\\).\\([0-9][0-9]\\).\\([0-9][0-9]\\).\\([0-5][0-9]\\).\\([0-5][0-9]\\)"
+           date)
         (message "Incorrect time string format.")
         (sleep-for 1)
         (delicious-read-time-string))
       (let ((time-string (replace-match "\\1-\\2-\\3T\\4:\\5:\\6Z" t nil date)))
-        time-string))))
+        time-string)))
 
 (defun delicious-read-url (&optional offline)
   "Read a url from a prompt, suggesting an appropriate default.
