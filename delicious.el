@@ -923,9 +923,9 @@ Returns the updated post."
                          (cons "time" (or time nil)))))
         (prin1 post (current-buffer)))
       (delicious-save-buffer)))
-  (if (y-or-n-p "Post another bookmark? ")
-      (call-interactively 'delicious-post-offline)
-    (message "Cache saved.")))
+  (when (y-or-n-p "Post another bookmark? ")
+    (call-interactively 'delicious-post-offline))
+  (message "Cache saved."))
 
 (defun delicious-post-cache (&optional cache-file)
   "Post bookmarks from `delicious-cache-file', or CACHE-FILE if non-nil."
