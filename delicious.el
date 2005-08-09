@@ -135,8 +135,7 @@ If OFFLINE is non-nil, don't update the local timestamp."
       (pp post (current-buffer))
       (let ((tags (cdr (assoc "tag" post))))
 	(delicious-rebuild-tags-maybe tags))
-      (delicious-save-buffer)
-      (bury-buffer))))
+      (delicious-save-buffer))))
 
 (defun delicious-rebuild-tags-maybe (tags)
   "If any tags in the space separated string TAGS are new, rebuild tags table."
@@ -305,8 +304,7 @@ timestamp comparison and force a refresh from the server."
           (mapc '(lambda (post)
                    (pp post (current-buffer)))
                 (delicious-api-get-all))
-          (delicious-save-buffer)
-          (bury-buffer)))
+          (delicious-save-buffer)))
       (message "Done."))))
 
 (defun delicious-guess-description ()
@@ -1008,7 +1006,8 @@ for use in completion. If OFFLINE is non-nil, don't query the server."
 
 (defun delicious-save-buffer ()
   (let ((require-final-newline nil))
-    (save-buffer)))
+    (save-buffer)
+    (bury-buffer)))
 
 (defconst delicious-timestamp
   (concat
@@ -1059,8 +1058,7 @@ Return '(0) if there is no timestamp."
         (if (looking-at delicious-timestamp)
             (replace-match time)
 	  (insert time)))
-      (delicious-save-buffer)
-      (bury-buffer))))
+      (delicious-save-buffer))))
 
 (defun delicious-format-time (&optional time)
   "Return TIME as a del.icio.us timestamp.
