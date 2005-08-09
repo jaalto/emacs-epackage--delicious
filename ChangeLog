@@ -11,6 +11,8 @@
 	(delicious-build-tags-list): Forgot here too.
 	(delicious-save-buffer): Bury the buffer here, so we don't have to
 	do it twenty other places.
+	(delicious-post-cache): Use ASSOC instead of ELT; safer when then
+	list structure changes a bit.
 
 	* delicioapi.el (delicious-api-post): Oops, I was escaping all the
 	fields but the URL. Escape the URL, so addresses with ampersands
