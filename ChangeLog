@@ -1,3 +1,8 @@
+2005-08-09  johnsu01  <john@wjsullivan.net>
+
+	* delicious.el (delicious-search-delete-tags): Replaced ugly
+	substring hack with something better.
+
 2005-08-08  johnsu01  <john@wjsullivan.net>
 
 	* delicious.el (delicious-post-matching-hash): Forgot to make the

@@ -4,7 +4,7 @@
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;; Created 25 October 2004
-;; Version: 0.2 2005-08-08
+;; Version: 0.2 2005-08-09
 ;; Keywords: comm, hypermedia
 
 ;; This program is free software; you can redistribute it and/or
@@ -78,7 +78,7 @@
 
 ;;;;_+ Global stuff
 
-(defconst delicious-version  "delicious.el/0.2 2005-08-08"
+(defconst delicious-version  "delicious.el/0.2 2005-08-09"
   "The version string for this copy of delicious.el.")
 
 (defconst delicious-tags-list '()
@@ -1056,12 +1056,14 @@ If UPDATE is non-nil, update the post's timestamp."
                      old-time))
          (delete-tags (split-string tags))
          (new-tags))
-    (mapc
-     (lambda (tag)
-       (unless (member tag delete-tags)
-         (setq new-tags (concat tag " " new-tags))))
-     old-tags)
-    (setq new-tags (substring new-tags 0 -1))   
+    (setq new-tags
+          (mapconcat #'identity
+                     (delq nil
+                           (mapcar
+                            (lambda (tag)
+                              (unless (member tag delete-tags) tag))
+                            old-tags))
+                     " "))
     (delicious-post href desc new-tags extended new-time t)
     (with-current-buffer delicious-posts-file-name
       (delicious-rebuild-tags-maybe new-tags))
