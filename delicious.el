@@ -974,6 +974,22 @@ If given a prefix, operate offline."
      posts)
     matches))
 
+(defun delicious-posts-matching-date (search-date &optional offline)
+  "Return all posts that match regexp SEARCH-DATE."
+  (let ((matches)(match))
+    (save-window-excursion
+      (delicious-build-posts-list offline)
+      (delicious-get-posts-buffer)
+      (re-search-forward delicious-timestamp)
+      (while (not (eq (condition-case nil
+			  (let* ((post (read (current-buffer)))
+				 (date (cdr (assoc "time" post))))
+			    (when (string-match search-date date)
+			      (setq match post)
+			      (add-to-list 'matches match)))
+			(end-of-file t)) t))))
+    matches))
+
 ;;;_+ Search by hash
 
 (defun delicious-search-hash (search-hash)
