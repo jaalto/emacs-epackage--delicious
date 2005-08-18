@@ -15,10 +15,15 @@
 	(planner-delicious-rewrite-posts-match-date): New command to
 	replace current delicious section with posts matching a date
 	regexp.
+	(planner-delicious-append): Don't insert extra newlines at the end
+	of the section, or between appends.
+	(planner-delicious-rewrite): Don't insert extra newlines at the
+	end of the section, or between appends.
 
-	* delicioapi.el (delicious-send-request): Fixed bug reported by
-	Gunnar Wrobel that prevented things from working with Squid (and
-	probably other proxies too).
+	* delicioapi.el
+	(delicious-send-request): Fixed bug reported by Gunnar Wrobel that
+	prevented things from working with Squid (and probably other
+	proxies too).
 
 2005-08-09  johnsu01  <john@wjsullivan.net>
 
