@@ -121,6 +121,22 @@ If a prefix is given, do not filter by date."
                        (planner-delicious-read-date))))
   (planner-delicious-posts-match-all tags 'append search-date))
 
+(defun planner-delicious-rewrite-posts-match-date (search-date)
+  "Replace `planner-delicious-section' with posts matching SEARCH-DATE."
+  (interactive (list (planner-delicious-read-date)))
+  (let ((matches (delicious-posts-matching-date search-date)))
+    (save-excursion
+      (save-restriction
+	(planner-delicious-modify-section matches 'rewrite)))))
+
+(defun planner-delicious-append-posts-match-date (search-date)
+  "Append all your posts with date matching the regexp SEARCH-DATE."
+  (interactive (list (planner-delicious-read-date)))
+  (let ((matches (delicious-posts-matching-date search-date)))
+    (save-excursion
+      (save-restriction
+	(planner-delicious-modify-section matches 'append)))))
+
 (defun planner-delicious-posts-match-all (tags modification
                                                &optional search-date)
   (save-excursion
