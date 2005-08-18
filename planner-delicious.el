@@ -68,15 +68,13 @@
   (if (null (planner-narrow-to-section planner-delicious-section))
       (error "No delicious section on this page")
     (goto-char (point-max))
-    (delete-blank-lines)
     (mapc
      (lambda (post)
        (let* ((href (cdr (assoc "href" post)))
               (desc (cdr (assoc "description" post)))
               (link (planner-make-link href desc)))
-         (insert "\n" link "\n")))
-     posts)
-    (insert "\n")))
+         (insert "\n" link "\n\n")))
+     posts)))
 
 (defun planner-delicious-rewrite (posts)
   "Erase `planner-delicious-section' and insert POSTS."
@@ -85,15 +83,13 @@
     (let ((beg (point))
           (end (point-max)))
       (delete-region beg end))
-    (delete-blank-lines)
     (mapc
      (lambda (post)
        (let* ((href (cdr (assoc "href" post)))
               (desc (cdr (assoc "description" post)))
               (link (planner-make-link href desc)))
-         (insert "\n" link "\n")))
-     posts)
-    (insert "\n")))
+         (insert "\n" link "\n\n")))
+     posts)))
 
 (defun planner-delicious-modify-section (posts method)
   "METHOD can be rewrite or append."
