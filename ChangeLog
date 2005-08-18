@@ -1,3 +1,9 @@
+2005-08-18  johnsu01  <john@wjsullivan.net>
+
+	* delicioapi.el (delicious-send-request): Fixed bug reported by
+	Gunnar Wrobel that prevented things from working with Squid (and
+	probably other proxies too).
+
 2005-08-09  johnsu01  <john@wjsullivan.net>
 
 	* delicious.el (delicious-search-delete-tags): Replaced ugly

@@ -4,7 +4,7 @@
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;; Created 25 October 2004
-;; Version: 0.2 2005-08-08
+;; Version: 0.2 2005-08-18
 ;; Keywords: comm, hypermedia
 
 ;; This program is free software; you can redistribute it and/or
@@ -70,7 +70,7 @@
 (defvar delicious-api-html "/html/"
   "*The path to the del.icio.us HTML feed.  It should begin and end with a slash.")
 
-(defconst delicious-api-version "delicioapi.el/0.2 2005-08-08"
+(defconst delicious-api-version "delicioapi.el/0.2 2005-08-18"
 "The version string for this copy of delicioapi.el.")
 
 (defconst delicious-api-field-match "=\"\\(.*?\\)\""
@@ -509,7 +509,7 @@ Wait for up to `delicious-api-timeout' seconds for output. Output goes to
                  (cond ((re-search-forward "HTTP/1.1 503" nil t)
                         (throw 
                          'error "HTTP 503 error received, server unavailable"))
-                       ((not (re-search-forward "HTTP/1.1 200 OK" nil t))
+                       ((not (re-search-forward "HTTP/1.. 200 OK" nil t))
                         (throw 
                          'error 
                          "HTTP error received, see delicious output buffer"))
