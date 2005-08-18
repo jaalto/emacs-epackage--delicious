@@ -1,4 +1,20 @@
-2005-08-18  johnsu01  <john@wjsullivan.net>
+2005-08-18  John Sullivan  <john@wjsullivan.net>
+
+	* delicious.el (delicious-posts-narrow-by-date): Change name of
+	date narrowing function to make namespace room for an interactive
+	command to search all posts by date.
+	(delicious-posts-matching-date): New function to return all posts
+	matching a date.
+
+	* planner-delicious.el (planner-delicious-posts-match-any): Change
+	name of date narrowing function.
+	(planner-delicious-posts-match-all): Change name of date narrowing
+	function.
+	(planner-delicious-append-posts-match-date): New command to append
+	posts matching a date regexp.
+	(planner-delicious-rewrite-posts-match-date): New command to
+	replace current delicious section with posts matching a date
+	regexp.
 
 	* delicioapi.el (delicious-send-request): Fixed bug reported by
 	Gunnar Wrobel that prevented things from working with Squid (and
