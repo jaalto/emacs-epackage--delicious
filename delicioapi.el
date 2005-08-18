@@ -530,7 +530,7 @@ Wait for up to `delicious-api-timeout' seconds for output. Output goes to
            (error error-check)))))
            
 (defun delicious-build-search (&rest fields)
-  "Given list FIELDS, return a list with CAR as the search-string and CDR the number of search fields."
+  "From list FIELDS, return a cons of the search-string and number of fields."
   (let ((search-string nil)
         (count-fields (length fields)))
     (loop for field in fields do
@@ -540,21 +540,28 @@ Wait for up to `delicious-api-timeout' seconds for output. Output goes to
     (cons search-string count-fields)))
 
 (defun delicious-do-search-list (search-string fields)
-  "Return a list of occurrences of SEARCH-STRING.  SEARCH-STRING has FIELDS separate fields.  Output to `delicious-api-buffer'."
+  "Return a list of occurrences of SEARCH-STRING.
+SEARCH-STRING has FIELDS separate fields.  Output to `delicious-api-buffer'."
   (save-excursion
     (with-current-buffer delicious-api-buffer
       (goto-char (point-min))
       (let ((results-list))
         (while (re-search-forward search-string nil t)
-          (setq results-list (cons (let ((result))
-                                     (loop for field from 1 to fields do
-                                           (setq result (append result (list (match-string field)))))
+          (setq results-list 
+                (cons (let ((result))
+                        (loop for field from 1 to fields do
+                              (setq result 
+                                    (append result 
+                                            (list (match-string field)))))
                                      result)
                                    results-list)))
         results-list))))
 
 (defun delicious-do-search-hash (search-string key)
-  "Return a hash table of occurrences in `delicious-api-buffer' of SEARCH-STRING.  KEY is either 1 or 2. If it is 1, then the hash key will be the match for the first field in the search string.  If it is 2, then the key will be the match for the second field."
+  "Return a hash table of SEARCH-STRING results from `delicious-api-buffer'
+KEY is either 1 or 2. If it is 1, then the hash key will be the match for
+the first field in the search string.  If it is 2, then the key will be
+the match for the second field."
   (save-excursion
     (with-current-buffer delicious-api-buffer
       (goto-char (point-min))
