@@ -127,7 +127,7 @@ If a prefix is given, do not filter by date."
     (save-restriction
       (let ((matches (delicious-posts-matching-tags tags)))
         (when search-date
-          (setq matches (delicious-posts-matching-date matches search-date)))
+          (setq matches (delicious-posts-narrow-by-date matches search-date)))
         (planner-delicious-modify-section matches modification)))))
 
 (defun planner-delicious-append-posts-match-any (tags &optional search-date)
@@ -152,7 +152,7 @@ If a prefix is given, do not filter by date."
     (save-restriction
       (let ((matches (delicious-posts-matching-tags-any tags)))
         (when search-date
-          (setq matches (delicious-posts-matching-date matches search-date)))
+          (setq matches (delicious-posts-narrow-by-date matches search-date)))
         (planner-delicious-modify-section matches modification)))))
 
 (provide 'planner-delicious)

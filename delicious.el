@@ -963,7 +963,7 @@ If given a prefix, operate offline."
 
 ;;;_+ Search by date
 
-(defun delicious-posts-matching-date (posts search-date)
+(defun delicious-posts-narrow-by-date (posts search-date)
   "Out of POSTS, return those that match regexp SEARCH-DATE."
   (let ((matches))
     (mapc
