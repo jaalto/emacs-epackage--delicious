@@ -15,6 +15,12 @@
 	(planner-delicious-rewrite-posts-match-date): New command to
 	replace current delicious section with posts matching a date
 	regexp.
+	(planner-delicious-rewrite): Remove blank lines between
+	links. Keep one blank line at the top of the section and one at
+	the bottom.
+	(planner-delicious-append): Remove blank lines between links. Keep
+	one blank line at the beginning of the appended chunk and one at
+	the end.
 
 	* delicioapi.el (delicious-send-request): Fixed bug reported by
 	Gunnar Wrobel that prevented things from working with Squid (and

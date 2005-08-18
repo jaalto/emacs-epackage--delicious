@@ -73,8 +73,9 @@
        (let* ((href (cdr (assoc "href" post)))
               (desc (cdr (assoc "description" post)))
               (link (planner-make-link href desc)))
-         (insert "\n" link "\n\n")))
-     posts)))
+         (insert link "\n")))
+     posts)
+    (insert "\n")))
 
 (defun planner-delicious-rewrite (posts)
   "Erase `planner-delicious-section' and insert POSTS."
@@ -88,8 +89,9 @@
        (let* ((href (cdr (assoc "href" post)))
               (desc (cdr (assoc "description" post)))
               (link (planner-make-link href desc)))
-         (insert "\n" link "\n\n")))
-     posts)))
+         (insert link "\n")))
+     posts)
+    (insert "\n")))
 
 (defun planner-delicious-modify-section (posts method)
   "METHOD can be rewrite or append."
