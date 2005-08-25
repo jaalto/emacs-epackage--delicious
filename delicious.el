@@ -4,7 +4,7 @@
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;; Created 25 October 2004
-;; Version: 0.2 2005-08-18
+;; Version: 0.2 2005-08-25
 ;; Keywords: comm, hypermedia
 
 ;; This program is free software; you can redistribute it and/or
@@ -78,7 +78,7 @@
 
 ;;;;_+ Global stuff
 
-(defconst delicious-version  "delicious.el/0.2 2005-08-18"
+(defconst delicious-version  "delicious.el/0.2 2005-08-25"
   "The version string for this copy of delicious.el.")
 
 (defconst delicious-tags-list '()
@@ -690,23 +690,27 @@ advances to the next search result."
   "Prepare a *delicious search results* buffer for output."
   (unless (equal (buffer-name) "*delicious search results*")
     (switch-to-buffer-other-window
-     (get-buffer-create "*delicious search results*")))
-  (delete-region (point-min) (point-max)))
+     (get-buffer-create "*delicious search results*"))
+  (let ((inhibit-read-only t))
+    (delete-region (point-min) (point-max)))
+  (let ((view-read-only nil))(toggle-read-only 1))))
 
 (defun delicious-search-buffer-finish (search-string matches)
   "Report search results in the *delicious search results* buffer.
 SEARCH-STRING is the regexp pattern that was used in the search.
 MATCHES is the number of matches found."
   (with-current-buffer "*delicious search results*"
-    (goto-char (point-min))
-    (insert (format "Your search for \"%s\" returned %d results.\n\n"
-                    search-string matches))
-    (delicious-search-mode 1)))
+    (let ((inhibit-read-only t))
+      (goto-char (point-min))
+      (insert (format "Your search for \"%s\" returned %d results.\n\n"
+                      search-string matches)))
+      (delicious-search-mode 1)))
 
 (defun delicious-search-insert-match (post)
   "Insert POST with the fields propertized."
   (with-current-buffer "*delicious search results*"
-    (let ((hash (cdr (assoc "hash" post))))
+    (let ((hash (cdr (assoc "hash" post)))
+          (inhibit-read-only t))
       (dolist (cell post)
         (let ((map (make-sparse-keymap))
               (field (car cell))

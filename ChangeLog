@@ -1,3 +1,14 @@
+2005-08-24  johnsu01  <john@wjsullivan.net>
+
+	* delicious.el (delicious-search-buffer-prep): I guess we'll make
+	this buffer read-only after all, after my comical experience of
+	typing something by accident and then trying to delete it with
+	backspace, which caused the screen to scroll, etc.
+	(delicious-search-insert-match): Inhibit read-only while inserting
+	matches.
+	(delicious-search-buffer-finish): Need to inhibit read-only here
+	too.
+
 2005-08-18  John Sullivan  <john@wjsullivan.net>
 
 	* delicious.el (delicious-posts-narrow-by-date): Change name of
