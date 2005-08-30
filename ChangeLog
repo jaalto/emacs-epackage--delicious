@@ -1,3 +1,16 @@
+2005-08-30  johnsu01  <john@wjsullivan.net>
+
+	* delicious.el (delicious-get-posts-buffer): Return the buffer.
+	(delicious-search-add-tags): Don't assume that everyone is using
+	~/.delicious for their posts file.
+	(delicious-search-delete-tags): Don't assume that everyone is
+	using ~/.delicious for their posts file.
+	(delicious-search-delete-tags): Forgot to turn off read-only when
+	updating the record after making changes.
+	(delicious-search-add-tags): Forgot to turn off read-only here
+	too.
+	(delicious-search-mode-map): Add binding for q to bury the buffer.
+
 2005-08-24  johnsu01  <john@wjsullivan.net>
 
 	* delicious.el (delicious-search-buffer-prep): I guess we'll make
