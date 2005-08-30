@@ -112,11 +112,13 @@
     (bury-buffer)))
 
 (defun delicious-get-posts-buffer ()
-  "Switch to a buffer containing `delicious-posts-file-name'."
+  "Switch to a buffer containing `delicious-posts-file-name'.
+Return the buffer."
   (let* ((home (getenv "HOME"))
          (posts-file (concat home "/" delicious-posts-file-name)))
     (find-file posts-file)
-    (goto-char (point-min))))
+    (goto-char (point-min))
+    (current-buffer)))
 
 ;;;;_+ Posting
 
@@ -1047,11 +1049,12 @@ If UPDATE is non-nil, update the post's timestamp."
                      old-time))
          (new-tags (concat current-tags " " tags)))
     (delicious-post href desc new-tags extended new-time t)
-    (with-current-buffer delicious-posts-file-name
+    (with-current-buffer 
+        (save-window-excursion (delicious-get-posts-buffer))
       (delicious-rebuild-tags-maybe new-tags))
     ;; rewrite the old record with the new record
     (let* ((new-fields (list (cons "tag" new-tags)
-                            (cons "time" new-time)))
+                             (cons "time" new-time)))
            (edit-post (delicious-edit-post-locally hash new-fields))
            (beg (search-backward href))
            (end (search-forward old-time)))
@@ -1085,10 +1088,11 @@ If UPDATE is non-nil, update the post's timestamp."
                             old-tags))
                      " "))
     (delicious-post href desc new-tags extended new-time t)
-    (with-current-buffer delicious-posts-file-name
+    (with-current-buffer 
+        (save-window-excursion (delicious-get-posts-buffer))
       (delicious-rebuild-tags-maybe new-tags))
     (let* ((new-fields (list (cons "tag" new-tags)
-                            (cons "time" new-time)))
+                             (cons "time" new-time)))
            (edit-post (delicious-edit-post-locally hash new-fields))
            (beg (search-backward href))
            (end (search-forward old-time)))
