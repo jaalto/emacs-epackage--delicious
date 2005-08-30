@@ -673,6 +673,7 @@ Optionally assign TAGS, an EXTENDED description, and TIME to the bookmarks."
     (define-key map [(meta ?p)] 'delicious-search-previous-result)
     (define-key map [(? )] 'scroll-up)
     (define-key map "\C-?" 'scroll-down)
+    (define-key map [?q] 'bury-buffer)
     map)
   "Keymap for function `delicious-search-mode'.")
 
