@@ -1,3 +1,9 @@
+2005-09-03  John Sullivan  <john@wjsullivan.net>
+
+	* delicioapi.el (delicious-api-get-all): Add optional tag
+	argument, which has been available in the server API for a while
+	now. Fix indentation.
+
 2005-08-30  johnsu01  <john@wjsullivan.net>
 
 	* delicious.el (delicious-get-posts-buffer): Return the buffer.

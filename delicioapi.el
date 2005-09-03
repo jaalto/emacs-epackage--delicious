@@ -4,7 +4,7 @@
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;; Created 25 October 2004
-;; Version: 0.2 2005-08-18
+;; Version: 0.2 2005-09-03
 ;; Keywords: comm, hypermedia
 
 ;; This program is free software; you can redistribute it and/or
@@ -70,7 +70,7 @@
 (defvar delicious-api-html "/html/"
   "*The path to the del.icio.us HTML feed.  It should begin and end with a slash.")
 
-(defconst delicious-api-version "delicioapi.el/0.2 2005-08-18"
+(defconst delicious-api-version "delicioapi.el/0.2 2005-09-03"
 "The version string for this copy of delicioapi.el.")
 
 (defconst delicious-api-field-match "=\"\\(.*?\\)\""
@@ -296,11 +296,16 @@ The keys are the tags."
   (delicious-send-request (delicious-build-request uri))
   (delicious-api-parse-posts)))
 
-(defun delicious-api-get-all ()
-"Return a list of all posts from your account.  The list is HREF, DESCRIPTION, EXTENDED, HASH, TAG, and TIME."
-(let ((uri "posts/all"))
-  (delicious-send-request (delicious-build-request uri))
-  (delicious-api-parse-posts)))
+(defun delicious-api-get-all (&optional tag)
+  "Return a list of all posts from your account. 
+If TAG is specified, return all posts with that tag.
+The list is HREF, DESCRIPTION, EXTENDED, HASH, TAG, and TIME."
+  (let* ((tag (url-hexify-string tag))
+        (uri (concat "posts/all"
+                     (unless (null tag)
+                       (format "?tag=%s" tag)))))
+    (delicious-send-request (delicious-build-request uri))
+    (delicious-api-parse-posts)))
 
 (defun delicious-api-get-dates (&optional tag)
 "Return a hash table of dates with the number of posts at each date.
