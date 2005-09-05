@@ -1,3 +1,10 @@
+2005-09-05  John Sullivan  <john@wjsullivan.net>
+
+	* delicious.el (delicious-search-insert-match): Add binding for c
+	to delicious search mode, to append the url with no properties to
+	the kill ring.
+	(delicious-search-copy-url): New command for the above binding.
+
 2005-09-03  John Sullivan  <john@wjsullivan.net>
 
 	* delicioapi.el (delicious-api-get-all): Add optional tag

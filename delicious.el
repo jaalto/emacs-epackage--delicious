@@ -4,7 +4,7 @@
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;; Created 25 October 2004
-;; Version: 0.2 2005-08-30
+;; Version: 0.2 2005-09-05
 ;; Keywords: comm, hypermedia
 
 ;; This program is free software; you can redistribute it and/or
@@ -78,7 +78,7 @@
 
 ;;;;_+ Global stuff
 
-(defconst delicious-version  "delicious.el/0.2 2005-08-30"
+(defconst delicious-version  "delicious.el/0.2 2005-09-05"
   "The version string for this copy of delicious.el.")
 
 (defconst delicious-tags-list '()
@@ -723,6 +723,7 @@ MATCHES is the number of matches found."
                  (define-key map [mouse-2] 'browse-url-at-point)
                  (define-key map [(control ?m)] 'browse-url-at-point)
                  (define-key map [(?w)] 'delicious-search-who-else)
+                 (define-key map [(?c)] 'delicious-search-copy-url)
                  (setq face 'delicious-result-href-face))
                 ((string= field "description")
                  (define-key map [(?w)] 'delicious-search-who-else)
@@ -781,6 +782,15 @@ MATCHES is the number of matches found."
          (href (cdr (assoc "href" post)))
          (url (format "http://%s/url?url=%s" delicious-api-host href)))
     (browse-url url)))
+
+(defun delicious-search-copy-url ()
+  "Copy the url under point to the kill ring, with no properties."
+  (interactive)
+  (let* ((beg (line-beginning-position))
+        (end (line-end-position))
+        (url (buffer-substring-no-properties beg end)))
+    (kill-new url)
+    (message url)))
 
 ;;;_+ Search by regexp
 
