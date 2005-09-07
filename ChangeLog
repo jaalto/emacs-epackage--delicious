@@ -1,3 +1,13 @@
+2005-09-07  John Sullivan  <john@wjsullivan.net>
+
+	* delicious.el (delicious-search-delete): New command in the
+	search result buffer. Hit 'd' on the url to delete the post. I'm
+	aware of a bug with the add and delete tag functions that cause
+	posts to be duplicated. Will fix later today.
+
+	* delicioapi.el (delicious-api-delete): Fixed major bug in url
+	encoding that was causing delete to fail.
+
 2005-09-05  John Sullivan  <john@wjsullivan.net>
 
 	* delicious.el (delicious-search-insert-match): Add binding for c

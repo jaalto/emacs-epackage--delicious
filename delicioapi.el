@@ -4,7 +4,7 @@
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;; Created 25 October 2004
-;; Version: 0.2 2005-09-03
+;; Version: 0.2 2005-09-07
 ;; Keywords: comm, hypermedia
 
 ;; This program is free software; you can redistribute it and/or
@@ -72,7 +72,7 @@
   "*The path to the del.icio.us HTML feed.
 It should begin and end with a slash.")
 
-(defconst delicious-api-version "delicioapi.el/0.2 2005-09-03"
+(defconst delicious-api-version "delicioapi.el/0.2 2005-09-07"
   "The version string for this copy of delicioapi.el.")
 
 (defconst delicious-api-field-match "=\"\\(.*?\\)\""
@@ -241,6 +241,7 @@ EXTENDED (extra description string) and TIME (in the format
                     "posts/add?&url=%s&description=%s&tags=%s&extended=%s&dt=%s"
                     url description tags extended time)))
     (delicious-send-request (delicious-build-request post-url))))
+
 
 (defun delicious-api-get-tags ()
   "Return a hash table of tags and the number of your entries with each tag.

@@ -4,7 +4,7 @@
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;; Created 25 October 2004
-;; Version: 0.2 2005-09-05
+;; Version: 0.2 2005-09-07
 ;; Keywords: comm, hypermedia
 
 ;; This program is free software; you can redistribute it and/or
@@ -78,7 +78,7 @@
 
 ;;;;_+ Global stuff
 
-(defconst delicious-version  "delicious.el/0.2 2005-09-05"
+(defconst delicious-version  "delicious.el/0.2 2005-09-07"
   "The version string for this copy of delicious.el.")
 
 (defconst delicious-tags-list '()
