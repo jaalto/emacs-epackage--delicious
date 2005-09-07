@@ -363,7 +363,8 @@ TAG is a tag to filter by.  The dates are the keys."
 
 (defun delicious-api-delete (url)
   "Delete a URL."
-  (let ((uri (format "posts/delete?url=%s" url)))
+  (let ((uri (format "posts/delete?url=%s" 
+                     (url-hexify-string url))))
     (delicious-send-request (delicious-build-request uri))))
 
 (defun delicious-api-get-timestamp ()
