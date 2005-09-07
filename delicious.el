@@ -724,6 +724,7 @@ MATCHES is the number of matches found."
                  (define-key map [(control ?m)] 'browse-url-at-point)
                  (define-key map [(?w)] 'delicious-search-who-else)
                  (define-key map [(?c)] 'delicious-search-copy-url)
+                 (define-key map [(?d)] 'delicious-search-delete)
                  (setq face 'delicious-result-href-face))
                 ((string= field "description")
                  (define-key map [(?w)] 'delicious-search-who-else)
@@ -791,6 +792,14 @@ MATCHES is the number of matches found."
         (url (buffer-substring-no-properties beg end)))
     (kill-new url)
     (message url)))
+
+(defun delicious-search-delete ()
+  "Delete the post under point."
+  (interactive)
+  (let* ((beg (line-beginning-position))
+        (end (line-end-position))
+        (url (buffer-substring-no-properties beg end)))
+    (delicious-delete-post url)))
 
 ;;;_+ Search by regexp
 
