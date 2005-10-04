@@ -228,8 +228,6 @@ It's determined using `delicious-api-user' and `delicious-api-password'."
                (list (format "%s:%s" delicious-api-host delicious-api-port)
                      (cons delicious-api-realm (delicious-auth)))))
 
-(delicious-api-register-auth)
-
 (defadvice url-http-user-agent-string 
   (after delicious-api-override-user-agent activate)
   "If called from delicious-api, use our specific user-agent."

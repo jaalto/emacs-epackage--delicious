@@ -1,5 +1,10 @@
 2005-10-04  John Sullivan  <john@wjsullivan.net>
 
+	* README (Keywords): Modified setup instructions. You now need to
+	add (delicious-api-register-auth) somewhere in your .emacs after
+	setting your username and password in order to avoid being
+	prompted for that information. 
+
 	* delicioapi.el (delicious-api-from): Removed, since we are now
 	relying on `url-privacy-level' for which information should be
 	included in the header of each request. 

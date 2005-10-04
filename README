@@ -84,10 +84,12 @@ If you decide you want to have the delicious-el functions available to you
 automatically when you start Emacs, add:
 
   (require 'delicious)
+  (setq delicious-api-user "myusername"
+        delicious-api-password "mypassword")
+  (delicious-api-register-auth)
 
 to your `.emacs' file, making sure that both `delicious.el' and `delicioapi.el'
-are somewhere in your load path. You will also need to either add the above
-option definitions to the file, or save your changes via Customization.
+are somewhere in your load path.
 
 del.icio.us has requested that you limit your hits to the API to a reasonable
 amount. In particular, it is requested that you do not do anything that will
