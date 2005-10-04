@@ -65,6 +65,9 @@
 (defvar delicious-api-host "del.icio.us"
   "The delicious host name.")
 
+(defvar delicious-api-port "80"
+  "The delicious port number.")
+
 (defvar delicious-api "/api/"
   "*The path to the del.ici.ous api.  It should begin and end in a slash.")
 
@@ -72,7 +75,10 @@
   "*The path to the del.icio.us HTML feed.
 It should begin and end with a slash.")
 
-(defconst delicious-api-version "delicioapi.el/0.2 2005-09-07"
+(defvar delicious-api-realm (format "%s API" delicious-api-host)
+  "The delicious auth realm name.")
+
+(defconst delicious-api-version "delicioapi.el/0.3 2005-10-04"
   "The version string for this copy of delicioapi.el.")
 
 (defconst delicious-api-field-match "=\"\\(.*?\\)\""
@@ -103,21 +109,6 @@ for managing and sharing bookmarks."
   :group 'delicious
   :type 'string
   :tag "del.icio.us password")
-
-(defcustom delicious-api-from nil
-  "*Sent to the server to identify the request sender.  Use your email address."
-  :version "21.3.1"
-  :group 'delicious
-  :type 'string
-  :tag "del.icio.us 'From' header")
-
-(defcustom delicious-api-timeout 60
-  "*The number of seconds to wait for output before timing out.
-The default is 60."
-  :version "21.3.1"
-  :group 'delicious
-  :type 'integer
-  :tag "del.icio.us timeout wait")
 
 (defcustom delicious-api-html-count 15
   "*The number of times to show by default when fetching an HTML feed.
@@ -222,6 +213,23 @@ Server default is `raquo'."
   :type 'string
   :tag "Delicious cache filename")
 
+;;;;_+ Setup
+
+(defun delicious-api-register-auth ()
+  "Register delicious auth information."
+  (add-to-list 'url-basic-auth-storage 
+               (list (format "%s:%s" delicious-api-host delicious-api-port)
+                     (cons delicious-api-realm (delicious-auth)))))
+
+(delicious-api-register-auth)
+
+(defadvice url-http-user-agent-string 
+  (after delicious-api-override-user-agent activate)
+  "If called from delicious-api, use our specific user-agent."
+  (if (string= (aref url 3) "del.icio.us")
+      (setq ad-return-value
+            (concat "User-Agent: " delicious-api-user-agent "\r\n"))))
+
 ;;;;_+ API Functions
 
 ;; All "inbox" function have been commented out because they have been
@@ -240,7 +248,7 @@ EXTENDED (extra description string) and TIME (in the format
          (post-url (format 
                     "posts/add?&url=%s&description=%s&tags=%s&extended=%s&dt=%s"
                     url description tags extended time)))
-    (delicious-send-request (delicious-build-request post-url))))
+    (delicious-api-send-request (delicious-api-build-request post-url))))
 
 
 (defun delicious-api-get-tags ()
@@ -248,7 +256,7 @@ EXTENDED (extra description string) and TIME (in the format
 The keys are the tags."
   (let ((uri "tags/get?")
         (search (delicious-build-search "count" "tag")))
-    (delicious-send-request (delicious-build-request uri))
+    (delicious-api-send-request (delicious-api-build-request uri))
     (delicious-do-search-hash (car search) 2)))
 
 (defun delicious-api-build-tag-completion ()
@@ -266,7 +274,7 @@ The keys are the tags."
 ;;   "Return a list of your inbox subscriptions. The list is tag and user."
 ;;   (let ((uri "inbox/subs?")
 ;;      (search (delicious-build-search "tag" "user")))
-;;     (delicious-send-request (delicious-build-request uri))
+;;     (delicious-api-send-request (delicious-api-build-request uri))
 ;;     (delicious-do-search-list (car search) (cdr search))))
 
 
@@ -275,7 +283,7 @@ The keys are the tags."
 ;; The keys are the dates."
 ;;   (let ((uri "inbox/dates?")
 ;;      (search (delicious-build-search "date" "count")))
-;;     (delicious-send-request (delicious-build-request uri))
+;;     (delicious-api-send-request (delicious-api-build-request uri))
 ;;     (delicious-do-search-hash (car search) 1)))
 
 
@@ -288,7 +296,7 @@ The keys are the tags."
 ;;             (unless (null date)
 ;;               (format "&dt=%s" date-filter))))
 ;;       (search (delicious-build-search "href" "description" "tags" "time" "user")))
-;;     (delicious-send-request (delicious-build-request uri))
+;;     (delicious-api-send-request (delicious-api-build-request uri))
 ;;     (delicious-do-search-list (car search) (cdr search))))
 
 
@@ -301,7 +309,7 @@ The list is HREF, DESCRIPTION, EXTENDED, HASH, TAG, and TIME."
                         (format "&tag=%s" tag))
                       (unless (null date)
                         (format "&dt=%s" date)))))
-    (delicious-send-request (delicious-build-request uri))
+    (delicious-api-send-request (delicious-api-build-request uri))
     (delicious-api-parse-posts)))
 
 (defun delicious-api-get-recent (&optional tag count)
@@ -319,7 +327,7 @@ than that."
                       (unless (null tag)
                         (format "&tag=%s" (url-hexify-string tag)))
                       (format "&count=%s" count-fixed))))
-    (delicious-send-request (delicious-build-request uri))
+    (delicious-api-send-request (delicious-api-build-request uri))
     (delicious-api-parse-posts)))
 
 (defun delicious-api-get-all (&optional tag)
@@ -330,7 +338,7 @@ The list is HREF, DESCRIPTION, EXTENDED, HASH, TAG, and TIME."
          (uri (concat "posts/all"
                       (unless (null tag)
                         (format "?tag=%s" tag)))))
-    (delicious-send-request (delicious-build-request uri))
+    (delicious-api-send-request (delicious-api-build-request uri))
     (delicious-api-parse-posts)))
 
 (defun delicious-api-get-dates (&optional tag)
@@ -341,38 +349,38 @@ TAG is a tag to filter by.  The dates are the keys."
                       (unless (null tag)
                         (format "&tag=%s" tag))))
          (search (delicious-build-search "count" "date")))
-    (delicious-send-request (delicious-build-request uri))
+    (delicious-api-send-request (delicious-api-build-request uri))
     (delicious-do-search-hash (car search) 2)))
 
 ;; (defun delicious-api-unsubscribe (name &optional tag)
 ;;   "Unsubscribe the inbox feed from NAME under TAG."
 ;;   (let ((uri (format "inbox/unsub?&user=%s&tag=%s" name tag)))
-;;     (delicious-send-request (delicious-build-request uri))))
+;;     (delicious-api-send-request (delicious-api-build-request uri))))
 
 ;; (defun delicious-api-subscribe (name &optional tag)
 ;;   "Subscribe to an inbox feed from NAME under TAG."
 ;;   (let ((uri (format "inbox/sub?&user=%s&tag=%s" name tag)))
-;;     (delicious-send-request (delicious-build-request uri))))
+;;     (delicious-api-send-request (delicious-api-build-request uri))))
 
 (defun delicious-api-rename (old-tag new-tag)
   "Rename OLD-TAG to NEW-TAG across all posts."
   (let ((uri (format "tags/rename?&old=%s&new=%s" 
 		     (url-hexify-string old-tag)
 		     (url-hexify-string new-tag))))
-    (delicious-send-request (delicious-build-request uri))))
+    (delicious-api-send-request (delicious-api-build-request uri))))
 
 (defun delicious-api-delete (url)
   "Delete a URL."
   (let ((uri (format "posts/delete?url=%s" 
                      (url-hexify-string url))))
-    (delicious-send-request (delicious-build-request uri))))
+    (delicious-api-send-request (delicious-api-build-request uri))))
 
 (defun delicious-api-get-timestamp ()
   "Return the time of the last update from the server.
 The value returned is a time value."
   (let ((uri (format "posts/update"))
 	(search-string (delicious-build-search "update time")))
-    (delicious-send-request (delicious-build-request uri))
+    (delicious-api-send-request (delicious-api-build-request uri))
     (setq date (caar (delicious-do-search-list (car search-string) 1)))
     (string-match 
      "\\([0-9]++++\\)-\\([0-9]++\\)-\\([0-9]++\\)T\\([0-9]++\\):\\([0-9]++\\):\\([0-9]++\\)"
@@ -406,7 +414,7 @@ nil, add an RSS feed button using CSS.  It it is non-nil, don't add an RSS feed
 button.  EXTENDEDDIV is an extended entry in its own div.  If it is nil, don't
 use it.  If it is non-nil, do something.  EXTENDEDCLASS is a CSS class to use
 for EXTENDEDDIV."
-  (delicious-send-request
+  (delicious-api-send-request
    (delicious-api-build-html-request
     (delicious-api-html-uri username tagname count extended divclass aclass
                             tags tagclass tagsep tagsepclass bullet rssbutton
@@ -510,61 +518,22 @@ for EXTENDEDDIV."
   
 (defun delicious-api-build-html-request (uri)
   "Return the proper HTTP request to get URI from the HTML feed."
-  (let* ((uri 
-          (format "http://%s%s%s" delicious-api-host delicious-api-html uri)))
-    (format 
-     "GET %s HTTP/1.0\nFrom: %s\nUser-Agent: %s\nAuthorization: Basic %s\n\n"
-            uri delicious-api-from delicious-api-user-agent (delicious-auth))))
+  (let ((uri 
+         (format "http://%s%s%s" delicious-api-host delicious-api-html uri)))
+    uri))
 
-(defun delicious-build-request (uri)
+(defun delicious-api-build-request (uri)
   "Return the proper HTTP request to get URI."
-  (let* ((uri (format "http://%s%s%s" delicious-api-host delicious-api uri)))
-    (format 
-     "GET %s HTTP/1.0\nFrom: %s\nUser-Agent: %s\nAuthorization: Basic %s\n\n"
-            uri delicious-api-from delicious-api-user-agent (delicious-auth))))
+  (format "http://%s%s%s" delicious-api-host delicious-api uri))
+  
 
-(defun delicious-send-request (request)
-  "Send the REQUEST to the server.
-Wait for up to `delicious-api-timeout' seconds for output. Output goes to
-`delicious-api-buffer'. After receiving output, check for HTTP errors."
-  (let ((error-check
-         (catch 'error
-           (unless (null (get-buffer delicious-api-buffer))
-             (kill-buffer delicious-api-buffer))
-           (open-network-stream "delicious" delicious-api-buffer 
-                                delicious-api-host "http")
-           (process-send-string "delicious" request)
-           (with-current-buffer delicious-api-buffer
-             (let ((proc (get-process "delicious")))
-               (setq time-out (run-with-timer delicious-api-timeout nil
-                                              '(lambda () (throw 'error 
-                                                                 "timeout"))))
-               (while (memq (process-status proc) '(open run))
-                 (accept-process-output proc))
-               (save-excursion 
-                 (goto-char (point-min))
-                 (cond ((re-search-forward "HTTP/1.1 503" nil t)
-                        (throw 
-                         'error "HTTP 503 error received, server unavailable"))
-                       ((not (re-search-forward "HTTP/1.. 200 OK" nil t))
-                        (throw 
-                         'error 
-                         "HTTP error received, see delicious output buffer"))
-                       ((re-search-forward "you have been banned" nil t)
-                        (throw
-                         'error
-                         "You have been banned by the server"))
-                       ((not (re-search-forward 
-                              delicious-api-success-match nil t))
-                        (throw
-                         'error "Unrecognized output received"))))))
-           (cancel-timer time-out))))
-    (cond ((equal error-check "timeout")
-           (error 
-            "Timed out waiting for response (transaction may still occur)")
-           (kill-process (get-process "delicious")))
-          (error-check
-           (error error-check)))))
+(defun delicious-api-send-request (request)
+  "Send REQUEST to the server."
+  (with-current-buffer (get-buffer-create delicious-api-buffer)
+    (erase-buffer)
+    (insert-buffer-substring 
+     (let ((delicious-api-p t)) ; necessary to get the right user-agent
+       (url-retrieve-synchronously request)))))
 
 ;;;;_+ Parsing the XML
            
