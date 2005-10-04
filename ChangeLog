@@ -5,6 +5,9 @@
 	included in the header of each request. 
 	(delicious-api-build-html-request): Remove HTTP header setup,
 	since we are using url.el for that.
+	(url-auth): Has to be loaded for us to register delicious auth
+	information. 
+	(delicious-auth): Moved to Setup section.
 
 	* README: Removed description of timeout. Remove
 	delicious-api-from, since we will rely on the general

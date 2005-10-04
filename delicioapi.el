@@ -52,6 +52,7 @@
 
 (require 'cl)
 (require 'url)
+(require 'url-auth)
 (require 'thingatpt)
 
 ;;;;_+ Variables
@@ -214,6 +215,12 @@ Server default is `raquo'."
   :tag "Delicious cache filename")
 
 ;;;;_+ Setup
+
+(defun delicious-auth ()
+  "Return the authorization string.
+It's determined using `delicious-api-user' and `delicious-api-password'."
+  (base64-encode-string
+   (format "%s:%s" delicious-api-user delicious-api-password)))
 
 (defun delicious-api-register-auth ()
   "Register delicious auth information."
@@ -599,12 +606,6 @@ the match for the second field."
                                       (concat field "=\"\\(.*?\\)\"") post)
                                   collect (cons field (match-string 1 post))))))
         posts-parsed))))
-
-(defun delicious-auth ()
-  "Return the authorization string.
-It's determined using `delicious-api-user' and `delicious-api-password'."
-  (base64-encode-string
-   (format "%s:%s" delicious-api-user delicious-api-password)))
 
 (defun delicious-api-version ()
   "Return the version of the Emacs Delicious API in use."
