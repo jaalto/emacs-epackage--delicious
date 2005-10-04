@@ -1,10 +1,11 @@
 * License and Copying Information
 
-`delicioapi.el' and `delicious.el' are Copyright (C) 2004, 2005 John Sullivan
+`delicioapi.el', `delicious.el', and this README are Copyright (C) 2004, 2005
+John Sullivan
 
 Author: John Sullivan <john@wjsullivan.net>
 Created 25 October 2004
-Version: 0.2 2005-08-05
+Version: 0.3 2005-10-04
 Keywords: comm, hypermedia
 
 This program is free software; you can redistribute it and/or modify it under
@@ -19,13 +20,6 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with
 this program; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA 02110-1301 USA.
-
-* Documentation License
-
-This README is Copyright 2004, 2005 by John Sullivan <john@wjsullivan.net>.
-
-Verbatim copying and distribution of this entire article are permitted
-worldwide, without royalty, in any medium, provided this notice is preserved.
 
 * Contents of the archive
 
@@ -84,8 +78,7 @@ Customize, with:
 or by evaluating something like the following:
 
   (setq delicious-api-user "myusername"
-        delicious-api-password "mypassword"
-        delicious-api-from "my@email.net")
+        delicious-api-password "mypassword")
 
 If you decide you want to have the delicious-el functions available to you
 automatically when you start Emacs, add:
@@ -96,17 +89,11 @@ to your `.emacs' file, making sure that both `delicious.el' and `delicioapi.el'
 are somewhere in your load path. You will also need to either add the above
 option definitions to the file, or save your changes via Customization.
 
-There are some other options as well, but these three have to be set for the
-program to work. You should use your e-mail address in `delicious-api-from',
-because it is a polite thing to do. That way if your programs ever start doing
-anything bonkers, del.icio.us will be able to contact you and let you know of
-the problem.
-
-Speaking of programs and bonkers, del.icio.us has requested that you limit your
-hits to the API to a reasonable amount. In particular, it is requested that you
-do not do anything that will trigger one hit to del.icio.us for every hit to
-your web site. In order to respect that, this program does a number of things
-(and will do more in the future) to cache information locally.
+del.icio.us has requested that you limit your hits to the API to a reasonable
+amount. In particular, it is requested that you do not do anything that will
+trigger one hit to del.icio.us for every hit to your web site. In order to
+respect that, this program does a number of things (and will do more in the
+future) to cache information locally.
 
 * Interactive commands to use and what to expect
 
@@ -444,17 +431,6 @@ using the up arrow to move back to the delicious-post command in your history,
 and hitting enter. If you are still getting a server error, then you can use
 delicious-post-offline to save the post to your cache. Later on, use
 delicious-post-cache to send the post to the server.
-
-- Server timeouts
-
-I implemented a timeout because I figured you probably didn't want your whole
-Emacs session to be unusable for too long while waiting for an OK response from
-the server. Depending on the speed of your connection and of the del.icio.us
-server, you might want to use a higher number for `delicious-api-timeout'. The
-default is 60 seconds. Note that when a connection times out, there is a good
-chance that your transaction with del.icio.us still happened; delicious-el just
-got tired of waiting. So you probably want to check with your browser and see
-if that last post was actually received before you send it again. 
 
 * Keeping Up
 

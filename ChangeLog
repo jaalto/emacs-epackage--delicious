@@ -1,3 +1,40 @@
+2005-10-04  John Sullivan  <john@wjsullivan.net>
+
+	* delicioapi.el (delicious-api-from): Removed, since we are now
+	relying on `url-privacy-level' for which information should be
+	included in the header of each request. 
+	(delicious-api-build-html-request): Remove HTTP header setup,
+	since we are using url.el for that.
+
+	* README: Removed description of timeout. Remove
+	delicious-api-from, since we will rely on the general
+	`url-privacy-level' settings for this.
+
+	* delicioapi.el (delicious-api-timeout): Removed, since we are now
+	relying on url.el for this.
+
+2005-10-02  John Sullivan  <john@wjsullivan.net>
+
+	* delicioapi.el (delicious-api-realm): New variable to hold the
+	auth realm name.
+	(delicious-api-port): New variable to hold the port number.
+	(delicious-api-register-auth): New function to register auth
+	information for the url library.
+	(url-http-user-agent-string): Advise to use our specific
+	user-agent string when called during a delicious-api request.
+	(delicious-api-send-request): Set the flag to get the right
+	user-agent. 
+
+2005-09-23  John Sullivan  <john@wjsullivan.net>
+
+	* delicioapi.el (delicious-send-request): Deleted. 
+	(delicious-api-build-request): We don't need to add the HTTP
+	headers anymore.
+	(delicious-api-send-request): New, simplified version that makes
+	use of the url library, which we are already requiring.
+	(delicious-api-version): Incremented to 0.3 in honor of major
+	change in how we communicate with the server.
+
 2005-09-07  John Sullivan  <john@wjsullivan.net>
 
 	* delicious.el (delicious-search-delete): New command in the

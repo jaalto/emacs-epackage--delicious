@@ -4,7 +4,7 @@
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;; Created 25 October 2004
-;; Version: 0.2 2005-09-07
+;; Version: 0.3 2005-10-04
 ;; Keywords: comm, hypermedia
 
 ;; This program is free software; you can redistribute it and/or
@@ -59,7 +59,7 @@
 (defvar delicious-api-buffer "*delicious output*"
   "*The name of the buffer to direct output to.")
 
-(defvar delicious-api-user-agent "delicioapi.el/0.2"
+(defvar delicious-api-user-agent "delicioapi.el/0.3"
   "The User-Agent field that we will send to the server.")
 
 (defvar delicious-api-host "del.icio.us"
