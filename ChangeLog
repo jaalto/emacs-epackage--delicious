@@ -1,3 +1,15 @@
+2005-10-07  John Sullivan  <john@wjsullivan.net>
+
+	* delicioapi.el (delicious-api-register-auth): Modified to account
+	for the way auth storage is handled in url-version "Emacs", which
+	is what is included in CVS Emacs. Also add check earlier in the
+	file to catch an url-version that we won't support at all right
+	now. "Emacs" and "Exp" should both be acceptable url versions now.
+
+	* delicious.el (delicious-skip-timestamp): New function used in
+	reading info from the posts buffer. Adjusted all the necessary
+	functions to use it.
+	
 2005-10-04  John Sullivan  <john@wjsullivan.net>
 
 	* README (Keywords): Modified setup instructions. You now need to

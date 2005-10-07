@@ -5,7 +5,7 @@ John Sullivan
 
 Author: John Sullivan <john@wjsullivan.net>
 Created 25 October 2004
-Version: 0.3 2005-10-04
+Version: 0.3 2005-10-07
 Keywords: comm, hypermedia
 
 This program is free software; you can redistribute it and/or modify it under
@@ -34,6 +34,11 @@ Street, Fifth Floor, Boston, MA 02110-1301 USA.
 * Dependencies not included
 
 - url.el
+
+You will need a version with a url-version string of either "Emacs" or
+"Exp". These are currently the two versions I'm trying to
+support. "Emacs" is the one that comes bundled with CVS Emacs. I can
+try to support more, but it gets to be a headache real fast.
 
 * Overview
 
