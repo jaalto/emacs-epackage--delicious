@@ -4,7 +4,7 @@
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;; Created 25 October 2004
-;; Version: 0.3 2005-10-04
+;; Version: 0.3 2005-10-07
 ;; Keywords: comm, hypermedia
 
 ;; This program is free software; you can redistribute it and/or
@@ -78,7 +78,7 @@
 
 ;;;;_+ Global stuff
 
-(defconst delicious-version  "delicious.el/0.3 2005-10-04"
+(defconst delicious-version  "delicious.el/0.3 2005-10-07"
   "The version string for this copy of delicious.el.")
 
 (defconst delicious-tags-list '()
@@ -119,6 +119,12 @@ Return the buffer."
     (find-file posts-file)
     (goto-char (point-min))
     (current-buffer)))
+
+(defun delicious-skip-timestamp ()
+  (unless 
+      (re-search-forward delicious-timestamp nil t)
+    (message "No timestamp found, forcing refresh")
+    (delicious-build-posts-list nil t)))
 
 ;;;;_+ Posting
 
@@ -407,7 +413,7 @@ If OFFLINE is non-nil, don't query the server for any information."
   (save-window-excursion
     (save-excursion
       (delicious-get-posts-buffer)
-      (re-search-forward delicious-timestamp)
+      (delicious-skip-timestamp)
       (let ((dup))
 	(while (not (or dup
                         (eq
@@ -502,7 +508,7 @@ for use in completion. If OFFLINE is non-nil, don't query the server."
   (save-window-excursion
     (save-excursion
       (delicious-get-posts-buffer)
-      (re-search-forward delicious-timestamp) ; skip over the timestamp
+      (delicious-skip-timestamp)
       (setq delicious-tags-list
             (let ((index 0)
                   (tags-table '()))
@@ -810,7 +816,7 @@ If given a prefix, operate offline."
   (interactive "sEnter regexp search string: ")
   (delicious-build-posts-list current-prefix-arg)
   (delicious-get-posts-buffer)
-  (re-search-forward delicious-timestamp) ; skip timestamp
+  (delicious-skip-timestamp) 
   (let ((match)(matches)(match-count 0))
     (while (not (eq 
                  (condition-case nil
@@ -839,7 +845,7 @@ If given a prefix, operate offline."
   (interactive "sEnter regexp search string: ")
   (delicious-build-posts-list current-prefix-arg)
   (delicious-get-posts-buffer)
-  (re-search-forward delicious-timestamp) ; skip timestamp
+  (delicious-skip-timestamp) 
   (let ((match)(matches)(match-count 0))
     (while (not (eq
                  (condition-case nil
@@ -871,7 +877,7 @@ If given a prefix, operate offline."
   (interactive "sEnter regexp search string: ")
   (delicious-build-posts-list current-prefix-arg)
   (delicious-get-posts-buffer)
-  (re-search-forward delicious-timestamp) ; skip timestamp
+  (delicious-skip-timestamp) 
   (let ((match)(matches)(match-count 0))
     (while (not (eq
                  (condition-case nil
@@ -899,7 +905,7 @@ If given a prefix, operate offline."
   (interactive "sEnter regexp search string: ")
   (delicious-build-posts-list current-prefix-arg)
   (delicious-get-posts-buffer)
-  (re-search-forward delicious-timestamp) ; skip timestamp
+  (delicious-skip-timestamp) 
   (let ((match)(matches)(match-count 0))
     (while (not (eq
                  (condition-case nil
@@ -930,7 +936,7 @@ If given a prefix, operate offline."
     (save-window-excursion
       (delicious-build-posts-list current-prefix-arg)
       (delicious-get-posts-buffer)
-      (re-search-forward delicious-timestamp) ; skip timestamp
+      (delicious-skip-timestamp) 
       (while (not (eq
                    (condition-case nil
                        (let* ((post (read (current-buffer)))
@@ -956,7 +962,7 @@ If given a prefix, operate offline."
     (save-window-excursion
       (delicious-build-posts-list current-prefix-arg)
       (delicious-get-posts-buffer)
-      (re-search-forward delicious-timestamp) ; skip timestamp
+      (delicious-skip-timestamp) 
       (while (not (eq
                    (condition-case nil
                        (let* ((post (read (current-buffer)))
@@ -1006,7 +1012,7 @@ If given a prefix, operate offline."
     (save-window-excursion
       (delicious-build-posts-list offline)
       (delicious-get-posts-buffer)
-      (re-search-forward delicious-timestamp)
+      (delicious-skip-timestamp)
       (while (not (eq (condition-case nil
 			  (let* ((post (read (current-buffer)))
 				 (date (cdr (assoc "time" post))))
@@ -1034,7 +1040,7 @@ If given a prefix, work offline only."
     (save-window-excursion
       (delicious-build-posts-list offline)
       (delicious-get-posts-buffer)
-      (re-search-forward delicious-timestamp)
+      (delicious-skip-timestamp)
     (while (not (or match 
                     (eq (condition-case nil
                             (let* ((post (read (current-buffer)))
