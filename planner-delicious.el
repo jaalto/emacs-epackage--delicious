@@ -56,6 +56,7 @@
 ;;; Code:
 
 (require 'delicious)
+(require 'planner)
 
 (defcustom planner-delicious-section "Delicious"
   "*Header for the del.icio.us section in a plan page."

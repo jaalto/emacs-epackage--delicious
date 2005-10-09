@@ -81,15 +81,15 @@
 (defconst delicious-version  "delicious.el/0.3 2005-10-07"
   "The version string for this copy of delicious.el.")
 
-(defconst delicious-tags-list '()
+(defvar delicious-tags-list '()
   "Table of tags for use in completion.")
 
 (defcustom delicious-xsel-prog nil
-"*The full path to a program that returns the X mouse selection, like xsel."
-:version "21.3.1"
-:group 'delicious
-:type 'string
-:tag "del.icio.us xsel program name")
+  "*The full path to a program that returns the X mouse selection, like xsel."
+  :version "21.3.1"
+  :group 'delicious
+  :type 'string
+  :tag "del.icio.us xsel program name")
 
 (defcustom delicious-guess-url-methods 
   '(delicious-guess-check-point 
@@ -98,11 +98,11 @@
     delicious-guess-check-selection
     delicious-guess-check-xsel
     delicious-guess-check-default)
-"*The list of methods to try, in order, to guess a URL to post."
-:version "21.3.1"
-:group 'delicious
-:type 'hook
-:tag "del.icio.us URL guess methods")
+  "*The list of methods to try, in order, to guess a URL to post."
+  :version "21.3.1"
+  :group 'delicious
+  :type 'hook
+  :tag "del.icio.us URL guess methods")
 
 ;;;;_+ Buffer management
 
@@ -280,15 +280,15 @@ If OFFLINE is non-nil, don't update the local timestamp."
  Use the current date and time if nothing entered."
   (let ((date (read-string "(Optional) Date/Time [yyyy-mm-dd hh:mm:ss]: ")))
     (if (equal date "") (setq date (delicious-format-time (current-time))))
-      (unless 
-          (string-match
-           "^\\([1-9][0-9][0-9][0-9]\\).\\([0-1][0-9]\\).\\([0-9][0-9]\\).\\([0-9][0-9]\\).\\([0-5][0-9]\\).\\([0-5][0-9]\\)"
-           date)
-        (message "Incorrect time string format.")
-        (sleep-for 1)
-        (delicious-read-time-string))
-      (let ((time-string (replace-match "\\1-\\2-\\3T\\4:\\5:\\6Z" t nil date)))
-        time-string)))
+    (unless 
+        (string-match
+         "^\\([1-9][0-9][0-9][0-9]\\).\\([0-1][0-9]\\).\\([0-9][0-9]\\).\\([0-9][0-9]\\).\\([0-5][0-9]\\).\\([0-5][0-9]\\)"
+         date)
+      (message "Incorrect time string format.")
+      (sleep-for 1)
+      (delicious-read-time-string))
+    (let ((time-string (replace-match "\\1-\\2-\\3T\\4:\\5:\\6Z" t nil date)))
+      time-string)))
 
 (defun delicious-refresh-p ()
   "Return t if server timestamp is newer than local timestamp."
@@ -519,7 +519,7 @@ for use in completion. If OFFLINE is non-nil, don't query the server."
                                ((post (read (current-buffer)))
                                 (tags (split-string (cdr (assoc "tag" post)))))
                              (mapc
-                              (lambda (tag)	; collect tags if new
+                              (lambda (tag) ; collect tags if new
                                 (unless (assoc tag tags-table)
                                   (add-to-list 'tags-table (list tag index))
                                   (setq index (1+ index))))
@@ -700,9 +700,9 @@ advances to the next search result."
   (unless (equal (buffer-name) "*delicious search results*")
     (switch-to-buffer-other-window
      (get-buffer-create "*delicious search results*"))
-  (let ((inhibit-read-only t))
-    (delete-region (point-min) (point-max)))
-  (let ((view-read-only nil))(toggle-read-only 1))))
+    (let ((inhibit-read-only t))
+      (delete-region (point-min) (point-max)))
+    (let ((view-read-only nil))(toggle-read-only 1))))
 
 (defun delicious-search-buffer-finish (search-string matches)
   "Report search results in the *delicious search results* buffer.
@@ -713,7 +713,7 @@ MATCHES is the number of matches found."
       (goto-char (point-min))
       (insert (format "Your search for \"%s\" returned %d results.\n\n"
                       search-string matches)))
-      (delicious-search-mode 1)))
+    (delicious-search-mode 1)))
 
 (defun delicious-search-insert-match (post)
   "Insert POST with the fields propertized."
@@ -794,8 +794,8 @@ MATCHES is the number of matches found."
   "Copy the url under point to the kill ring, with no properties."
   (interactive)
   (let* ((beg (line-beginning-position))
-        (end (line-end-position))
-        (url (buffer-substring-no-properties beg end)))
+         (end (line-end-position))
+         (url (buffer-substring-no-properties beg end)))
     (kill-new url)
     (message url)))
 
@@ -803,8 +803,8 @@ MATCHES is the number of matches found."
   "Delete the post under point."
   (interactive)
   (let* ((beg (line-beginning-position))
-        (end (line-end-position))
-        (url (buffer-substring-no-properties beg end)))
+         (end (line-end-position))
+         (url (buffer-substring-no-properties beg end)))
     (delicious-delete-post url)))
 
 ;;;_+ Search by regexp
@@ -1041,15 +1041,15 @@ If given a prefix, work offline only."
       (delicious-build-posts-list offline)
       (delicious-get-posts-buffer)
       (delicious-skip-timestamp)
-    (while (not (or match 
-                    (eq (condition-case nil
-                            (let* ((post (read (current-buffer)))
-                                   (hash (cdr (assoc "hash" post))))
-                              (when (string= hash search-hash)
-                                (setq match post)
-                                (setq match-count 1)))
-                          (end-of-file t)) t))))
-    match)))
+      (while (not (or match 
+                      (eq (condition-case nil
+                              (let* ((post (read (current-buffer)))
+                                     (hash (cdr (assoc "hash" post))))
+                                (when (string= hash search-hash)
+                                  (setq match post)
+                                  (setq match-count 1)))
+                            (end-of-file t)) t))))
+      match)))
 
 ;;;_+ Editing posts
 
@@ -1149,11 +1149,11 @@ Returns the updated post."
            (setcdr (assoc target post) content)))
        fields)
       (pp post (current-buffer)) 
-     (delete-blank-lines)
-     (backward-sexp)
-     (setq post (read (current-buffer)))
-     (delicious-update-timestamp)
-     post)))
+      (delete-blank-lines)
+      (backward-sexp)
+      (setq post (read (current-buffer)))
+      (delicious-update-timestamp)
+      post)))
 
 (provide 'delicious)
          
