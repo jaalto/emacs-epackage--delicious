@@ -8,6 +8,11 @@
 	offline. Previously, if the posts file was empty, and you tried to
 	delicious-post-offline, we'd get confused and try to contact the
 	server.
+	(delicious-search-buffer-prep): If we're already in the search
+	results buffer, clear it before doing a new search.
+	(delicious-search-edit-extended): New command to edit the extended
+	description of a post. Just type 'e' when over the extended
+	description of a post in the delicious search results buffer.
 
 2005-10-07  John Sullivan  <john@wjsullivan.net>
 
