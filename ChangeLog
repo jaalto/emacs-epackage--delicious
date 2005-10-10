@@ -3,7 +3,11 @@
 	* delicious.el (delicious-read-extended-description): The server
 	accepts a maximum of 253 characters for the extended
 	description. Check to see if the input is longer than that,
-	suggest a truncation if it is. 
+	suggest a truncation if it is.
+	(delicious-skip-timestamp): Account for the possibility of being
+	offline. Previously, if the posts file was empty, and you tried to
+	delicious-post-offline, we'd get confused and try to contact the
+	server.
 
 2005-10-07  John Sullivan  <john@wjsullivan.net>
 
