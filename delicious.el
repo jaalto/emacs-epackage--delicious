@@ -707,10 +707,10 @@ advances to the next search result."
   "Prepare a *delicious search results* buffer for output."
   (unless (equal (buffer-name) "*delicious search results*")
     (switch-to-buffer-other-window
-     (get-buffer-create "*delicious search results*"))
-    (let ((inhibit-read-only t))
-      (delete-region (point-min) (point-max)))
-    (let ((view-read-only nil))(toggle-read-only 1))))
+     (get-buffer-create "*delicious search results*")))
+  (let ((inhibit-read-only t))
+    (delete-region (point-min) (point-max)))
+  (let ((view-read-only nil))(toggle-read-only 1)))
 
 (defun delicious-search-buffer-finish (search-string matches)
   "Report search results in the *delicious search results* buffer.
