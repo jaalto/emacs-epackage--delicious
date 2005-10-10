@@ -124,7 +124,7 @@ Return the buffer."
   (unless 
       (re-search-forward delicious-timestamp nil t)
     (message "No timestamp found, forcing refresh")
-    (delicious-build-posts-list nil t)))
+    (delicious-build-posts-list offline t)))
 
 ;;;;_+ Posting
 
