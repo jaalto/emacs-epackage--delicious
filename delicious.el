@@ -450,16 +450,16 @@ If OFFLINE is non-nil, don't query the server for any information."
 
 ;;;;_+ Extended description
 
-(defun delicious-read-extended-description (&optional truncated)
+(defun delicious-read-extended-description (&optional suggest truncated)
   "Read an extended description from a prompt."
   (let ((ext 
          (read-string 
           (concat 
            (when truncated
              "Trimmed to fit server limit of 253 characters; please edit or accept.\n")
-           "(Optional) Extended Description: ") truncated)))
+           "(Optional) Extended Description: ") suggest)))
     (if (> (length ext) 253)
-        (delicious-read-extended-description (substring ext 0 252))
+        (delicious-read-extended-description (substring ext 0 252) t)
       ext)))
 
 ;;;;_+ Tag completion, suggestion, and manipulation
@@ -760,6 +760,7 @@ MATCHES is the number of matches found."
                  (define-key map [(?w)] 'delicious-search-who-else)
                  (setq face 'delicious-result-time-face))
                 ((string= field "extended")
+                 (define-key map [(?e)] 'delicious-search-edit-extended)
                  (define-key map [(?w)] 'delicious-search-who-else)
                  (setq face 'delicious-result-extended-face)))
           (setq content (propertize content 'hash hash 'face face 'keymap map))
@@ -1136,6 +1137,31 @@ If UPDATE is non-nil, update the post's timestamp."
       (delicious-search-insert-match edit-post)
       (delete-blank-lines)
       (search-backward new-tags))))
+
+(defun delicious-search-edit-extended ()
+  "Edit the extended description under point."
+  (interactive)
+  (let* ((hash (get-text-property (point) 'hash))
+         (post (delicious-post-matching-hash hash))
+         (ext (cdr (assoc "extended" post)))
+         (time (cdr (assoc "time" post)))
+         (href (cdr (assoc "href" post)))
+         (desc (cdr (assoc "description" post)))
+         (tag (cdr (assoc "tag" post)))
+         (new-ext (delicious-read-extended-description ext))
+         (update-p (y-or-n-p "Update timestamp? "))
+         (new-time (if update-p (delicious-format-time (current-time)) time)))
+    (delicious-post href desc tag new-ext new-time t)
+    (let* ((new-fields (list (cons "extended" new-ext)
+                             (cons "time" new-time)))
+           (edit-post (delicious-edit-post-locally hash new-fields))
+           (beg (search-backward href))
+           (end (search-forward time))
+           (inhibit-read-only t))
+      (delete-region beg end)
+      (delicious-search-insert-match edit-post)
+      (delete-blank-lines)
+      (search-backward new-ext))))
 
 (defun delicious-edit-post-locally (hash fields)
   "Replace old information in local copy of post with HASH using FIELDS.
