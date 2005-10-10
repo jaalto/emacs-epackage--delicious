@@ -4,7 +4,7 @@
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;; Created 25 October 2004
-;; Version: 0.3 2005-10-07
+;; Version: 0.3 2005-10-10
 ;; Keywords: comm, hypermedia
 
 ;; This program is free software; you can redistribute it and/or
@@ -78,7 +78,7 @@
 
 ;;;;_+ Global stuff
 
-(defconst delicious-version  "delicious.el/0.3 2005-10-07"
+(defconst delicious-version  "delicious.el/0.3 2005-10-10"
   "The version string for this copy of delicious.el.")
 
 (defvar delicious-tags-list '()
@@ -450,9 +450,17 @@ If OFFLINE is non-nil, don't query the server for any information."
 
 ;;;;_+ Extended description
 
-(defun delicious-read-extended-description ()
+(defun delicious-read-extended-description (&optional truncated)
   "Read an extended description from a prompt."
-  (read-string "(Optional) Extended Description: "))
+  (let ((ext 
+         (read-string 
+          (concat 
+           (when truncated
+             "Trimmed to fit server limit of 253 characters; please edit or accept.\n")
+           "(Optional) Extended Description: ") truncated)))
+    (if (> (length ext) 253)
+        (delicious-read-extended-description (substring ext 0 252))
+      ext)))
 
 ;;;;_+ Tag completion, suggestion, and manipulation
 
