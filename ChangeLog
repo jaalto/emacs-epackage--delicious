@@ -1,5 +1,17 @@
 2005-10-10  John Sullivan  <john@wjsullivan.net>
 
+	* delicious.el (delicious-search-delete): Look up the post's
+	actual url, instead of just copying it from the search results
+	buffer. Deleting from the search results buffer should actually
+	work now.
+	(delicious-update-timestamp): Put the timestamp on its own line in
+	the posts file, easier not to accidentally include it in a post
+	that way.
+
+	* delicioapi.el (delicious-api-post): Fix bugs with hexifying the
+	URL that were causing duplicate posts and stopping the editing
+	functions in search mode from working right.
+
 	* delicious.el (delicious-read-extended-description): The server
 	accepts a maximum of 253 characters for the extended
 	description. Check to see if the input is longer than that,
