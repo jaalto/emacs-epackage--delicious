@@ -10,6 +10,10 @@
 	(delicious-search-insert-match): Insert a space if the field is
 	empty. This way, the 'e' binding and other text properties will
 	work on a blank extended description field.
+	(delicious-search-next-result): Improved TAB behavior in the
+	search results buffer. Previously it just wrapped to the beginning
+	of the buffer when the user was on the last post, but did not
+	actually go to the first post in the buffer. Now it does.
 
 	* delicioapi.el (delicious-api-post): Fix bugs with hexifying the
 	URL that were causing duplicate posts and stopping the editing
