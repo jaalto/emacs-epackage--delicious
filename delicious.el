@@ -766,6 +766,7 @@ MATCHES is the number of matches found."
                  (define-key map [(?e)] 'delicious-search-edit-extended)
                  (define-key map [(?w)] 'delicious-search-who-else)
                  (setq face 'delicious-result-extended-face)))
+          (if (string= content "") (setq content " "))
           (setq content (propertize content 'hash hash 'face face 'keymap map))
           (unless (string= field "hash")
             (insert content "\n"))))
