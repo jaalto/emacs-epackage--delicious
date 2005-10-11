@@ -780,7 +780,9 @@ MATCHES is the number of matches found."
   (let ((last-match (match-beginning 0)))
     (re-search-forward thing-at-point-url-regexp nil t)
     (if (equal (match-beginning 0) last-match)
-        (goto-char (point-min))
+        (progn
+          (goto-char (point-min))
+          (delicious-search-next-result))
       (goto-char (match-beginning 0)))))
 
 (defun delicious-search-previous-result ()
