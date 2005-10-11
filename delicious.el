@@ -152,7 +152,7 @@ timestamp comparison and force a refresh from the server."
                   current-prefix-arg
                   (delicious-refresh-p))
           (erase-buffer)
-          (insert (delicious-format-time (delicious-api-get-timestamp)))
+          (delicious-update-timestamp)
           (mapc '(lambda (post)
                    (pp post (current-buffer)))
                 (delicious-api-get-all))
@@ -339,12 +339,15 @@ Return '(0) if there is no timestamp."
         (if (looking-at delicious-timestamp)
             (replace-match time)
 	  (insert time)))
+      (insert "\n")
+      (delete-blank-lines)
       (delicious-save-buffer))))
 
 (defun delicious-format-time (&optional time)
   "Return TIME as a del.icio.us timestamp.
 If TIME is not provided, use the server timestamp."
-  (format-time-string "%Y-%m-%dT%H:%M:%SZ" (or time (delicious-api-get-timestamp))))
+  (format-time-string "%Y-%m-%dT%H:%M:%SZ" 
+                      (or time (delicious-api-get-timestamp))))
 
 ;;;;_+ URL input, guessing, and duplicate checking
 
