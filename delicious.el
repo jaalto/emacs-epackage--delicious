@@ -814,10 +814,10 @@ MATCHES is the number of matches found."
 (defun delicious-search-delete ()
   "Delete the post under point."
   (interactive)
-  (let* ((beg (line-beginning-position))
-         (end (line-end-position))
-         (url (buffer-substring-no-properties beg end)))
-    (delicious-delete-post url)))
+  (let* ((hash (get-text-property (point) 'hash))
+         (post (delicious-post-matching-hash hash))
+         (href (cdr (assoc "href" post))))
+    (delicious-delete-post href)))
 
 ;;;_+ Search by regexp
 
