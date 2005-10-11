@@ -4,7 +4,7 @@
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;; Created 25 October 2004
-;; Version: 0.3 2005-10-10
+;; Version: 0.3 2005-10-11
 ;; Keywords: comm, hypermedia
 
 ;; This program is free software; you can redistribute it and/or
@@ -87,7 +87,7 @@ It should begin and end with a slash.")
 (defvar delicious-api-realm (format "%s API" delicious-api-host)
   "The delicious auth realm name.")
 
-(defconst delicious-api-version "delicioapi.el/0.3 2005-10-10"
+(defconst delicious-api-version "delicioapi.el/0.3 2005-10-11"
   "The version string for this copy of delicioapi.el.")
 
 (defconst delicious-api-field-match "=\"\\(.*?\\)\""
@@ -236,7 +236,9 @@ It's determined using `delicious-api-user' and `delicious-api-password'."
 			 (cons delicious-api-realm (delicious-auth))))
 	(auth-storage))
     (if (string= url-version "Emacs")
-	(setq auth-storage 'url-http-real-basic-auth-storage)
+	(progn
+	  (require 'url-http)
+	  (setq auth-storage 'url-http-real-basic-auth-storage))
       (setq auth-storage 'url-basic-auth-storage)) ; used in url-version "Exp"
     (add-to-list auth-storage auth-info)))
 

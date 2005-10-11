@@ -1,3 +1,8 @@
+2005-10-11  John Sullivan  <johns@fsf.org>
+
+	* delicioapi.el (delicious-api-register-auth): url-version "Emacs"
+	requires url-http to be loaded for basic auth to work. 
+
 2005-10-10  John Sullivan  <john@wjsullivan.net>
 
 	* delicious.el (delicious-search-delete): Look up the post's
