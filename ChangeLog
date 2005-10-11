@@ -7,6 +7,9 @@
 	(delicious-update-timestamp): Put the timestamp on its own line in
 	the posts file, easier not to accidentally include it in a post
 	that way.
+	(delicious-search-insert-match): Insert a space if the field is
+	empty. This way, the 'e' binding and other text properties will
+	work on a blank extended description field.
 
 	* delicioapi.el (delicious-api-post): Fix bugs with hexifying the
 	URL that were causing duplicate posts and stopping the editing
