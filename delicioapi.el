@@ -257,8 +257,7 @@ It's determined using `delicious-api-user' and `delicious-api-password'."
 You must include a DESCRIPTION (string).  TAGS (space separated string), 
 EXTENDED (extra description string) and TIME (in the format 
 %C%y-%m-%dT%H:%M:%SZ) are optional additions."
-  (let* ((url (url-hexify-string url))
-         (description (url-hexify-string description))
+  (let* ((description (url-hexify-string description))
          (tags (url-hexify-string tags))
          (extended (url-hexify-string extended))
          (time (url-hexify-string time))
@@ -266,7 +265,6 @@ EXTENDED (extra description string) and TIME (in the format
                     "posts/add?&url=%s&description=%s&tags=%s&extended=%s&dt=%s"
                     url description tags extended time)))
     (delicious-api-send-request (delicious-api-build-request post-url))))
-
 
 (defun delicious-api-get-tags ()
   "Return a hash table of tags and the number of your entries with each tag.
@@ -388,8 +386,7 @@ TAG is a tag to filter by.  The dates are the keys."
 
 (defun delicious-api-delete (url)
   "Delete a URL."
-  (let ((uri (format "posts/delete?url=%s" 
-                     (url-hexify-string url))))
+  (let ((uri (format "posts/delete?&url=%s" url)))
     (delicious-api-send-request (delicious-api-build-request uri))))
 
 (defun delicious-api-get-timestamp ()
