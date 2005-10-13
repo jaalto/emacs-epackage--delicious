@@ -1,4 +1,10 @@
-2005-10-11  John Sullivan  <johns@fsf.org>
+2005-10-13  John Sullivan  <john@wjsullivan.net>
+
+	* delicioapi.el (url-auth): Add missing require needed for
+	url-version "Emacs", and maybe others too. Solves error about
+	url-is-cached.
+
+2005-10-11  John Sullivan  <john@wjsullivan.net>
 
 	* delicioapi.el (delicious-api-register-auth): url-version "Emacs"
 	requires url-http to be loaded for basic auth to work. 

@@ -4,7 +4,7 @@
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;; Created 25 October 2004
-;; Version: 0.3 2005-10-11
+;; Version: 0.3 2005-10-13
 ;; Keywords: comm, hypermedia
 
 ;; This program is free software; you can redistribute it and/or
@@ -60,7 +60,7 @@
     (error "Your version of url.el is not supported"))
 
 (require 'url-auth)
-
+(require 'url-cache)
 (require 'thingatpt)
 
 ;;;;_+ Variables
@@ -87,7 +87,7 @@ It should begin and end with a slash.")
 (defvar delicious-api-realm (format "%s API" delicious-api-host)
   "The delicious auth realm name.")
 
-(defconst delicious-api-version "delicioapi.el/0.3 2005-10-11"
+(defconst delicious-api-version "delicioapi.el/0.3 2005-10-13"
   "The version string for this copy of delicioapi.el.")
 
 (defconst delicious-api-field-match "=\"\\(.*?\\)\""
