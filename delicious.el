@@ -4,7 +4,7 @@
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;; Created 25 October 2004
-;; Version: 0.3 2005-10-10
+;; Version: 0.3 2005-10-16
 ;; Keywords: comm, hypermedia
 
 ;; This program is free software; you can redistribute it and/or
@@ -78,7 +78,7 @@
 
 ;;;;_+ Global stuff
 
-(defconst delicious-version  "delicious.el/0.3 2005-10-10"
+(defconst delicious-version  "delicious.el/0.3 2005-10-16"
   "The version string for this copy of delicious.el.")
 
 (defvar delicious-tags-list '()
@@ -106,10 +106,11 @@
 
 ;;;;_+ Buffer management
 
-(defun delicious-save-buffer ()
+(defun delicious-save-buffer (&optional no-bury)
   (let ((require-final-newline nil))
     (save-buffer)
-    (bury-buffer)))
+    (unless no-bury
+      (bury-buffer))))
 
 (defun delicious-get-posts-buffer ()
   "Switch to a buffer containing `delicious-posts-file-name'.
@@ -332,16 +333,18 @@ Return '(0) if there is no timestamp."
          
 (defun delicious-update-timestamp ()
   "Update or create the local timestamp in `delicious-posts-file-name'."
-  (save-window-excursion
-    (save-excursion
-      (delicious-get-posts-buffer)
-      (let ((time (delicious-format-time)))
-        (if (looking-at delicious-timestamp)
-            (replace-match time)
-	  (insert time)))
-      (insert "\n")
-      (delete-blank-lines)
-      (delicious-save-buffer))))
+  ;; check to make sure we are in the right place
+  (when (and 
+         (eq (current-buffer) 
+             (find-buffer-visiting delicious-posts-file-name))
+         (bobp))
+    (let ((time (delicious-format-time)))
+      (if (looking-at delicious-timestamp)
+          (replace-match time)
+        (insert time)))
+    (insert "\n")
+    (delete-blank-lines)
+    (delicious-save-buffer t)))
 
 (defun delicious-format-time (&optional time)
   "Return TIME as a del.icio.us timestamp.

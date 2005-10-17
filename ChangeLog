@@ -1,3 +1,11 @@
+2005-10-16  John Sullivan  <john@wjsullivan.net>
+
+	* delicious.el (delicious-update-timestamp): Fix bug that was
+	causing the timestamp in new posts files to get bumped to the end
+	of the file. 
+	(delicious-save-buffer): Add new argument, NO-BURY, for situations
+	when we want to save the buffer but not bury it. 
+
 2005-10-13  John Sullivan  <john@wjsullivan.net>
 
 	* delicioapi.el (url-auth): Add missing require needed for
