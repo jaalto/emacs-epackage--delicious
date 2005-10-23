@@ -4,7 +4,7 @@
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;; Created 25 October 2004
-;; Version: 0.3 2005-10-16
+;; Version: 0.3 2005-10-23
 ;; Keywords: comm, hypermedia
 
 ;; This program is free software; you can redistribute it and/or
@@ -78,7 +78,7 @@
 
 ;;;;_+ Global stuff
 
-(defconst delicious-version  "delicious.el/0.3 2005-10-16"
+(defconst delicious-version  "delicious.el/0.3 2005-10-23"
   "The version string for this copy of delicious.el.")
 
 (defvar delicious-tags-list '()
@@ -112,14 +112,18 @@
     (unless no-bury
       (bury-buffer))))
 
+(defun delicious-posts-file ()
+  "Return the full path for `delicious-posts-file-name'."
+  (let* ((home (getenv "HOME"))
+         (posts-file (concat home "/" delicious-posts-file-name)))
+    posts-file))
+
 (defun delicious-get-posts-buffer ()
   "Switch to a buffer containing `delicious-posts-file-name'.
 Return the buffer."
-  (let* ((home (getenv "HOME"))
-         (posts-file (concat home "/" delicious-posts-file-name)))
-    (find-file posts-file)
-    (goto-char (point-min))
-    (current-buffer)))
+  (find-file (delicious-posts-file))
+  (goto-char (point-min))
+  (current-buffer))
 
 (defun delicious-skip-timestamp ()
   (unless 
@@ -336,7 +340,7 @@ Return '(0) if there is no timestamp."
   ;; check to make sure we are in the right place
   (when (and 
          (eq (current-buffer) 
-             (find-buffer-visiting delicious-posts-file-name))
+             (find-buffer-visiting (delicious-posts-file)))
          (bobp))
     (let ((time (delicious-format-time)))
       (if (looking-at delicious-timestamp)

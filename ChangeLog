@@ -1,3 +1,13 @@
+2005-10-23  John Sullivan  <john@wjsullivan.net>
+
+	* delicious.el (delicious-posts-file): New function to return the
+	full path for the posts file.
+	(delicious-get-posts-buffer): Use new `delicious-posts-file'
+	function.
+	(delicious-update-timestamp): Use new
+	`delicious-posts-file'. Should fix the problem of the disappearing
+	timestamp. Thanks to Gunnar Wrobel for the bug report.
+
 2005-10-16  John Sullivan  <john@wjsullivan.net>
 
 	* delicious.el (delicious-update-timestamp): Fix bug that was
