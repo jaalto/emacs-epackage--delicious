@@ -1,3 +1,13 @@
+2005-11-03  John Sullivan  <john@wjsullivan.net>
+
+	* delicioapi.el (delicious-api-register-auth): The Debian packaged
+	version of url.el is now closer to or even the same as the CVS
+	Emacs version. However, the Debian package version still has its
+	same old url-version, "Exp"! I applied fixes to make auth work
+	again. People using older Debian packaged versions who run into
+	trouble will want to either get the CVS Emacs version of the url
+	files, or pull the w3-url-e21 package from Debian unstable.
+
 2005-10-23  John Sullivan  <john@wjsullivan.net>
 
 	* delicious.el (delicious-posts-file): New function to return the

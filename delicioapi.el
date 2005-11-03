@@ -4,7 +4,7 @@
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;; Created 25 October 2004
-;; Version: 0.3 2005-10-13
+;; Version: 0.3 2005-11-03
 ;; Keywords: comm, hypermedia
 
 ;; This program is free software; you can redistribute it and/or
@@ -61,6 +61,7 @@
 
 (require 'url-auth)
 (require 'url-cache)
+(require 'url-http)
 (require 'thingatpt)
 
 ;;;;_+ Variables
@@ -87,7 +88,7 @@ It should begin and end with a slash.")
 (defvar delicious-api-realm (format "%s API" delicious-api-host)
   "The delicious auth realm name.")
 
-(defconst delicious-api-version "delicioapi.el/0.3 2005-10-13"
+(defconst delicious-api-version "delicioapi.el/0.3 2005-11-03"
   "The version string for this copy of delicioapi.el.")
 
 (defconst delicious-api-field-match "=\"\\(.*?\\)\""
@@ -233,14 +234,8 @@ It's determined using `delicious-api-user' and `delicious-api-password'."
 (defun delicious-api-register-auth ()
   "Register delicious auth information."
   (let ((auth-info (list (format "%s:%s" delicious-api-host delicious-api-port)
-			 (cons delicious-api-realm (delicious-auth))))
-	(auth-storage))
-    (if (string= url-version "Emacs")
-	(progn
-	  (require 'url-http)
-	  (setq auth-storage 'url-http-real-basic-auth-storage))
-      (setq auth-storage 'url-basic-auth-storage)) ; used in url-version "Exp"
-    (add-to-list auth-storage auth-info)))
+			 (cons delicious-api-realm (delicious-auth)))))
+    (add-to-list 'url-http-real-basic-auth-storage auth-info)))
 
 (defadvice url-http-user-agent-string 
   (after delicious-api-override-user-agent activate)
