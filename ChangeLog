@@ -1,3 +1,16 @@
+2005-11-07  John Sullivan  <john@wjsullivan.net>
+
+	* delicious.el (delicious-posts-matching-tags): Added
+	(bury-buffer) so that 'q' from the results buffer doesn't take us
+	to the .delicious posts buffer.
+	(delicious-posts-matching-tags-any): Same here.
+	(delicious-posts-matching-date): And here.
+	(delicious-post-matching-hash): Here too.
+	(delicious-search-href-regexp): And here, also added save-window-excursion.
+	(delicious-search-tags-regexp): Same here.
+	(delicious-search-description-regexp): And here.
+	(delicious-search-posts-regexp): Finally, here.
+
 2005-11-03  John Sullivan  <john@wjsullivan.net>
 
 	* delicioapi.el (delicious-api-register-auth): The Debian packaged

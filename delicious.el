@@ -4,7 +4,7 @@
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;; Created 25 October 2004
-;; Version: 0.3 2005-10-23
+;; Version: 0.3 2005-11-07
 ;; Keywords: comm, hypermedia
 
 ;; This program is free software; you can redistribute it and/or
@@ -78,7 +78,7 @@
 
 ;;;;_+ Global stuff
 
-(defconst delicious-version  "delicious.el/0.3 2005-10-23"
+(defconst delicious-version  "delicious.el/0.3 2005-11-07"
   "The version string for this copy of delicious.el.")
 
 (defvar delicious-tags-list '()
@@ -836,23 +836,26 @@ MATCHES is the number of matches found."
 Display the results in *delicious search results*.
 If given a prefix, operate offline."
   (interactive "sEnter regexp search string: ")
-  (delicious-build-posts-list current-prefix-arg)
-  (delicious-get-posts-buffer)
-  (delicious-skip-timestamp) 
   (let ((match)(matches)(match-count 0))
-    (while (not (eq 
-                 (condition-case nil
-                     (let ((post (read (current-buffer))))
-                       (mapc
-                        '(lambda (field)
-                           (if (string-match search-string (cdr field))
-                               (setq match post)))
-                        post)
-                       (when match
-                         (setq match-count (1+ match-count))
-                         (add-to-list 'matches match))
-                       (setq match nil))
-                   (end-of-file t)) t)))
+    (save-window-excursion
+      (delicious-build-posts-list current-prefix-arg)
+      (delicious-get-posts-buffer)
+      (delicious-skip-timestamp) 
+
+      (while (not (eq 
+                   (condition-case nil
+                       (let ((post (read (current-buffer))))
+                         (mapc
+                          '(lambda (field)
+                             (if (string-match search-string (cdr field))
+                                 (setq match post)))
+                          post)
+                         (when match
+                           (setq match-count (1+ match-count))
+                           (add-to-list 'matches match))
+                         (setq match nil))
+                     (end-of-file t)) t)))
+      (bury-buffer))
     (delicious-search-buffer-prep)
     (mapc 
      '(lambda (post) 
@@ -865,26 +868,29 @@ If given a prefix, operate offline."
 Display the results in *delicious search results*.
 If given a prefix, operate offline."
   (interactive "sEnter regexp search string: ")
-  (delicious-build-posts-list current-prefix-arg)
-  (delicious-get-posts-buffer)
-  (delicious-skip-timestamp) 
   (let ((match)(matches)(match-count 0))
-    (while (not (eq
-                 (condition-case nil
-                     (let* ((post (read (current-buffer)))
-                            (desc 
-                             (or 
-                              (cdr (assoc "description" post))
-                              (error
-                               "Malformed bookmark missing description %s"
-                               post))))
-                       (if (string-match search-string desc)
-                           (setq match post))
-                       (when match
-                         (setq match-count (1+ match-count))
-                         (add-to-list 'matches match))
-                       (setq match nil))
-                   (end-of-file t)) t)))
+    (save-window-excursion
+      (delicious-build-posts-list current-prefix-arg)
+      (delicious-get-posts-buffer)
+      (delicious-skip-timestamp) 
+
+      (while (not (eq
+                   (condition-case nil
+                       (let* ((post (read (current-buffer)))
+                              (desc 
+                               (or 
+                                (cdr (assoc "description" post))
+                                (error
+                                 "Malformed bookmark missing description %s"
+                                 post))))
+                         (if (string-match search-string desc)
+                             (setq match post))
+                         (when match
+                           (setq match-count (1+ match-count))
+                           (add-to-list 'matches match))
+                         (setq match nil))
+                     (end-of-file t)) t)))
+      (bury-buffer))
     (delicious-search-buffer-prep)
     (mapc
      '(lambda (post)
@@ -897,22 +903,24 @@ If given a prefix, operate offline."
 Display the results in *delicious search results*.
 If given a prefix, operate offline."
   (interactive "sEnter regexp search string: ")
-  (delicious-build-posts-list current-prefix-arg)
-  (delicious-get-posts-buffer)
-  (delicious-skip-timestamp) 
   (let ((match)(matches)(match-count 0))
-    (while (not (eq
-                 (condition-case nil
-                     (let* ((post (read (current-buffer)))
-                            (tags (or (cdr (assoc "tag" post))
-                                      "")))
-                       (if (string-match search-string tags)
-                           (setq match post))
-                       (when match
-                         (setq match-count (1+ match-count))
-                         (add-to-list 'matches match))
-                       (setq match nil))
-                   (end-of-file t)) t)))
+    (save-window-excursion
+      (delicious-build-posts-list current-prefix-arg)
+      (delicious-get-posts-buffer)
+      (delicious-skip-timestamp) 
+      (while (not (eq
+                   (condition-case nil
+                       (let* ((post (read (current-buffer)))
+                              (tags (or (cdr (assoc "tag" post))
+                                        "")))
+                         (if (string-match search-string tags)
+                             (setq match post))
+                         (when match
+                           (setq match-count (1+ match-count))
+                           (add-to-list 'matches match))
+                         (setq match nil))
+                     (end-of-file t)) t)))
+      (bury-buffer))
     (delicious-search-buffer-prep)
     (mapc
      '(lambda (post)
@@ -925,24 +933,26 @@ If given a prefix, operate offline."
 Display the results in *delicious search results*.
 If given a prefix, operate offline."
   (interactive "sEnter regexp search string: ")
-  (delicious-build-posts-list current-prefix-arg)
-  (delicious-get-posts-buffer)
-  (delicious-skip-timestamp) 
   (let ((match)(matches)(match-count 0))
-    (while (not (eq
-                 (condition-case nil
-                     (let* ((post (read (current-buffer)))
-                            (href 
-                             (or (cdr (assoc "href" post))
-                                 (error 
-                                  "Malformed bookmark missing href %s" post))))
-                       (if (string-match search-string href)
-                           (setq match post))
-                       (when match
-                         (setq match-count (1+ match-count))
-                         (add-to-list 'matches match))
-                       (setq match nil))
-                   (end-of-file t)) t)))
+    (save-window-excursion
+      (delicious-build-posts-list current-prefix-arg)
+      (delicious-get-posts-buffer)
+      (delicious-skip-timestamp) 
+      (while (not (eq
+                   (condition-case nil
+                       (let* ((post (read (current-buffer)))
+                              (href 
+                               (or (cdr (assoc "href" post))
+                                   (error 
+                                    "Malformed bookmark missing href %s" post))))
+                         (if (string-match search-string href)
+                             (setq match post))
+                         (when match
+                           (setq match-count (1+ match-count))
+                           (add-to-list 'matches match))
+                         (setq match nil))
+                     (end-of-file t)) t)))
+      (bury-buffer))
     (delicious-search-buffer-prep)
     (mapc
      '(lambda (post)
@@ -975,7 +985,8 @@ If given a prefix, operate offline."
                            (setq match-count (1+ match-count))
                            (add-to-list 'matches match)
                            (setq match nil)))
-                     (end-of-file t)) t))))
+                     (end-of-file t)) t)))
+      (bury-buffer))
     matches))
 
 (defun delicious-posts-matching-tags-any (tags)
@@ -1000,7 +1011,8 @@ If given a prefix, operate offline."
                            (setq match-count (1+ match-count))
                            (add-to-list 'matches match)
                            (setq match nil)))
-                     (end-of-file t)) t))))
+                     (end-of-file t)) t)))
+      (bury-buffer))
     matches))
 
 (defun delicious-search-tags (tags)
@@ -1041,7 +1053,8 @@ If given a prefix, operate offline."
 			    (when (string-match search-date date)
 			      (setq match post)
 			      (add-to-list 'matches match)))
-			(end-of-file t)) t))))
+			(end-of-file t)) t)))
+      (bury-buffer))
     matches))
 
 ;;;_+ Search by hash
@@ -1071,7 +1084,8 @@ If given a prefix, work offline only."
                                   (setq match post)
                                   (setq match-count 1)))
                             (end-of-file t)) t))))
-      match)))
+      (bury-buffer))
+    match))
 
 ;;;_+ Editing posts
 
