@@ -1,3 +1,12 @@
+2005-12-17  John Sullivan  <john@wjsullivan.net>
+
+	* delicioapi.el (delicious-timestamp): Moved from delicious.el to here.
+	(delicious-api-get-timestamp): Use the delicious-timestamp regular
+	expression instead of defining another one.
+
+	* delicious.el (delicious-post-cache): Check to make sure the file
+	exists, and error if it doesn't.
+
 2005-11-07  John Sullivan  <john@wjsullivan.net>
 
 	* delicious.el (delicious-posts-matching-tags): Added

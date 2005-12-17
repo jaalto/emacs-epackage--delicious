@@ -4,7 +4,7 @@
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;; Created 25 October 2004
-;; Version: 0.3 2005-11-03
+;; Version: 0.3
 ;; Keywords: comm, hypermedia
 
 ;; This program is free software; you can redistribute it and/or
@@ -88,7 +88,7 @@ It should begin and end with a slash.")
 (defvar delicious-api-realm (format "%s API" delicious-api-host)
   "The delicious auth realm name.")
 
-(defconst delicious-api-version "delicioapi.el/0.3 2005-11-03"
+(defconst delicious-api-version "delicioapi.el/0.3"
   "The version string for this copy of delicioapi.el.")
 
 (defconst delicious-api-field-match "=\"\\(.*?\\)\""
@@ -386,6 +386,16 @@ TAG is a tag to filter by.  The dates are the keys."
   (let ((uri (format "posts/delete?&url=%s" url)))
     (delicious-api-send-request (delicious-api-build-request uri))))
 
+(defconst delicious-timestamp
+  (concat
+   "\\([1-9][0-9]\\{3\\}\\)-"		;year
+   "\\([0-1][0-9]\\)-"			;month
+   "\\([0-3][0-9]\\)T"			;day
+   "\\([0-2][0-9]\\):"			;hour
+   "\\([0-5][0-9]\\):"			;minute
+   "\\([0-5][0-9]\\)Z")			;second
+  "Regular expression matching the timestamp format.")
+
 (defun delicious-api-get-timestamp ()
   "Return the time of the last update from the server.
 The value returned is a time value."
@@ -393,13 +403,10 @@ The value returned is a time value."
 	(search-string (delicious-build-search "update time")))
     (delicious-api-send-request (delicious-api-build-request uri))
     (setq date (caar (delicious-do-search-list (car search-string) 1)))
-    (string-match 
-     "\\([0-9]++++\\)-\\([0-9]++\\)-\\([0-9]++\\)T\\([0-9]++\\):\\([0-9]++\\):\\([0-9]++\\)"
-     date)
-    (apply 'encode-time 
-	   (mapcar (lambda (i)
-		     (string-to-int (match-string i date)))
-		   '(6 5 4 3 2 1)))))
+    (string-match delicious-timestamp date)
+    (apply 'encode-time (mapcar (lambda (i)
+                                  (string-to-int (match-string i date)))
+                                '(6 5 4 3 2 1)))))
 
 ;;;;_+ HTML
 
