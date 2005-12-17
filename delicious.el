@@ -144,7 +144,7 @@ timestamp comparison and force a refresh from the server."
   (if (and offline force)
       (error "Can't force an update while offline"))
   (cond (offline
-	 (message "Reading local posts list..."))
+         (message "Reading local posts list..."))
         ((or force current-prefix-arg)
          (message "Reading posts from server..."))
         (t
@@ -195,8 +195,8 @@ If OFFLINE is non-nil, don't update the local timestamp."
       (unless offline (delicious-update-timestamp))
       (goto-char (point-max))
       (pp post (current-buffer))
-      (let ((tags (cdr (assoc "tag" post))))
-	(delicious-rebuild-tags-maybe tags))
+      (let ((tags (assoc-default "tag" post)))
+        (delicious-rebuild-tags-maybe tags))
       (delicious-save-buffer))))
 
 (defun delicious-check-input (input &optional name)
@@ -244,11 +244,11 @@ If OFFLINE is non-nil, don't update the local timestamp."
       (goto-char (point-min))
       (while (not (eobp))
         (let* ((delicious-cache-post (read (current-buffer)))
-               (href (cdr (assoc "href" delicious-cache-post)))
-               (description (cdr (assoc "description" delicious-cache-post)))
-               (tags (cdr (assoc "tag" delicious-cache-post)))
-               (extended (cdr (assoc "extended" delicious-cache-post)))
-               (time (cdr (assoc "time" delicious-cache-post))))
+               (href (assoc-default "href" delicious-cache-post))
+               (description (assoc-default "description" delicious-cache-post))
+               (tags (assoc-default "tag" delicious-cache-post))
+               (extended (assoc-default "extended" delicious-cache-post))
+               (time (cdr (assoc-default "time" delicious-cache-post))))
           (delicious-api-post href description tags extended time)
           (delicious-post-local delicious-cache-post)
           (message "%s posted." description)
@@ -273,16 +273,6 @@ If OFFLINE is non-nil, don't update the local timestamp."
 
 ;;;_+ Timestamps
 
-(defconst delicious-timestamp
-  (concat
-   "\\([1-9][0-9]\\{3\\}\\)-"		;year
-   "\\([0-1][0-9]\\)-"			;month
-   "\\([0-3][0-9]\\)T"			;day
-   "\\([0-2][0-9]\\):"			;hour
-   "\\([0-5][0-9]\\):"			;minute
-   "\\([0-5][0-9]\\)Z")			;second
-  "Regular expression matching the timestamp format.")
-      
 (defun delicious-read-time-string ()
   "Read a date string from a prompt and format it properly for the server.
  Use the current date and time if nothing entered."
@@ -428,14 +418,14 @@ If OFFLINE is non-nil, don't query the server for any information."
       (delicious-get-posts-buffer)
       (delicious-skip-timestamp)
       (let ((dup))
-	(while (not (or dup
+        (while (not (or dup
                         (eq
                          (condition-case nil
                              (let ((post (read (current-buffer))))
                                (if (member (cons "href" url) post)
                                    (setq dup post)))
                            (end-of-file t)) t))))
-	dup))))
+        dup))))
 
 (defun delicious-post-duplicate-p (url)
   "Return t if existing post should be replaced with URL."
@@ -488,15 +478,15 @@ are accepted as input. If OFFLINE is non-nil, don't contact the server."
   (unless delicious-tags-list
     (setq delicious-tags-list (delicious-build-tags-list t)))
   (let* ((base-prompt 
-	  (or prompt-string
-	      "(Enter one at a time, blank to end.) Tag: "))
-	 (suggest-prompt
-	  (unless nosuggest
-	    (format "Suggested Tags: %s\n" (delicious-suggest-tags))))
-	 (sofar-prompt
-	  (unless sofar
-	    "Tags so far: %s\n"))
-	 (prompt (concat suggest-prompt sofar-prompt base-prompt)))
+          (or prompt-string
+              "(Enter one at a time, blank to end.) Tag: "))
+         (suggest-prompt
+          (unless nosuggest
+            (format "Suggested Tags: %s\n" (delicious-suggest-tags))))
+         (sofar-prompt
+          (unless sofar
+            "Tags so far: %s\n"))
+         (prompt (concat suggest-prompt sofar-prompt base-prompt)))
     (loop until (or (equal tag "")
                     (and
                      (numberp quantity)
@@ -538,7 +528,7 @@ for use in completion. If OFFLINE is non-nil, don't query the server."
                        (condition-case nil
                            (let* 
                                ((post (read (current-buffer)))
-                                (tags (split-string (cdr (assoc "tag" post)))))
+                                (tags (split-string (assoc-default "tag" post))))
                              (mapc
                               (lambda (tag) ; collect tags if new
                                 (unless (assoc tag tags-table)
@@ -546,7 +536,7 @@ for use in completion. If OFFLINE is non-nil, don't query the server."
                                   (setq index (1+ index))))
                               tags))
                          (end-of-file t)) t)))
-	      tags-table)))))
+              tags-table)))))
 
 (defun delicious-suggest-tags ()
   "Suggest tags based on the contents of the current buffer and the current list of tags."
@@ -577,8 +567,8 @@ for use in completion. If OFFLINE is non-nil, don't query the server."
           with words = '()
           for word = (downcase (current-word))
           if (not (member word words))
-	  collect word into words
-	  end
+          collect word into words
+          end
           do (forward-word 1)
           finally return words)))
        
@@ -637,8 +627,8 @@ They will be stored under SECTION."
    "nNumber of recent posts to bookmark: \nsTag to filter by: \nsw3m bookmark section to use: ")
   (let ((delicious-list (delicious-api-get-recent tag count)))
     (loop for bookmark in delicious-list
-          for url = (cdr (assoc "href" bookmark))
-          for title = (cdr (assoc "description" bookmark))
+          for url = (assoc-default "href" bookmark)
+          for title = (assoc-default "description" bookmark)
           do (w3m-bookmark-write-file url title section)
           finally do (message "w3m bookmarks updated."))))
 
@@ -693,9 +683,9 @@ Optionally assign TAGS, an EXTENDED description, and TIME to the bookmarks."
     (define-key map [(shift tab)] 'delicious-search-previous-result)
     (unless (featurep 'xemacs)
       (define-key map [(shift iso-lefttab)]
-	'delicious-search-previous-result)
+        'delicious-search-previous-result)
       (define-key map [(shift control ?i)]
-	'delicious-search-previous-result))
+        'delicious-search-previous-result))
     (define-key map [(meta ?n)] 'delicious-search-next-result)
     (define-key map [(meta ?p)] 'delicious-search-previous-result)
     (define-key map [(? )] 'scroll-up)
@@ -739,7 +729,7 @@ MATCHES is the number of matches found."
 (defun delicious-search-insert-match (post)
   "Insert POST with the fields propertized."
   (with-current-buffer "*delicious search results*"
-    (let ((hash (cdr (assoc "hash" post)))
+    (let ((hash (assoc-default "hash" post))
           (inhibit-read-only t))
       (dolist (cell post)
         (let ((map (make-sparse-keymap))
@@ -811,7 +801,7 @@ MATCHES is the number of matches found."
   (interactive)
   (let* ((hash (get-text-property (point) 'hash))
          (post (delicious-post-matching-hash hash))
-         (href (cdr (assoc "href" post)))
+         (href (assoc-default "href" post))
          (url (format "http://%s/url?url=%s" delicious-api-host href)))
     (browse-url url)))
 
@@ -829,7 +819,7 @@ MATCHES is the number of matches found."
   (interactive)
   (let* ((hash (get-text-property (point) 'hash))
          (post (delicious-post-matching-hash hash))
-         (href (cdr (assoc "href" post))))
+         (href (assoc-default "href" post)))
     (delicious-delete-post href)))
 
 ;;;_+ Search by regexp
@@ -882,7 +872,7 @@ If given a prefix, operate offline."
                        (let* ((post (read (current-buffer)))
                               (desc 
                                (or 
-                                (cdr (assoc "description" post))
+                                (assoc-default "description" post)
                                 (error
                                  "Malformed bookmark missing description %s"
                                  post))))
@@ -914,7 +904,7 @@ If given a prefix, operate offline."
       (while (not (eq
                    (condition-case nil
                        (let* ((post (read (current-buffer)))
-                              (tags (or (cdr (assoc "tag" post))
+                              (tags (or (assoc-default "tag" post)
                                         "")))
                          (if (string-match search-string tags)
                              (setq match post))
@@ -945,7 +935,7 @@ If given a prefix, operate offline."
                    (condition-case nil
                        (let* ((post (read (current-buffer)))
                               (href 
-                               (or (cdr (assoc "href" post))
+                               (or (assoc-default "href" post)
                                    (error 
                                     "Malformed bookmark missing href %s" post))))
                          (if (string-match search-string href)
@@ -977,7 +967,7 @@ If given a prefix, operate offline."
                        (let* ((post (read (current-buffer)))
                               (tags (split-string tags))
                               (post-tags (split-string
-                                          (or (cdr (assoc "tag" post)) " "))))
+                                          (or (assoc-default "tag" post) " "))))
                          (setq match post)
                          (mapc
                           '(lambda (tag)
@@ -1004,7 +994,7 @@ If given a prefix, operate offline."
                        (let* ((post (read (current-buffer)))
                               (tags (split-string tags))
                               (post-tags (split-string
-                                          (or (cdr (assoc "tag" post)) " "))))
+                                          (assoc-default "tag" post) " ")))
                          (while (and tags
                                      (null match))
                            (let ((tag (pop tags)))
@@ -1037,7 +1027,7 @@ If given a prefix, operate offline."
   (let ((matches))
     (mapc
      (lambda (post)
-       (let ((post-date (cdr (assoc "time" post))))
+       (let ((post-date (assoc-default "time" post)))
          (if (string-match search-date post-date)
              (add-to-list 'matches post))))
      posts)
@@ -1051,12 +1041,12 @@ If given a prefix, operate offline."
       (delicious-get-posts-buffer)
       (delicious-skip-timestamp)
       (while (not (eq (condition-case nil
-			  (let* ((post (read (current-buffer)))
-				 (date (cdr (assoc "time" post))))
-			    (when (string-match search-date date)
-			      (setq match post)
-			      (add-to-list 'matches match)))
-			(end-of-file t)) t)))
+                          (let* ((post (read (current-buffer)))
+                                 (date (assoc-default "time" post)))
+                            (when (string-match search-date date)
+                              (setq match post)
+                              (add-to-list 'matches match)))
+                        (end-of-file t)) t)))
       (bury-buffer))
     matches))
 
@@ -1082,7 +1072,7 @@ If given a prefix, work offline only."
       (while (not (or match 
                       (eq (condition-case nil
                               (let* ((post (read (current-buffer)))
-                                     (hash (cdr (assoc "hash" post))))
+                                     (hash (assoc-default "hash" post)))
                                 (when (string= hash search-hash)
                                   (setq match post)
                                   (setq match-count 1)))
@@ -1105,11 +1095,11 @@ If UPDATE is non-nil, update the post's timestamp."
                    (search-backward "href")
                    (beginning-of-line)
                    (read (current-buffer)))))
-         (current-tags (cdr (assoc "tag" post)))
-         (href (cdr (assoc "href" post)))
-         (desc (cdr (assoc "description" post)))
-         (extended (or (cdr (assoc "extended" post)) ""))
-         (old-time (cdr (assoc "time" post)))
+         (current-tags (assoc-default "tag" post))
+         (href (assoc-default "href" post))
+         (desc (assoc-default "description" post))
+         (extended (or (assoc-default "extended" post) ""))
+         (old-time (assoc-default "time" post))
          (new-time (if update (delicious-format-time (current-time))
                      old-time))
          (new-tags (concat current-tags " " tags)))
@@ -1136,11 +1126,11 @@ If UPDATE is non-nil, update the post's timestamp."
                      (y-or-n-p "Update timestamp? ")))
   (let* ((hash (get-text-property (point) 'hash))
          (post (delicious-post-matching-hash hash t))
-         (old-tags (split-string (cdr (assoc "tag" post))))
-         (href (cdr (assoc "href" post)))
-         (desc (cdr (assoc "description" post)))
-         (extended (or (cdr (assoc "extended" post)) ""))
-         (old-time (cdr (assoc "time" post)))
+         (old-tags (split-string (assoc-default "tag" post)))
+         (href (assoc-default "href" post))
+         (desc (assoc-default "description" post))
+         (extended (or (assoc-default "extended" post) ""))
+         (old-time (assoc-default "time" post))
          (new-time (if update (delicious-format-time (current-time))
                      old-time))
          (delete-tags (split-string tags))
@@ -1173,11 +1163,11 @@ If UPDATE is non-nil, update the post's timestamp."
   (interactive)
   (let* ((hash (get-text-property (point) 'hash))
          (post (delicious-post-matching-hash hash))
-         (ext (cdr (assoc "extended" post)))
-         (time (cdr (assoc "time" post)))
-         (href (cdr (assoc "href" post)))
-         (desc (cdr (assoc "description" post)))
-         (tag (cdr (assoc "tag" post)))
+         (ext (assoc-default "extended" post))
+         (time (assoc-default "time" post))
+         (href (assoc-default "href" post))
+         (desc (assoc-default "description" post))
+         (tag (assoc-default "tag" post))
          (new-ext (delicious-read-extended-description ext))
          (update-p (y-or-n-p "Update timestamp? "))
          (new-time (if update-p (delicious-format-time (current-time)) time)))
