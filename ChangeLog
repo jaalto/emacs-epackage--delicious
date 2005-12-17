@@ -1,5 +1,8 @@
 2005-12-17  John Sullivan  <john@wjsullivan.net>
 
+	* delicious.el (delicious-post-cache): Start using assoc-default,
+	in many different places. 
+
 	* delicioapi.el (delicious-timestamp): Moved from delicious.el to here.
 	(delicious-api-get-timestamp): Use the delicious-timestamp regular
 	expression instead of defining another one.
