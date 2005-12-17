@@ -4,7 +4,7 @@
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;; Created 25 October 2004
-;; Version: 0.3 2005-11-07
+;; Version: 0.3
 ;; Keywords: comm, hypermedia
 
 ;; This program is free software; you can redistribute it and/or
@@ -78,7 +78,7 @@
 
 ;;;;_+ Global stuff
 
-(defconst delicious-version  "delicious.el/0.3 2005-11-07"
+(defconst delicious-version  "delicious.el/0.3"
   "The version string for this copy of delicious.el.")
 
 (defvar delicious-tags-list '()
@@ -237,7 +237,10 @@ If OFFLINE is non-nil, don't update the local timestamp."
   (interactive)
   (save-window-excursion
     (save-excursion
-      (find-file (or cache-file delicious-cache-file))
+      (let ((cache (or cache-file delicious-cache-file)))
+        (if (file-exists-p cache)
+            (find-file cache)
+          (error "Cache file %s not found" cache)))
       (goto-char (point-min))
       (while (not (eobp))
         (let* ((delicious-cache-post (read (current-buffer)))
