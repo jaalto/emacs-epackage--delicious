@@ -720,10 +720,11 @@ advances to the next search result."
 SEARCH-STRING is the regexp pattern that was used in the search.
 MATCHES is the number of matches found."
   (with-current-buffer "*delicious search results*"
-    (let ((inhibit-read-only t))
+    (let ((inhibit-read-only t)
+          (result (if (eq matches 1) "result" "results")))
       (goto-char (point-min))
-      (insert (format "Your search for \"%s\" returned %d results.\n\n"
-                      search-string matches)))
+      (insert (format "Your search for \"%s\" returned %d %s.\n\n"
+                      search-string matches result)))
     (delicious-search-mode 1)))
 
 (defun delicious-search-insert-match (post)
@@ -771,6 +772,12 @@ MATCHES is the number of matches found."
           (unless (string= field "hash")
             (insert content "\n"))))
       (insert "\n"))))
+
+(defun delicious-search-insert-matches (posts)
+  "Insert list POSTS with the fields propertized."
+  (mapc 
+   (lambda (post) (delicious-search-insert-match post))
+     posts))
 
 (defun delicious-search-next-result ()
   "Goto the next search result in a delicious search results list."
@@ -850,10 +857,7 @@ If given a prefix, operate offline."
                      (end-of-file t)) t)))
       (bury-buffer))
     (delicious-search-buffer-prep)
-    (mapc 
-     '(lambda (post) 
-        (delicious-search-insert-match post))
-     matches)
+    (delicious-search-insert-matches matches)
     (delicious-search-buffer-finish search-string match-count)))
 
 (defun delicious-search-description-regexp (search-string)
@@ -885,10 +889,7 @@ If given a prefix, operate offline."
                      (end-of-file t)) t)))
       (bury-buffer))
     (delicious-search-buffer-prep)
-    (mapc
-     '(lambda (post)
-        (delicious-search-insert-match post))
-     matches)
+    (delicious-search-insert-matches matches)
     (delicious-search-buffer-finish search-string match-count)))
 
 (defun delicious-search-tags-regexp (search-string)
@@ -915,10 +916,7 @@ If given a prefix, operate offline."
                      (end-of-file t)) t)))
       (bury-buffer))
     (delicious-search-buffer-prep)
-    (mapc
-     '(lambda (post)
-        (delicious-search-insert-match post))
-     matches)
+    (delicious-search-insert-matches matches)
     (delicious-search-buffer-finish search-string match-count)))
 
 (defun delicious-search-href-regexp (search-string)
@@ -947,10 +945,7 @@ If given a prefix, operate offline."
                      (end-of-file t)) t)))
       (bury-buffer))
     (delicious-search-buffer-prep)
-    (mapc
-     '(lambda (post)
-        (delicious-search-insert-match post))
-     matches)
+    (delicious-search-insert-matches matches)
     (delicious-search-buffer-finish search-string match-count)))
 
 ;;;_+ Search by tag
@@ -1014,10 +1009,7 @@ If given a prefix, operate offline."
   (let* ((matches (delicious-posts-matching-tags tags))
          (match-count (length matches)))
     (delicious-search-buffer-prep)
-    (mapc
-     '(lambda (post)
-        (delicious-search-insert-match post))
-     matches)
+    (delicious-search-insert-matches matches)
     (delicious-search-buffer-finish tags match-count)))
 
 ;;;_+ Search by date

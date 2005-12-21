@@ -1,3 +1,13 @@
+2005-12-21  John Sullivan  <john@wjsullivan.net>
+
+	* delicious.el (delicious-search-buffer-finish): Correct use of
+	plural based on how many results there are.
+	(delicious-search-insert-match): Changed to accept a list as its
+	argument.
+	(delicious-search-insert-matches): New function to insert a list
+	of matches. Updated all of the search functions that can return
+	multiple results to use this.
+
 2005-12-17  John Sullivan  <john@wjsullivan.net>
 
 	* delicious.el (delicious-post-cache): Start using assoc-default,
