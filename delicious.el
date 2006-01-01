@@ -248,7 +248,7 @@ If OFFLINE is non-nil, don't update the local timestamp."
                (description (assoc-default "description" delicious-cache-post))
                (tags (assoc-default "tag" delicious-cache-post))
                (extended (assoc-default "extended" delicious-cache-post))
-               (time (cdr (assoc-default "time" delicious-cache-post))))
+               (time (assoc-default "time" delicious-cache-post)))
           (delicious-api-post href description tags extended time)
           (delicious-post-local delicious-cache-post)
           (message "%s posted." description)
