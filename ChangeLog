@@ -1,3 +1,13 @@
+2006-01-02  John Sullivan  <john@wjsullivan.net>
+
+	* delicious.el (delicious-read-time-string): Fixed problem that
+	was causing us to send timestamps with two Zs instead of one. This
+	may have been the cause of some weird issues.
+
+2006-01-01  John Sullivan  <john@wjsullivan.net>
+
+	* delicious.el: Fixed dumb mistake in `delicious-post-cache'.
+
 2005-12-21  John Sullivan  <john@wjsullivan.net>
 
 	* delicious.el (delicious-search-buffer-finish): Correct use of
