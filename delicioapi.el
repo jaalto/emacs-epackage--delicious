@@ -91,13 +91,6 @@ It should begin and end with a slash.")
 (defconst delicious-api-version "delicioapi.el/0.3"
   "The version string for this copy of delicioapi.el.")
 
-(defconst delicious-api-field-match "=\"\\(.*?\\)\""
-  "Regular expression to match a field.")
-
-(defconst delicious-api-success-match 
-  "\\(</.*>\\)\\|\\(<result code=\"done\" />\\)\\|\\(<.* />\\)"
-  "Regular expression to match the various successful result tags.")
-
 ;;;;_+ Customization
 
 (defgroup delicious nil
@@ -599,24 +592,12 @@ the match for the second field."
         results-hash))))
 
 (defun delicious-api-parse-posts ()
-  "Parse the *delicious output* XML for posts into fields."
+  "Parse the `delicious-api-buffer' XML into a list."
   (save-excursion
     (with-current-buffer delicious-api-buffer
       (goto-char (point-min))
-      (let* ((posts
-              (loop while (re-search-forward "<post " nil t)
-                    for post = (buffer-substring (point)
-                                                 (- (re-search-forward "/>" nil t) 3))
-                    collect post))
-             (posts-parsed
-              (loop for post in posts
-                    with fields = '("href" "description" "extended" "hash" "tag"
-                                    "time")
-                    collect (loop for field in fields
-                                  if (string-match
-                                      (concat field "=\"\\(.*?\\)\"") post)
-                                  collect (cons field (match-string 1 post))))))
-        posts-parsed))))
+      (let ((posts (car (xml-parse-region (point-min) (point-max)))))
+        (mapcar (lambda (p) (cadr p)) (xml-get-children posts 'post))))))
 
 (defun delicious-api-version ()
   "Return the version of the Emacs Delicious API in use."
