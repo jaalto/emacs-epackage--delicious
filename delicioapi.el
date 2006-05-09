@@ -1,6 +1,6 @@
 ;;; delicioapi.el --- functions to interact with the http://del.icio.us API
 
-;; Copyright (C) 2004, 2005 John Sullivan
+;; Copyright (C) 2004, 2005, 2006 John Sullivan
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;; Created 25 October 2004
@@ -72,20 +72,20 @@
 (defvar delicious-api-user-agent "delicioapi.el/0.3"
   "The User-Agent field that we will send to the server.")
 
-(defvar delicious-api-host "del.icio.us"
+(defconst delicious-api-host "del.icio.us"
   "The delicious host name.")
 
-(defvar delicious-api-port "80"
+(defconst delicious-api-port "80"
   "The delicious port number.")
 
-(defvar delicious-api "/api/"
+(defconst delicious-api "/api/"
   "*The path to the del.ici.ous api.  It should begin and end in a slash.")
 
-(defvar delicious-api-html "/html/"
+(defconst delicious-api-html "/html/"
   "*The path to the del.icio.us HTML feed.
 It should begin and end with a slash.")
 
-(defvar delicious-api-realm (format "%s API" delicious-api-host)
+(defconst delicious-api-realm (format "%s API" delicious-api-host)
   "The delicious auth realm name.")
 
 (defconst delicious-api-version "delicioapi.el/0.3"
