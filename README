@@ -1,6 +1,6 @@
 * License and Copying Information
 
-`delicioapi.el', `delicious.el', and this README are Copyright (C) 2004, 2005
+`delicioapi.el', `delicious.el', and this README are Copyright (C) 2004, 2005, 2006, 2007
 John Sullivan
 
 Author: John Sullivan <john@wjsullivan.net>
@@ -74,24 +74,11 @@ already in your load-path (M-x describe-variable <ret> load-path <ret> to see
 what that is) or evaluate:
 
   (add-to-list 'load-path "/path/to/delicious-el/files")
-  
-Then, you need to set a few required options. You can do this either through
-Customize, with:
-
-  M-x customize-group <ret> delicious <ret>
-
-or by evaluating something like the following:
-
-  (setq delicious-api-user "myusername"
-        delicious-api-password "mypassword")
 
 If you decide you want to have the delicious-el functions available to you
 automatically when you start Emacs, add:
 
   (require 'delicious)
-  (setq delicious-api-user "myusername"
-        delicious-api-password "mypassword")
-  (delicious-api-register-auth)
 
 to your `.emacs' file, making sure that both `delicious.el' and `delicioapi.el'
 are somewhere in your load path.
