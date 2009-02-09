@@ -1,6 +1,6 @@
 ;; delicious.el --- functions to make productive use of the http://del.icio.us API
 
-;; Copyright (C) 2004, 2005 John Sullivan
+;; Copyright (C) 2004, 2005, 2006, 2007 John Sullivan
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;; Created 25 October 2004
@@ -9,7 +9,7 @@
 
 ;; This program is free software; you can redistribute it and/or
 ;; modify it under the terms of the GNU General Public License as
-;; published by the Free Software Foundation; either version 2 of
+;; published by the Free Software Foundation; either version 3 of
 ;; the License, or (at your option) any later version.
 
 ;; This program is distributed in the hope that it will be
@@ -112,24 +112,28 @@
     (unless no-bury
       (bury-buffer))))
 
-(defun delicious-posts-file ()
-  "Return the full path for `delicious-posts-file-name'."
-  (let* ((home (getenv "HOME"))
-         (posts-file (concat home "/" delicious-posts-file-name)))
-    posts-file))
-
 (defun delicious-get-posts-buffer ()
   "Switch to a buffer containing `delicious-posts-file-name'.
 Return the buffer."
-  (find-file (delicious-posts-file))
+  (find-file delicious-posts-file-name)
+  (if (not (eq buffer-undo-list t))
+      (buffer-disable-undo))
   (goto-char (point-min))
+  (if (not (eq 'major-mode 'emacs-lisp-mode))
+      (emacs-lisp-mode))
   (current-buffer))
 
-(defun delicious-skip-timestamp ()
-  (unless 
-      (re-search-forward delicious-timestamp nil t)
-    (message "No timestamp found, forcing refresh")
-    (delicious-build-posts-list offline t)))
+(defun delicious-skip-to-posts ()
+  "Skip to the point where the posts start."
+  (down-list 1)
+  (forward-sexp 2))
+
+(defun delicious-get-next-post ()
+  "Return the next post."
+  (forward-char 1)
+  (condition-case nil 
+      (read (current-buffer))
+    (end-of-file nil)))
 
 ;;;;_+ Posting
 
@@ -156,11 +160,9 @@ timestamp comparison and force a refresh from the server."
         (when (or force
                   current-prefix-arg
                   (delicious-refresh-p))
-          (erase-buffer)
-          (delicious-update-timestamp)
-          (mapc '(lambda (post)
-                   (pp post (current-buffer)))
-                (delicious-api-get-all))
+          (let ((posts (delicious-api/posts/all)))
+            (erase-buffer)
+            (prin1 posts (current-buffer)))
           (delicious-save-buffer)))
       (message "Done."))))
 
@@ -174,15 +176,17 @@ If NOLOCAL is non-nil, don't add the post to the local list."
                 (delicious-read-extended-description)
                 (delicious-read-time-string)))
   (message "Waiting for server.")
-  (delicious-api-post url description tags extended time)
+  (delicious-api/posts/add url description tags extended time)
   (let* ((hash (md5 url))
-         (post (list
-                (cons "href" url)
-                (cons "description" description)
-                (cons "hash" hash)
-                (cons "tag" tags)
-                (cons "extended" extended)
-                (cons "time" time))))
+         (post
+          (list 'post
+                (list 
+                 (cons 'href url)
+                 (cons 'description description)
+                 (cons 'extended extended)
+                 (cons 'hash hash)
+                 (cons 'tag tags)
+                 (cons 'time time)))))
     (unless nolocal (delicious-post-local post))
     (message "URL posted.")))
 
@@ -191,13 +195,16 @@ If NOLOCAL is non-nil, don't add the post to the local list."
 If OFFLINE is non-nil, don't update the local timestamp."
   (save-window-excursion
     (save-excursion
-      (delicious-get-posts-buffer)
       (unless offline (delicious-update-timestamp))
-      (goto-char (point-max))
-      (pp post (current-buffer))
-      (let ((tags (assoc-default "tag" post)))
-        (delicious-rebuild-tags-maybe tags))
-      (delicious-save-buffer))))
+      (delicious-get-posts-buffer)
+      (delicious-skip-to-posts)
+      (insert "\n")
+      (prin1 post (current-buffer))
+      (delete-blank-lines)
+      (delicious-save-buffer)
+      (let ((tags (split-string (delicious-tags-from-post post))))
+        ;; Don't query the server, since we just did.
+        (delicious-rebuild-tags-maybe tags t)))))
 
 (defun delicious-check-input (input &optional name)
   "Verify that INPUT has content.  NAME is the name of the field being checked."
@@ -219,15 +226,18 @@ If OFFLINE is non-nil, don't update the local timestamp."
     (save-excursion
       (find-file delicious-cache-file)
       (goto-char (point-max))
-      (let* ((hash (md5 url))
-             (post (list (cons "href" url)
-                         (cons "description" description)
-                         (cons "hash" hash)
-                         (cons "tag" (or tags nil))
-                         (cons "extended" (or extended nil))
-                         (cons "time" (or time nil)))))
-        (prin1 post (current-buffer)))
-      (delicious-save-buffer)))
+  (let* ((hash (md5 url))
+         (post
+          (list 'post
+                (list 
+                 (cons 'href url)
+                 (cons 'description description)
+                 (cons 'extended extended)
+                 (cons 'hash hash)
+                 (cons 'tag tags)
+                 (cons 'time time)))))
+    (prin1 post (current-buffer)))
+  (delicious-save-buffer)))
   (when (y-or-n-p "Post another bookmark? ")
     (call-interactively 'delicious-post-offline))
   (message "Cache saved."))
@@ -243,14 +253,14 @@ If OFFLINE is non-nil, don't update the local timestamp."
           (error "Cache file %s not found" cache)))
       (goto-char (point-min))
       (while (not (eobp))
-        (let* ((delicious-cache-post (read (current-buffer)))
-               (href (assoc-default "href" delicious-cache-post))
-               (description (assoc-default "description" delicious-cache-post))
-               (tags (assoc-default "tag" delicious-cache-post))
-               (extended (assoc-default "extended" delicious-cache-post))
-               (time (assoc-default "time" delicious-cache-post)))
-          (delicious-api-post href description tags extended time)
-          (delicious-post-local delicious-cache-post)
+        (let* ((post (read (current-buffer)))
+               (href (delicious-href-from-post post))
+               (description (delicious-description-from-post post))
+               (tags (delicious-tags-from-post post))
+               (extended (delicious-extended-from-post post))
+               (time (delicious-time-from-post post)))
+          (delicious-api/posts/add href description tags extended time)
+          (delicious-post-local post)
           (message "%s posted." description)
           (sleep-for 2)))))
   (when (y-or-n-p "Clear cache now? ")
@@ -273,6 +283,10 @@ If OFFLINE is non-nil, don't update the local timestamp."
 
 ;;;_+ Timestamps
 
+(defun delicious-time-from-post (post)
+  "Return the timestamp of POST, as string."
+  (assoc-default 'time (cadr post)))
+
 (defun delicious-read-time-string ()
   "Read a date string from a prompt and format it properly for the server.
  Use the current date and time if nothing entered."
@@ -293,65 +307,36 @@ If OFFLINE is non-nil, don't update the local timestamp."
 (defun delicious-refresh-p ()
   "Return t if server timestamp is newer than local timestamp."
   (let ((server-timestamp (delicious-api-get-timestamp))
-        (local-timestamp 
-         (save-window-excursion
-           (save-excursion
-             (delicious-get-posts-buffer)
-             (delicious-get-local-timestamp-value)))))
-    (time-less-p local-timestamp server-timestamp)))
+        (local-timestamp (delicious-get-local-timestamp)))
+    (or (null local-timestamp)
+        (string< local-timestamp server-timestamp))))
 
 (defun delicious-get-local-timestamp ()
   "Return the timestamp recorded in the local posts as a string."
-  (let ((local-timestamp 
-         (if (re-search-forward delicious-timestamp nil t)
-             (match-string 0))))
-    local-timestamp))
+  (save-window-excursion
+    (save-excursion
+      (delicious-get-posts-buffer)
+      (condition-case nil
+          (assoc-default 'update (cadr (read (current-buffer))))
+        (end-of-file nil)))))
 
-(defun delicious-get-local-timestamp-value ()
-  "Return the timestamp recorded in the local posts as a time value.
-Return '(0) if there is no timestamp."
-  (let* ((local-timestamp (delicious-get-local-timestamp))
-         (time-value 
-          (if (null local-timestamp)
-              (list 0)
-            (string-match delicious-timestamp local-timestamp)
-            (encode-time
-             (string-to-int
-              (match-string 6 local-timestamp)) ;seconds
-             (string-to-int
-              (match-string 5 local-timestamp)) ;minutes
-             (string-to-int
-              (match-string 4 local-timestamp)) ;hours
-             (string-to-int
-              (match-string 3 local-timestamp)) ;days
-             (string-to-int
-              (match-string 2 local-timestamp)) ;month
-             (string-to-int
-              (match-string 1 local-timestamp)))))) ;year
-    time-value))
-         
 (defun delicious-update-timestamp ()
   "Update or create the local timestamp in `delicious-posts-file-name'."
-  ;; check to make sure we are in the right place
-  (when (and 
-         (eq (current-buffer) 
-             (find-buffer-visiting (delicious-posts-file)))
-         (bobp))
-    (let ((time (delicious-format-time)))
-      (if (looking-at delicious-timestamp)
-          (replace-match time)
-        (insert time)))
-    (insert "\n")
-    (delete-blank-lines)
+  (delicious-get-posts-buffer)
+  (let ((time (delicious-api-get-timestamp)))
+    (re-search-forward delicious-timestamp)
+    (replace-match time)
     (delicious-save-buffer t)))
 
-(defun delicious-format-time (&optional time)
-  "Return TIME as a del.icio.us timestamp.
-If TIME is not provided, use the server timestamp."
-  (format-time-string "%Y-%m-%dT%H:%M:%SZ" 
-                      (or time (delicious-api-get-timestamp))))
+(defun delicious-format-time (time)
+  "Return TIME as a del.icio.us timestamp."
+  (format-time-string "%Y-%m-%dT%H:%M:%SZ" time))
 
 ;;;;_+ URL input, guessing, and duplicate checking
+
+(defun delicious-href-from-post (post)
+  "Return the href from POST as a string."
+  (assoc-default 'href (cadr post)))
 
 (defun delicious-read-url (&optional offline)
   "Read a url from a prompt, suggesting an appropriate default.
@@ -389,7 +374,7 @@ If OFFLINE is non-nil, don't query the server for any information."
   (save-excursion
     (goto-char (point-min))
     (if (re-search-forward thing-at-point-url-regexp nil t)
-        (match-string 0))))
+        (match-string-no-properties 0))))
 
 (defun delicious-guess-check-selection ()
   "Check the X selection for a URL and return it."
@@ -407,7 +392,7 @@ If OFFLINE is non-nil, don't query the server for any information."
   (when delicious-xsel-prog
     (let ((selection (shell-command-to-string delicious-xsel-prog)))
       (if (string-match thing-at-point-url-regexp selection)
-          (match-string 0 selection)))))
+          (match-string-no-properties 0 selection)))))
 
 (defun delicious-guess-check-default ()
   "Return some text to use for the URL guess."
@@ -418,15 +403,19 @@ If OFFLINE is non-nil, don't query the server for any information."
   (save-window-excursion
     (save-excursion
       (delicious-get-posts-buffer)
-      (delicious-skip-timestamp)
       (let ((dup))
-        (while (not (or dup
-                        (eq
-                         (condition-case nil
-                             (let ((post (read (current-buffer))))
-                               (if (member (cons "href" url) post)
-                                   (setq dup post)))
-                           (end-of-file t)) t))))
+        (delicious-skip-to-posts)
+        (while 
+            (not 
+             (or dup
+                 (eq
+                  (condition-case nil
+                      (let ((post (delicious-get-next-post)))
+                        (if post
+                            (if (string= (delicious-href-from-post post) url)
+                                (setq dup post))
+                          t))
+                    (end-of-file t)) t))))
         dup))))
 
 (defun delicious-post-duplicate-p (url)
@@ -437,6 +426,10 @@ If OFFLINE is non-nil, don't query the server for any information."
     (error "Duplicate URL not posted")))
 
 ;;;;_+ Description input and suggestion
+
+(defun delicious-description-from-post (post)
+  "Return the description from POST as a string."
+  (assoc-default 'description (cadr post)))
 
 (defun delicious-read-description ()
   "Read a description from a prompt, suggesting an appropriate default."
@@ -455,6 +448,10 @@ If OFFLINE is non-nil, don't query the server for any information."
 
 ;;;;_+ Extended description
 
+(defun delicious-extended-from-post (post)
+  "Return the extended field from POST as a string."
+  (assoc-default 'extended (cadr post)))
+
 (defun delicious-read-extended-description (&optional suggest truncated)
   "Read an extended description from a prompt."
   (let ((ext 
@@ -468,6 +465,10 @@ If OFFLINE is non-nil, don't query the server for any information."
       ext)))
 
 ;;;;_+ Tag completion, suggestion, and manipulation
+
+(defun delicious-tags-from-post (post)
+  "Return the tags from POST as string."
+  (assoc-default 'tag (cadr post)))
 
 (defun delicious-complete-tags (&optional nosuggest sofar quantity prompt-string
                                           require offline)
@@ -503,16 +504,16 @@ are accepted as input. If OFFLINE is non-nil, don't contact the server."
                            (message "%s" tags)
                            (mapconcat 'identity tags " ")))))
 
-(defun delicious-rebuild-tags-maybe (tags)
-  "If any tags in the space separated string TAGS are new, rebuild tags table."
-  (let ((tags-list (split-string tags))
-        (new))
+(defun delicious-rebuild-tags-maybe (tags &optional offline)
+  "If any tags in the list TAGS are new, rebuild tags table.
+If OFFLINE is non-nil, don't query the server."
+  (let ((new))
     (mapc 
      (lambda (tag)
        (unless (assoc tag delicious-tags-list)
          (setq new t)))
-     tags-list)
-    (if new (delicious-build-tags-list))))
+     tags)
+    (if new (delicious-build-tags-list offline))))
 
 (defun delicious-build-tags-list (&optional offline)
   "Build the `delicious-tags-list' table of tags and and index number,
@@ -521,23 +522,23 @@ for use in completion. If OFFLINE is non-nil, don't query the server."
   (save-window-excursion
     (save-excursion
       (delicious-get-posts-buffer)
-      (delicious-skip-timestamp)
+      (delicious-skip-to-posts)
       (setq delicious-tags-list
             (let ((index 0)
-                  (tags-table '()))
-              (while (not 
-                      (eq
-                       (condition-case nil
-                           (let* 
-                               ((post (read (current-buffer)))
-                                (tags (split-string (assoc-default "tag" post))))
-                             (mapc
-                              (lambda (tag) ; collect tags if new
-                                (unless (assoc tag tags-table)
-                                  (add-to-list 'tags-table (list tag index))
-                                  (setq index (1+ index))))
-                              tags))
-                         (end-of-file t)) t)))
+                  (tags-table '())
+                  (post t)
+                  (tags))
+              (while post
+                (setq post (delicious-get-next-post))
+                (if post (setq tags (split-string 
+                                     (delicious-tags-from-post post))))
+                (if tags
+                    (mapc
+                     (lambda (tag) ; collect tags if new
+                       (when (not (assoc tag tags-table))
+                         (add-to-list 'tags-table (list tag index))
+                         (setq index (1+ index))))
+                     tags)))
               tags-table)))))
 
 (defun delicious-suggest-tags ()
@@ -562,17 +563,15 @@ for use in completion. If OFFLINE is non-nil, don't query the server."
           finally return shared)))
   
 (defun delicious-buffer-words ()
-  "Break the current buffer into a list of lowercase unique words."
-  (save-excursion
-    (goto-char (point-min))
-    (loop until (eobp)
-          with words = '()
-          for word = (downcase (current-word))
-          if (not (member word words))
-          collect word into words
-          end
-          do (forward-word 1)
-          finally return words)))
+  "Break the current buffer into a list of unique words."
+  (let ((words (split-string 
+                (buffer-substring-no-properties (point-min) (point-max))))
+        (uniqued '()))
+    (mapc
+     (lambda (w)
+       (add-to-list 'uniqued w))
+     words)
+    uniqued))
        
 (defun delicious-rename-tag (old-tag new-tag)
   "Change all instances of OLD-TAG to NEW-TAG.
@@ -586,7 +585,7 @@ NEW-TAG can be multiple tags, space-separated."
           (equal new-tag ""))
       (message "Aborting due to empty input.")
     (message "Renaming...")
-    (delicious-api-rename old-tag new-tag)
+    (delicious-api/tags/rename old-tag new-tag)
     (delicious-build-tags-list)
     (message "Done renaming %s to %s" old-tag new-tag)))
 
@@ -595,7 +594,7 @@ NEW-TAG can be multiple tags, space-separated."
 (defun delicious-delete-post (href)
   "Delete the post with URL HREF."
   (interactive "sEnter URL to delete: ")
-  (delicious-api-delete href)
+  (delicious-api/posts/delete href)
   (delicious-delete-post-locally href)
   (message "%s deleted." href))
 
@@ -627,7 +626,7 @@ With prefix, visit the page in a new w3m session."
 They will be stored under SECTION."
   (interactive
    "nNumber of recent posts to bookmark: \nsTag to filter by: \nsw3m bookmark section to use: ")
-  (let ((delicious-list (delicious-api-get-recent tag count)))
+  (let ((delicious-list (delicious-api/posts/recent tag count)))
     (loop for bookmark in delicious-list
           for url = (assoc-default "href" bookmark)
           for title = (assoc-default "description" bookmark)
@@ -665,7 +664,7 @@ Optionally assign TAGS, an EXTENDED description, and TIME to the bookmarks."
           (loop for cell in links
                 for link = (car cell)
                 for title = (cdr cell)
-                do (delicious-api-post link title tags extended time)
+                do (delicious-api/posts/add link title tags extended time)
                 do (message "%s posted." title)
                 do (sleep-for 1)))))))
 
@@ -842,8 +841,6 @@ If given a prefix, operate offline."
     (save-window-excursion
       (delicious-build-posts-list current-prefix-arg)
       (delicious-get-posts-buffer)
-      (delicious-skip-timestamp) 
-
       (while (not (eq 
                    (condition-case nil
                        (let ((post (read (current-buffer))))
@@ -871,8 +868,6 @@ If given a prefix, operate offline."
     (save-window-excursion
       (delicious-build-posts-list current-prefix-arg)
       (delicious-get-posts-buffer)
-      (delicious-skip-timestamp) 
-
       (while (not (eq
                    (condition-case nil
                        (let* ((post (read (current-buffer)))
@@ -903,7 +898,6 @@ If given a prefix, operate offline."
     (save-window-excursion
       (delicious-build-posts-list current-prefix-arg)
       (delicious-get-posts-buffer)
-      (delicious-skip-timestamp) 
       (while (not (eq
                    (condition-case nil
                        (let* ((post (read (current-buffer)))
@@ -930,7 +924,6 @@ If given a prefix, operate offline."
     (save-window-excursion
       (delicious-build-posts-list current-prefix-arg)
       (delicious-get-posts-buffer)
-      (delicious-skip-timestamp) 
       (while (not (eq
                    (condition-case nil
                        (let* ((post (read (current-buffer)))
@@ -958,7 +951,6 @@ If given a prefix, operate offline."
     (save-window-excursion
       (delicious-build-posts-list current-prefix-arg)
       (delicious-get-posts-buffer)
-      (delicious-skip-timestamp) 
       (while (not (eq
                    (condition-case nil
                        (let* ((post (read (current-buffer)))
@@ -985,7 +977,6 @@ If given a prefix, operate offline."
     (save-window-excursion
       (delicious-build-posts-list current-prefix-arg)
       (delicious-get-posts-buffer)
-      (delicious-skip-timestamp) 
       (while (not (eq
                    (condition-case nil
                        (let* ((post (read (current-buffer)))
@@ -1033,7 +1024,6 @@ If given a prefix, operate offline."
     (save-window-excursion
       (delicious-build-posts-list offline)
       (delicious-get-posts-buffer)
-      (delicious-skip-timestamp)
       (while (not (eq (condition-case nil
                           (let* ((post (read (current-buffer)))
                                  (date (assoc-default "time" post)))
@@ -1062,7 +1052,6 @@ If given a prefix, work offline only."
     (save-window-excursion
       (delicious-build-posts-list offline)
       (delicious-get-posts-buffer)
-      (delicious-skip-timestamp)
       (while (not (or match 
                       (eq (condition-case nil
                               (let* ((post (read (current-buffer)))
