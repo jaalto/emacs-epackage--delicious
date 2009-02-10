@@ -1,10 +1,10 @@
 ;;; delicioapi.el --- functions to interact with the http://del.icio.us API
 
-;; Copyright (C) 2004, 2005, 2006, 2007 John Sullivan
+;; Copyright (C) 2004, 2005, 2006, 2007, 2009 John Sullivan
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;; Created 25 October 2004
-;; Version: 0.3
+;; Version: 0.4
 ;; Keywords: comm, hypermedia
 
 ;; This program is free software; you can redistribute it and/or
@@ -114,7 +114,10 @@ for managing and sharing bookmarks."
       (with-current-buffer buffer
         (save-excursion
           (goto-char url-http-end-of-headers)
-          (let ((response (car (xml-parse-region (point) (point-max)))))
+          (let ((response 
+                 (car (xml-parse-region 
+                       (point) 
+                       (- (re-search-forward "<!--") 5)))))
             (delete "\n" (delete "\n  " response)))))))
             
 (defun delicious-api-request (path)
