@@ -1,11 +1,11 @@
 * License and Copying Information
 
-`delicioapi.el', `delicious.el', and this README are Copyright (C) 2004, 2005, 2006, 2007
+`delicioapi.el', `delicious.el', and this README are Copyright (C) 2004, 2005, 2006, 2007, 2009
 John Sullivan
 
 Author: John Sullivan <john@wjsullivan.net>
 Created 25 October 2004
-Version: 0.3 2005-10-07
+Version: 0.4
 Keywords: comm, hypermedia
 
 This program is free software; you can redistribute it and/or modify it under
@@ -21,25 +21,6 @@ You should have received a copy of the GNU General Public License along with
 this program; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-* Contents of the archive
-
-- delicioapi.el
-- delicious.el
-- planner-delicious.el
-- ChangeLog
-- ChangeLog.OLD
-- README
-- COPYING
-
-* Dependencies not included
-
-- url.el
-
-You will need a version with a url-version string of either "Emacs" or
-"Exp". These are currently the two versions I'm trying to
-support. "Emacs" is the one that comes bundled with CVS Emacs. I can
-try to support more, but it gets to be a headache real fast.
-
 * Overview
 
 This is a complete set of functions for interacting with <http://del.icio.us>,
@@ -54,22 +35,26 @@ required to load the commands that I have written.
 putting the API functions to productive use, via Emacs. 'delicioapi.el' must be
 loaded for these functions to work. 
 
-'planner-delicious.el' contains functions to integrate with Planner in
-Emacs. It requires Planner, which can be found at
-<http://sacha.free.net.ph>. This is included primarily for testing
-purposes. For instructions, please see the comments at the top of the file.
+'planner-delicious.el' contains functions to integrate with Planner in Emacs.
+It requires Planner, which can be found at
+<http://wjsullivan.net/PlannerMode.html>. This is included primarily for
+testing purposes. For instructions, please see the comments at the top of the
+file.
 
 The del.icio.us API does go through frequent changes; I've made an effort here
 to structure the code so that these changes can be easily accommodated.
 
-The specifications for the API are at <http://del.icio.us/doc/api>.
+The specifications for the API are at <http://del.icio.us/help/api>.
 
 * Getting started
 
-First, you need to set up an account at del.icio.us, by visiting that site and
+You'll need rest-api.el, which can be retrieved at
+<http://github.com/hober/37emacs/blob/master/rest-api.el?raw=true>.
+
+Then, you need to set up an account at del.icio.us, by visiting that site and
 following the instructions there.
 
-Second, load the delicious-el files. Either put them in a directory that is
+Third, load the delicious-el files. Either put them in a directory that is
 already in your load-path (M-x describe-variable <ret> load-path <ret> to see
 what that is) or evaluate:
 
@@ -428,13 +413,12 @@ delicious-post-cache to send the post to the server.
 
 * Keeping Up
 
-Updated versions can be had via darcs at
-<http://www.wjsullivan.net/darcs/delicious-el>. You can also download the
-archive, generally just as current, at
-<http://www.wjsullivan.net/darcs/delicious-el/delicious-el.tar.gz>.
+Updated versions can be had via git:
 
-There is a Web page with updated information about the project at
-<http://www.wjsullivan.net/code/delicious-el.html>.
+  git clone http://git.wjsullivan.net/delicious-el.git
+
+There is a web page with updated information about the project at
+<http://www.wjsullivan.net/delicious-el.html>.
 
 * Bugs
 
