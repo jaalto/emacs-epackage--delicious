@@ -1,4 +1,4 @@
-;; delicious.el --- functions to make productive use of the http://del.icio.us API
+;;; delicious.el --- functions to make productive use of the http://del.icio.us API
 
 ;; Copyright (C) 2004, 2005, 2006, 2007 John Sullivan
 
@@ -85,7 +85,7 @@
   "Table of tags for use in completion.")
 
 (defcustom delicious-xsel-prog nil
-  "*The full path to a program that returns the X mouse selection, like xsel."
+  "The full path to a program that returns the X mouse selection, like xsel."
   :version "21.3.1"
   :group 'delicious
   :type 'string
@@ -98,7 +98,7 @@
     delicious-guess-check-selection
     delicious-guess-check-xsel
     delicious-guess-check-default)
-  "*The list of methods to try, in order, to guess a URL to post."
+  "The list of methods to try, in order, to guess a URL to post."
   :version "21.3.1"
   :group 'delicious
   :type 'hook
@@ -116,10 +116,10 @@
   "Switch to a buffer containing `delicious-posts-file-name'.
 Return the buffer."
   (find-file delicious-posts-file-name)
-  (if (not (eq buffer-undo-list t))
+  (or (eq buffer-undo-list t)
       (buffer-disable-undo))
   (goto-char (point-min))
-  (if (not (eq 'major-mode 'emacs-lisp-mode))
+  (or (eq major-mode 'emacs-lisp-mode)
       (emacs-lisp-mode))
   (current-buffer))
 
@@ -139,7 +139,7 @@ Return the buffer."
 
 ;;;_+ Online and offline
 
-(defun delicious-build-posts-list (&optional offline force )
+(defun delicious-build-posts-list (&optional offline force)
   "Load local copy of posts, then update if server timestamp is newer.
 If OFFLINE is non-nil, don't query the server.
 If FORCE is non-nil, or if a prefix is given interactively, skip the
@@ -164,7 +164,7 @@ timestamp comparison and force a refresh from the server."
             (erase-buffer)
             (prin1 posts (current-buffer)))
           (delicious-save-buffer)))
-      (message "Done."))))
+      (message "Done"))))
 
 (defun delicious-post (url description &optional tags extended time nolocal)
   "Post a url with arguments URL, DESCRIPTION, TAGS, EXTENDED, and TIME.
@@ -175,7 +175,7 @@ If NOLOCAL is non-nil, don't add the post to the local list."
                 (delicious-complete-tags)
                 (delicious-read-extended-description)
                 (delicious-read-time-string)))
-  (message "Waiting for server.")
+  (message "Waiting for server")
   (delicious-api/posts/add url description tags extended time)
   (let* ((hash (md5 url))
          (post
@@ -188,7 +188,7 @@ If NOLOCAL is non-nil, don't add the post to the local list."
                  (cons 'tag tags)
                  (cons 'time time)))))
     (unless nolocal (delicious-post-local post))
-    (message "URL posted.")))
+    (message "URL posted")))
 
 (defun delicious-post-local (post &optional offline)
   "Add POST to the local copy.
@@ -215,7 +215,7 @@ If OFFLINE is non-nil, don't update the local timestamp."
 ;;;_+ Offline
 
 (defun delicious-post-offline (url description &optional tags extended time)
-  "Input bookmarks to post later. Don't contact the server for anything."
+  "Input bookmarks to post later.  Don't contact the server for anything."
   (interactive (list
                 (delicious-read-url t)
                 (delicious-read-description)
@@ -566,12 +566,12 @@ for use in completion. If OFFLINE is non-nil, don't query the server."
   "Break the current buffer into a list of unique words."
   (let ((words (split-string 
                 (buffer-substring-no-properties (point-min) (point-max))))
-        (uniqued '()))
+        unique)
     (mapc
      (lambda (w)
-       (add-to-list 'uniqued w))
+       (add-to-list 'unique w))
      words)
-    uniqued))
+    unique))
        
 (defun delicious-rename-tag (old-tag new-tag)
   "Change all instances of OLD-TAG to NEW-TAG.
@@ -583,7 +583,7 @@ NEW-TAG can be multiple tags, space-separated."
      t "Enter new tag(s) one at a time (blank to end): ")))
   (if (or (equal old-tag "")
           (equal new-tag ""))
-      (message "Aborting due to empty input.")
+      (message "Aborting due to empty input")
     (message "Renaming...")
     (delicious-api/tags/rename old-tag new-tag)
     (delicious-build-tags-list)
@@ -596,7 +596,7 @@ NEW-TAG can be multiple tags, space-separated."
   (interactive "sEnter URL to delete: ")
   (delicious-api/posts/delete href)
   (delicious-delete-post-locally href)
-  (message "%s deleted." href))
+  (message "%s deleted" href))
 
 (defun delicious-delete-post-locally (href)
   "Delete the first local copy of the post with URL HREF."
@@ -695,11 +695,12 @@ Optionally assign TAGS, an EXTENDED description, and TIME to the bookmarks."
     map)
   "Keymap for function `delicious-search-mode'.")
 
+;;FIXME why is this a minor mode??
 (define-minor-mode delicious-search-mode
   "Toggle Delicious Search mode.
 With no argument, this command toggles the mode.
-Non-null prefix argument turns on the mode.
-Null prefix argument turns off the mode.
+Positive prefix argument turns on the mode.
+Negative or zero prefix argument turns off the mode.
 
 When Delicious Search mode is enabled, the tab key
 advances to the next search result."
@@ -714,7 +715,7 @@ advances to the next search result."
      (get-buffer-create "*delicious search results*")))
   (let ((inhibit-read-only t))
     (delete-region (point-min) (point-max)))
-  (let ((view-read-only nil))(toggle-read-only 1)))
+  (let ((view-read-only nil)) (toggle-read-only 1)))
 
 (defun delicious-search-buffer-finish (search-string matches)
   "Report search results in the *delicious search results* buffer.
@@ -722,7 +723,7 @@ SEARCH-STRING is the regexp pattern that was used in the search.
 MATCHES is the number of matches found."
   (with-current-buffer "*delicious search results*"
     (let ((inhibit-read-only t)
-          (result (if (eq matches 1) "result" "results")))
+          (result (if (= matches 1) "result" "results")))
       (goto-char (point-min))
       (insert (format "Your search for \"%s\" returned %d %s.\n\n"
                       search-string matches result)))
@@ -752,11 +753,11 @@ MATCHES is the number of matches found."
                  (setq face 'delicious-result-hash-face))
                 ((string= field "tag")
                  (define-key map [mouse-2] 
-                   '(lambda () (interactive) 
-                      (delicious-search-tags (word-at-point))))
+                   (lambda () (interactive) 
+                     (delicious-search-tags (word-at-point))))
                  (define-key map [(control ?m)] 
-                   '(lambda () (interactive) 
-                      (delicious-search-tags (word-at-point))))
+                   (lambda () (interactive) 
+                     (delicious-search-tags (word-at-point))))
                  (define-key map [(?a)] 'delicious-search-add-tags)
                  (define-key map [(?d)] 'delicious-search-delete-tags)
                  (define-key map [(?w)] 'delicious-search-who-else)
@@ -781,7 +782,7 @@ MATCHES is the number of matches found."
      posts))
 
 (defun delicious-search-next-result ()
-  "Goto the next search result in a delicious search results list."
+  "Go to the next search result in a Delicious search results list."
   (interactive)
   (if (thing-at-point-url-at-point)
       (goto-char (match-end 0)))
@@ -794,7 +795,7 @@ MATCHES is the number of matches found."
       (goto-char (match-beginning 0)))))
 
 (defun delicious-search-previous-result ()
-  "Goto the previous search result in a delicious search results list."
+  "Go to the previous search result in a Delicious search results list."
   (interactive)
   (if (thing-at-point-url-at-point)
       (goto-char (match-beginning 0)))
@@ -832,6 +833,7 @@ MATCHES is the number of matches found."
 
 ;;;_+ Search by regexp
 
+;; FIXME this waits for some refactoring
 (defun delicious-search-posts-regexp (search-string)
   "Search DELICIOUS-POSTS-LIST for SEARCH-STRING, a regular expression.
 Display the results in *delicious search results*.
@@ -845,9 +847,9 @@ If given a prefix, operate offline."
                    (condition-case nil
                        (let ((post (read (current-buffer))))
                          (mapc
-                          '(lambda (field)
-                             (if (string-match search-string (cdr field))
-                                 (setq match post)))
+                          (lambda (field)
+                            (if (string-match search-string (cdr field))
+                                (setq match post)))
                           post)
                          (when match
                            (setq match-count (1+ match-count))
@@ -959,9 +961,9 @@ If given a prefix, operate offline."
                                           (or (assoc-default "tag" post) " "))))
                          (setq match post)
                          (mapc
-                          '(lambda (tag)
-                             (unless (member tag post-tags)
-                               (setq match nil)))
+                          (lambda (tag)
+                            (unless (member tag post-tags)
+                              (setq match nil)))
                           tags)
                          (when match
                            (setq match-count (1+ match-count))
