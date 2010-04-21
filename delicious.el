@@ -81,8 +81,8 @@
 (defconst delicious-version  "delicious.el/0.3"
   "The version string for this copy of delicious.el.")
 
-(defvar delicious-tags-list '()
-  "Table of tags for use in completion.")
+(defvar delicious-tags-list nil
+  "List of tags (strings) for use in completion.")
 
 (defcustom delicious-xsel-prog nil
   "The full path to a program that returns the X mouse selection, like xsel."
@@ -505,48 +505,41 @@ are accepted as input. If OFFLINE is non-nil, don't contact the server."
                            (mapconcat 'identity tags " ")))))
 
 (defun delicious-rebuild-tags-maybe (tags &optional offline)
-  "If any tags in the list TAGS are new, rebuild tags table.
+  "Rebuild `delicious-tags-list' if it misses any of TAGS (a list).
 If OFFLINE is non-nil, don't query the server."
-  (let ((new))
-    (mapc 
-     (lambda (tag)
-       (unless (assoc tag delicious-tags-list)
-         (setq new t)))
-     tags)
-    (if new (delicious-build-tags-list offline))))
+  (when (catch 'new 
+          (dolist (tag tags)
+            (unless (member tag delicious-tags-list)
+              (throw 'new t))))
+    (delicious-build-tags-list offline)))
 
 (defun delicious-build-tags-list (&optional offline)
-  "Build the `delicious-tags-list' table of tags and and index number,
-for use in completion. If OFFLINE is non-nil, don't query the server."
+  "Build the `delicious-tags-list' for use in completion.
+If OFFLINE is non-nil, don't query the server."
   (delicious-build-posts-list offline)
   (save-window-excursion
     (save-excursion
       (delicious-get-posts-buffer)
       (delicious-skip-to-posts)
       (setq delicious-tags-list
-            (let ((index 0)
-                  (tags-table '())
+            (let (tags-list
                   (post t)
-                  (tags))
+                  tags)
               (while post
                 (setq post (delicious-get-next-post))
-                (if post (setq tags (split-string 
-                                     (delicious-tags-from-post post))))
-                (if tags
-                    (mapc
-                     (lambda (tag) ; collect tags if new
-                       (when (not (assoc tag tags-table))
-                         (add-to-list 'tags-table (list tag index))
-                         (setq index (1+ index))))
-                     tags)))
-              tags-table)))))
+                (and post
+                     (setq tags (split-string (delicious-tags-from-post post))))
+                (and tags
+                     (mapc (lambda (tag)
+                             (add-to-list 'tags-list tag))
+                           tags)))
+              tags-list)))))
 
 (defun delicious-suggest-tags ()
   "Suggest tags based on the contents of the current buffer and the current list of tags."
   (let ((buffer-words (delicious-buffer-words))
-        (tags (loop for cell in delicious-tags-list
-                    collect (downcase (car cell)) into tags
-                    finally return tags)))
+        (tags (mapcar 'downcase delicious-tags-list)))
+    ;; FIXME get rid of cl?
     (loop for word in buffer-words
           if (or (member word tags)
                  (member (concat word "s") tags)
