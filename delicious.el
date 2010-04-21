@@ -132,7 +132,7 @@ Return the buffer."
   "Return the next post."
   (forward-char 1)
   (condition-case nil 
-      (read (current-buffer))
+      (cadr (read (current-buffer)))
     (end-of-file nil)))
 
 ;;;;_+ Posting
@@ -253,7 +253,8 @@ If OFFLINE is non-nil, don't update the local timestamp."
           (error "Cache file %s not found" cache)))
       (goto-char (point-min))
       (while (not (eobp))
-        (let* ((post (read (current-buffer)))
+        ;; FIXME
+        (let* ((post (cadr (read (current-buffer))))
                (href (delicious-href-from-post post))
                (description (delicious-description-from-post post))
                (tags (delicious-tags-from-post post))
@@ -285,7 +286,7 @@ If OFFLINE is non-nil, don't update the local timestamp."
 
 (defun delicious-time-from-post (post)
   "Return the timestamp of POST, as string."
-  (assoc-default 'time (cadr post)))
+  (assoc-default 'time post))
 
 (defun delicious-read-time-string ()
   "Read a date string from a prompt and format it properly for the server.
@@ -336,7 +337,7 @@ If OFFLINE is non-nil, don't update the local timestamp."
 
 (defun delicious-href-from-post (post)
   "Return the href from POST as a string."
-  (assoc-default 'href (cadr post)))
+  (assoc-default 'href post))
 
 (defun delicious-read-url (&optional offline)
   "Read a url from a prompt, suggesting an appropriate default.
@@ -429,7 +430,7 @@ If OFFLINE is non-nil, don't query the server for any information."
 
 (defun delicious-description-from-post (post)
   "Return the description from POST as a string."
-  (assoc-default 'description (cadr post)))
+  (assoc-default 'description post))
 
 (defun delicious-read-description ()
   "Read a description from a prompt, suggesting an appropriate default."
@@ -450,7 +451,7 @@ If OFFLINE is non-nil, don't query the server for any information."
 
 (defun delicious-extended-from-post (post)
   "Return the extended field from POST as a string."
-  (assoc-default 'extended (cadr post)))
+  (assoc-default 'extended post))
 
 (defun delicious-read-extended-description (&optional suggest truncated)
   "Read an extended description from a prompt."
@@ -468,7 +469,7 @@ If OFFLINE is non-nil, don't query the server for any information."
 
 (defun delicious-tags-from-post (post)
   "Return the tags from POST as string."
-  (assoc-default 'tag (cadr post)))
+  (assoc-default 'tag post))
 
 (defun delicious-complete-tags (&optional nosuggest sofar quantity prompt-string
                                           require offline)
@@ -770,9 +771,7 @@ MATCHES is the number of matches found."
 
 (defun delicious-search-insert-matches (posts)
   "Insert list POSTS with the fields propertized."
-  (mapc 
-   (lambda (post) (delicious-search-insert-match post))
-     posts))
+  (mapc 'delicious-search-insert-match posts))
 
 (defun delicious-search-next-result ()
   "Go to the next search result in a Delicious search results list."
@@ -808,7 +807,7 @@ MATCHES is the number of matches found."
     (browse-url url)))
 
 (defun delicious-search-copy-url ()
-  "Copy the url under point to the kill ring, with no properties."
+  "Copy the URL under point to the kill ring, with no properties."
   (interactive)
   (let* ((beg (line-beginning-position))
          (end (line-end-position))
