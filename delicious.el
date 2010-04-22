@@ -115,13 +115,12 @@
 (defun delicious-get-posts-buffer ()
   "Switch to a buffer containing `delicious-posts-file-name'.
 Return the buffer."
-  (find-file delicious-posts-file-name)
+  (set-buffer (find-file-noselect delicious-posts-file-name))
   (or (eq buffer-undo-list t)
       (buffer-disable-undo))
   (goto-char (point-min))
   (or (eq major-mode 'emacs-lisp-mode)
-      (emacs-lisp-mode))
-  (current-buffer))
+      (emacs-lisp-mode)))
 
 (defun delicious-skip-to-posts ()
   "Skip to the point where the posts start."
@@ -837,8 +836,7 @@ See also `delicious-get-post-field'."
         (when match
           (setq match-count (1+ match-count))
           (add-to-list 'matches match)
-          (setq match nil)))
-      (bury-buffer))
+          (setq match nil))))
     (delicious-search-buffer-prep)
     (delicious-search-insert-matches matches)
     (delicious-search-buffer-finish what match-count)))
