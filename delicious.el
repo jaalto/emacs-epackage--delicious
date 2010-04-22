@@ -104,7 +104,7 @@
   :type 'hook
   :tag "del.icio.us URL guess methods")
 
-;;;;_+ Buffer management
+;;;;_+ Helper functions
 
 (defun delicious-save-buffer (&optional no-bury)
   (let ((require-final-newline nil))
@@ -134,6 +134,11 @@ Return the buffer."
   (condition-case nil 
       (cadr (read (current-buffer)))
     (end-of-file nil)))
+
+(defun delicious-get-post-field (field post)
+  "Return the value of FIELD (a symbol) in POST.
+POST is a Delicious post as returned by `delicious-get-next-post'."
+  (assoc-default field post))
 
 ;;;;_+ Posting
 
@@ -202,7 +207,7 @@ If OFFLINE is non-nil, don't update the local timestamp."
       (prin1 post (current-buffer))
       (delete-blank-lines)
       (delicious-save-buffer)
-      (let ((tags (split-string (delicious-tags-from-post post))))
+      (let ((tags (split-string (delicious-get-post-field 'tag post))))
         ;; Don't query the server, since we just did.
         (delicious-rebuild-tags-maybe tags t)))))
 
@@ -240,7 +245,7 @@ If OFFLINE is non-nil, don't update the local timestamp."
   (delicious-save-buffer)))
   (when (y-or-n-p "Post another bookmark? ")
     (call-interactively 'delicious-post-offline))
-  (message "Cache saved."))
+  (message "Cache saved"))
 
 (defun delicious-post-cache (&optional cache-file)
   "Post bookmarks from `delicious-cache-file', or CACHE-FILE if non-nil."
@@ -255,11 +260,11 @@ If OFFLINE is non-nil, don't update the local timestamp."
       (while (not (eobp))
         ;; FIXME
         (let* ((post (cadr (read (current-buffer))))
-               (href (delicious-href-from-post post))
-               (description (delicious-description-from-post post))
-               (tags (delicious-tags-from-post post))
-               (extended (delicious-extended-from-post post))
-               (time (delicious-time-from-post post)))
+               (href (delicious-get-post-field 'href post))
+               (description (delicious-get-post-field 'description post))
+               (tags (delicious-get-post-field 'tag post))
+               (extended (delicious-get-post-field 'extended post))
+               (time (delicious-get-post-field 'time post)))
           (delicious-api/posts/add href description tags extended time)
           (delicious-post-local post)
           (message "%s posted." description)
@@ -270,7 +275,7 @@ If OFFLINE is non-nil, don't update the local timestamp."
         (find-file buf)
         (kill-buffer (current-buffer))
         (delete-file buf)))
-    (message "Cache cleared.")))
+    (message "Cache cleared")))
 
 (defun delicious-clear-cache (&optional cache-file)
   "Kill buffer visiting `delicious-cache-file' or CACHE-FILE, and delete file."
@@ -280,13 +285,9 @@ If OFFLINE is non-nil, don't update the local timestamp."
       (find-file buf)
       (kill-buffer (current-buffer))
       (delete-file buf)))
-  (message "Cache cleared."))
+  (message "Cache cleared"))
 
 ;;;_+ Timestamps
-
-(defun delicious-time-from-post (post)
-  "Return the timestamp of POST, as string."
-  (assoc-default 'time post))
 
 (defun delicious-read-time-string ()
   "Read a date string from a prompt and format it properly for the server.
@@ -297,7 +298,7 @@ If OFFLINE is non-nil, don't update the local timestamp."
             (string-match
              "^\\([1-9][0-9][0-9][0-9]\\).\\([0-1][0-9]\\).\\([0-9][0-9]\\).\\([0-9][0-9]\\).\\([0-5][0-9]\\).\\([0-5][0-9]\\)"
              date))
-      (message "Incorrect time string format.")
+      (message "Incorrect time string format")
       (sleep-for 1)
       (delicious-read-time-string))
     (if (equal date "") 
@@ -330,14 +331,10 @@ If OFFLINE is non-nil, don't update the local timestamp."
     (delicious-save-buffer t)))
 
 (defun delicious-format-time (time)
-  "Return TIME as a del.icio.us timestamp."
+  "Return TIME as a Delicious timestamp."
   (format-time-string "%Y-%m-%dT%H:%M:%SZ" time))
 
 ;;;;_+ URL input, guessing, and duplicate checking
-
-(defun delicious-href-from-post (post)
-  "Return the href from POST as a string."
-  (assoc-default 'href post))
 
 (defun delicious-read-url (&optional offline)
   "Read a url from a prompt, suggesting an appropriate default.
@@ -413,7 +410,7 @@ If OFFLINE is non-nil, don't query the server for any information."
                   (condition-case nil
                       (let ((post (delicious-get-next-post)))
                         (if post
-                            (if (string= (delicious-href-from-post post) url)
+                            (if (string= (delicious-get-post-field 'href post) url)
                                 (setq dup post))
                           t))
                     (end-of-file t)) t))))
@@ -427,10 +424,6 @@ If OFFLINE is non-nil, don't query the server for any information."
     (error "Duplicate URL not posted")))
 
 ;;;;_+ Description input and suggestion
-
-(defun delicious-description-from-post (post)
-  "Return the description from POST as a string."
-  (assoc-default 'description post))
 
 (defun delicious-read-description ()
   "Read a description from a prompt, suggesting an appropriate default."
@@ -449,10 +442,6 @@ If OFFLINE is non-nil, don't query the server for any information."
 
 ;;;;_+ Extended description
 
-(defun delicious-extended-from-post (post)
-  "Return the extended field from POST as a string."
-  (assoc-default 'extended post))
-
 (defun delicious-read-extended-description (&optional suggest truncated)
   "Read an extended description from a prompt."
   (let ((ext 
@@ -466,10 +455,6 @@ If OFFLINE is non-nil, don't query the server for any information."
       ext)))
 
 ;;;;_+ Tag completion, suggestion, and manipulation
-
-(defun delicious-tags-from-post (post)
-  "Return the tags from POST as string."
-  (assoc-default 'tag post))
 
 (defun delicious-complete-tags (&optional nosuggest sofar quantity prompt-string
                                           require offline)
@@ -529,7 +514,7 @@ If OFFLINE is non-nil, don't query the server."
               (while post
                 (setq post (delicious-get-next-post))
                 (and post
-                     (setq tags (split-string (delicious-tags-from-post post))))
+                     (setq tags (split-string (delicious-get-post-field 'tag post))))
                 (and tags
                      (mapc (lambda (tag)
                              (add-to-list 'tags-list tag))
@@ -669,6 +654,8 @@ Optionally assign TAGS, an EXTENDED description, and TIME to the bookmarks."
 
 ;;;;_+ Searching 
 
+;;; FIXME error handling -- what fields can be omitted?
+
 ;;;_+ Search mode and results buffer
 
 (defvar delicious-search-mode-map
@@ -801,8 +788,8 @@ MATCHES is the number of matches found."
   "Browse to the del.icio.us URL showing who else has bookmarked this post."
   (interactive)
   (let* ((hash (get-text-property (point) 'hash))
-         (post (delicious-post-matching-hash hash))
-         (href (assoc-default "href" post))
+         (post (delicious-get-hash-post hash))
+         (href (delicious-get-post-field 'href post))
          (url (format "http://%s/url?url=%s" delicious-api-host href)))
     (browse-url url)))
 
@@ -819,243 +806,152 @@ MATCHES is the number of matches found."
   "Delete the post under point."
   (interactive)
   (let* ((hash (get-text-property (point) 'hash))
-         (post (delicious-post-matching-hash hash))
-         (href (assoc-default "href" post)))
+         (post (delicious-get-hash-post hash))
+         (href (delicious-get-post-field 'href post)))
     (delicious-delete-post href)))
+
+;;;_+ This does all the dirty work
+
+(defun delicious-search (what lambda)
+  "Helper for all the other search functions.
+Look at their definitions for example usage. 
+
+WHAT is the thing we're searching for. 
+
+LAMBDA is the function to call with `post' bound to the currently
+processed Delicious post, as returned by `delicious-get-next-post',
+i.e. alist of the form ((FIELD1 . VALUE1) (FIELD2 . VALUE2) ...).
+
+LAMBDA is expected to set `match' to the post in case it satisfied
+whatever it's testing for. It can also set `continue' to nil to
+prevent processing of further posts.
+
+See also `delicious-get-post-field'."
+  (let (post (continue t) match matches (match-count 0))
+    (save-window-excursion
+      (delicious-build-posts-list current-prefix-arg)
+      (delicious-get-posts-buffer)
+      (delicious-skip-to-posts)
+      (while (and continue (setq post (delicious-get-next-post)))
+        (funcall lambda)
+        (when match
+          (setq match-count (1+ match-count))
+          (add-to-list 'matches match)
+          (setq match nil)))
+      (bury-buffer))
+    (delicious-search-buffer-prep)
+    (delicious-search-insert-matches matches)
+    (delicious-search-buffer-finish what match-count)))
 
 ;;;_+ Search by regexp
 
-;; FIXME this waits for some refactoring
-(defun delicious-search-posts-regexp (search-string)
-  "Search DELICIOUS-POSTS-LIST for SEARCH-STRING, a regular expression.
-Display the results in *delicious search results*.
-If given a prefix, operate offline."
+(defun delicious-search-posts-regexp (regexp)
+  "Display all posts matching REGEXP string in any of their fields.
+With a prefix argument, operate offline."
   (interactive "sEnter regexp search string: ")
-  (let ((match)(matches)(match-count 0))
-    (save-window-excursion
-      (delicious-build-posts-list current-prefix-arg)
-      (delicious-get-posts-buffer)
-      (while (not (eq 
-                   (condition-case nil
-                       (let ((post (read (current-buffer))))
-                         (mapc
-                          (lambda (field)
-                            (if (string-match search-string (cdr field))
-                                (setq match post)))
-                          post)
-                         (when match
-                           (setq match-count (1+ match-count))
-                           (add-to-list 'matches match))
-                         (setq match nil))
-                     (end-of-file t)) t)))
-      (bury-buffer))
-    (delicious-search-buffer-prep)
-    (delicious-search-insert-matches matches)
-    (delicious-search-buffer-finish search-string match-count)))
+  (delicious-search
+   regexp
+   (lambda ()
+     (when (catch 'match
+             (dolist (field post)
+               (when (string-match regexp (cdr field))
+                 (throw 'match t))))
+       (setq match post)))))
 
-(defun delicious-search-description-regexp (search-string)
-  "Search DELICIOUS-POSTS-LIST for descriptions matching SEARCH-STRING.
-Display the results in *delicious search results*.
-If given a prefix, operate offline."
+(defun delicious-search-description-regexp (regexp)
+  "Display all posts matching REGEXP string in their description fields.
+With a prefix argument, operate offline."
   (interactive "sEnter regexp search string: ")
-  (let ((match)(matches)(match-count 0))
-    (save-window-excursion
-      (delicious-build-posts-list current-prefix-arg)
-      (delicious-get-posts-buffer)
-      (while (not (eq
-                   (condition-case nil
-                       (let* ((post (read (current-buffer)))
-                              (desc 
-                               (or 
-                                (assoc-default "description" post)
-                                (error
-                                 "Malformed bookmark missing description %s"
-                                 post))))
-                         (if (string-match search-string desc)
-                             (setq match post))
-                         (when match
-                           (setq match-count (1+ match-count))
-                           (add-to-list 'matches match))
-                         (setq match nil))
-                     (end-of-file t)) t)))
-      (bury-buffer))
-    (delicious-search-buffer-prep)
-    (delicious-search-insert-matches matches)
-    (delicious-search-buffer-finish search-string match-count)))
+  (delicious-search
+   regexp
+   (lambda ()
+     (when (string-match regexp (delicious-get-post-field 'description post))
+       (setq match post)))))
 
-(defun delicious-search-tags-regexp (search-string)
-  "Search DELICIOUS-POSTS-LIST for tags matching SEARCH-STRING.
-Display the results in *delicious search results*.
-If given a prefix, operate offline."
+;; FIXME this is (was/would be) rather silly
+'(defun delicious-search-tags-regexp (regexp)
   (interactive "sEnter regexp search string: ")
-  (let ((match)(matches)(match-count 0))
-    (save-window-excursion
-      (delicious-build-posts-list current-prefix-arg)
-      (delicious-get-posts-buffer)
-      (while (not (eq
-                   (condition-case nil
-                       (let* ((post (read (current-buffer)))
-                              (tags (or (assoc-default "tag" post)
-                                        "")))
-                         (if (string-match search-string tags)
-                             (setq match post))
-                         (when match
-                           (setq match-count (1+ match-count))
-                           (add-to-list 'matches match))
-                         (setq match nil))
-                     (end-of-file t)) t)))
-      (bury-buffer))
-    (delicious-search-buffer-prep)
-    (delicious-search-insert-matches matches)
-    (delicious-search-buffer-finish search-string match-count)))
+  )
 
-(defun delicious-search-href-regexp (search-string)
-  "Search DELICIOUS-POSTS-LIST for urls matching SEARCH-STRING.
-Display the results in *delicious search results*.
-If given a prefix, operate offline."
+(defun delicious-search-href-regexp (regexp)
+  "Display all posts with URL matching REGEXP.
+With a prefix argument, operate offline."
   (interactive "sEnter regexp search string: ")
-  (let ((match)(matches)(match-count 0))
-    (save-window-excursion
-      (delicious-build-posts-list current-prefix-arg)
-      (delicious-get-posts-buffer)
-      (while (not (eq
-                   (condition-case nil
-                       (let* ((post (read (current-buffer)))
-                              (href 
-                               (or (assoc-default "href" post)
-                                   (error 
-                                    "Malformed bookmark missing href %s" post))))
-                         (if (string-match search-string href)
-                             (setq match post))
-                         (when match
-                           (setq match-count (1+ match-count))
-                           (add-to-list 'matches match))
-                         (setq match nil))
-                     (end-of-file t)) t)))
-      (bury-buffer))
-    (delicious-search-buffer-prep)
-    (delicious-search-insert-matches matches)
-    (delicious-search-buffer-finish search-string match-count)))
+  (delicious-search
+   regexp
+   (lambda ()
+     (when (string-match regexp (delicious-get-post-field 'href post))
+       (setq match post)))))
 
 ;;;_+ Search by tag
 
-(defun delicious-posts-matching-tags (tags)
-  "Return a list of posts with TAGS."
-  (let ((match)(matches)(match-count 0))
-    (save-window-excursion
-      (delicious-build-posts-list current-prefix-arg)
-      (delicious-get-posts-buffer)
-      (while (not (eq
-                   (condition-case nil
-                       (let* ((post (read (current-buffer)))
-                              (tags (split-string tags))
-                              (post-tags (split-string
-                                          (or (assoc-default "tag" post) " "))))
-                         (setq match post)
-                         (mapc
-                          (lambda (tag)
-                            (unless (member tag post-tags)
-                              (setq match nil)))
-                          tags)
-                         (when match
-                           (setq match-count (1+ match-count))
-                           (add-to-list 'matches match)
-                           (setq match nil)))
-                     (end-of-file t)) t)))
-      (bury-buffer))
-    matches))
-
-(defun delicious-posts-matching-tags-any (tags)
-  "Return a list of posts with any of TAGS."
-  (let ((match)(matches)(match-count 0))
-    (save-window-excursion
-      (delicious-build-posts-list current-prefix-arg)
-      (delicious-get-posts-buffer)
-      (while (not (eq
-                   (condition-case nil
-                       (let* ((post (read (current-buffer)))
-                              (tags (split-string tags))
-                              (post-tags (split-string
-                                          (assoc-default "tag" post) " ")))
-                         (while (and tags
-                                     (null match))
-                           (let ((tag (pop tags)))
-                             (if (member tag post-tags)
-                                 (setq match post))))
-                         (when match
-                           (setq match-count (1+ match-count))
-                           (add-to-list 'matches match)
-                           (setq match nil)))
-                     (end-of-file t)) t)))
-      (bury-buffer))
-    matches))
-
 (defun delicious-search-tags (tags)
-  "Display all posts with TAGS. If given a prefix, operate offline."
+  "Display all posts with TAGS.  With a prefix argument, operate offline."
   (interactive (list (delicious-complete-tags t)))
-  (let* ((matches (delicious-posts-matching-tags tags))
-         (match-count (length matches)))
-    (delicious-search-buffer-prep)
-    (delicious-search-insert-matches matches)
-    (delicious-search-buffer-finish tags match-count)))
+  (let ((taglist (split-string tags)))
+    (delicious-search
+     tags
+     (lambda ()
+       (let* ((post-tags (split-string
+                          (or (delicious-get-post-field 'tag post) ""))))
+         (setq match post)
+         (mapc (lambda (tag)
+                 (unless (member tag post-tags)
+                   (setq match nil)))
+               taglist))))))
+
+(defun delicious-search-tags-any (tags)
+  "Display all posts matching any of TAGS."
+  (interactive (list (delicious-complete-tags t)))
+  (let ((taglist (split-string tags)))
+    (delicious-search
+     tags
+     (lambda ()
+       (let* ((post-tags (split-string
+                          (or (delicious-get-post-field 'tag post) ""))))
+         (when (catch 'match
+                 (dolist (tag taglist)
+                   (when (member tag post-tags)
+                     (throw 'match t))))
+           (setq match post)))))))
 
 ;;;_+ Search by date
 
-(defun delicious-posts-narrow-by-date (posts search-date)
-  "Out of POSTS, return those that match regexp SEARCH-DATE."
-  (let ((matches))
-    (mapc
-     (lambda (post)
-       (let ((post-date (assoc-default "time" post)))
-         (if (string-match search-date post-date)
-             (add-to-list 'matches post))))
-     posts)
-    matches))
-
-(defun delicious-posts-matching-date (search-date &optional offline)
-  "Return all posts that match regexp SEARCH-DATE."
-  (let ((matches)(match))
-    (save-window-excursion
-      (delicious-build-posts-list offline)
-      (delicious-get-posts-buffer)
-      (while (not (eq (condition-case nil
-                          (let* ((post (read (current-buffer)))
-                                 (date (assoc-default "time" post)))
-                            (when (string-match search-date date)
-                              (setq match post)
-                              (add-to-list 'matches match)))
-                        (end-of-file t)) t)))
-      (bury-buffer))
-    matches))
+(defun delicious-search-date (date)
+  "Display all posts matching regexp SEARCH-DATE.
+With a prefix argument, operate offline."
+  (interactive "sEnter the date (regexp): ")
+  (delicious-search
+   date
+   (lambda ()
+     (when (string-match date (delicious-get-post-field 'time post))
+       (setq match post)))))
 
 ;;;_+ Search by hash
 
-(defun delicious-search-hash (search-hash)
-  "Display the post with a hash matching SEARCH-HASH.
-If given a prefix, work offline only."
+(defun delicious-search-hash (hash)
+  "Display the post with hash HASH.
+With a prefix argument, operate offline."
   (interactive "sEnter the hash: ")
-  (let ((match) (match-count 0))
-    (setq match (delicious-post-matching-hash search-hash current-prefix-arg))
-    (if match (setq match-count 1))
-    (delicious-search-buffer-prep)
-    (delicious-search-insert-match match)
-    (delicious-search-buffer-finish search-hash match-count)))
+  (delicious-search 
+   hash
+   (lambda ()
+     (when (string= hash (delicious-get-post-field 'hash post))
+       (setq match post
+             continue nil)))))
 
-(defun delicious-post-matching-hash (search-hash &optional offline)
-  (let ((match))
+(defun delicious-get-hash-post (hash)
+  "Return the post with hash HASH."
+  (let (post)
     (save-window-excursion
-      (delicious-build-posts-list offline)
+      ;; FIXME offline?
+      (delicious-build-posts-list)
       (delicious-get-posts-buffer)
-      (while (not (or match 
-                      (eq (condition-case nil
-                              (let* ((post (read (current-buffer)))
-                                     (hash (assoc-default "hash" post)))
-                                (when (string= hash search-hash)
-                                  (setq match post)
-                                  (setq match-count 1)))
-                            (end-of-file t)) t))))
-      (bury-buffer))
-    match))
+      (delicious-skip-to-posts)
+      (catch 'match
+        (while (setq post (delicious-get-next-post))
+          (when (string= hash (delicious-get-post-field 'hash post))
+            (throw 'match post)))))))
 
 ;;;_+ Editing posts
 
@@ -1102,7 +998,7 @@ If UPDATE is non-nil, update the post's timestamp."
   (interactive (list (delicious-complete-tags t t nil nil nil)
                      (y-or-n-p "Update timestamp? ")))
   (let* ((hash (get-text-property (point) 'hash))
-         (post (delicious-post-matching-hash hash t))
+         (post (delicious-get-hash-post hash t))
          (old-tags (split-string (assoc-default "tag" post)))
          (href (assoc-default "href" post))
          (desc (assoc-default "description" post))
@@ -1139,7 +1035,7 @@ If UPDATE is non-nil, update the post's timestamp."
   "Edit the extended description under point."
   (interactive)
   (let* ((hash (get-text-property (point) 'hash))
-         (post (delicious-post-matching-hash hash))
+         (post (delicious-get-hash-post hash))
          (ext (assoc-default "extended" post))
          (time (assoc-default "time" post))
          (href (assoc-default "href" post))
