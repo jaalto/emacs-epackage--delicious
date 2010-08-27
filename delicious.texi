@@ -46,7 +46,7 @@ General Public License.''
 
 @menu
 * Introduction::
-* Installation::        Downloading and installing the libraries 
+* Installation::        Downloading and installing the libraries
 * Getting Started::
 @end menu
 
@@ -83,7 +83,7 @@ repository, you should have the following files:
 
 In order to use delicious-el, you will also need the following files,
 which most likely came with your Emacs distribution, but which you will
-need to locate and install if not. 
+need to locate and install if not.
 
 @itemize
 @item @file{url.el}
@@ -98,7 +98,7 @@ written.
 
 @file{delicious.el} contains the front-end interactive functions and commands for
 putting the API functions to productive use, via Emacs. 'delicioapi.el' must be
-loaded for these functions to work. 
+loaded for these functions to work.
 
 @file{planner-delicious.el} contains functions to integrate with Planner
 in Emacs. It requires Planner, which can be found at
@@ -117,7 +117,7 @@ already in your load-path (M-x describe-variable <ret> load-path <ret> to see
 what that is) or evaluate:
 
   (add-to-list 'load-path "/path/to/delicious-el/files")
-  
+
 Then, you need to set a few required options. You can do this either through
 Customize, with:
 
@@ -170,7 +170,7 @@ is a URL there. If it doesn't find one, it will just put an "http://" in the
 input line for you.
 
 URL is a required field. If you try to enter a blank URL, the program will
-abort. 
+abort.
 
 When prompted for tags, enter one at a time, hitting enter after each. You have
 tab-completion available in typical Emacs style, based on all of the tags you
@@ -186,7 +186,7 @@ suggest the title of the article as a description. If you like the suggestion,
 hit enter. If you don't, just erase it and type your own.
 
 The server requires some kind of description be entered. If you don't enter
-one, the program will abort. 
+one, the program will abort.
 
 Extended Description is the next field, and it's all up to you. No guessing
 attempts are made here.
@@ -242,7 +242,7 @@ one, and then you will be able to recover them.
 - M-x delicious-load-posts
 
 This command will load your posts from the file named by
-`delicious-posts-file-name' into the variable `delicious-posts-list'. 
+`delicious-posts-file-name' into the variable `delicious-posts-list'.
 
 * Interactive search commands
 
@@ -260,10 +260,10 @@ one, or for a second window to be created if none is available. Being in View
 mode, the buffer is read-only and has many nice shortcuts for speedy
 navigation. Delicious Search mode will also add some useful shortcuts in the
 future---for now, it just binds <TAB> to skip to the next URL, looping back to
-the beginning of the buffer if there are no more URLs. 
+the beginning of the buffer if there are no more URLs.
 
 Results are currently unsorted. At least, no intentional sorting is
-applied. That will change in the future. 
+applied. That will change in the future.
 
 The basic search command is:
 
@@ -288,7 +288,7 @@ href/link field of your posts, and display the matches.
 
 This command will prompt you for a regular expression, search only the tag
 field of your posts, and display the matches. When searching, it may be useful
-to remember that multiple tags are separated by whitespace. 
+to remember that multiple tags are separated by whitespace.
 
 Since tags are the means for organizing links in del.icio.us, we have a special
 search function just for them:
@@ -350,7 +350,7 @@ you would do:
 
 Note that both of these examples specify `nil' for the TAGNAME argument. This
 means that the most recent posts, regardless of tag, will be
-returned. Specifying a TAGNAME will return only posts with that tag. 
+returned. Specifying a TAGNAME will return only posts with that tag.
 
 Here is the list of parameters and a very brief description of each.
 
@@ -368,7 +368,7 @@ Here is the list of parameters and a very brief description of each.
 + delicious-api-html-aclass
   Class to use for a link. The server default is `delLink'.
 
-+ delicious-api-html-tags 
++ delicious-api-html-tags
   Show tags or not. Server default is to show tags. Set this to true if you do NOT want tags.
 
 + delicious-api-html-tagclass
@@ -397,7 +397,7 @@ Here is the list of parameters and a very brief description of each.
 
 - Binding commands to keys
 
-The author uses this in his `.emacs' to bind `delicious-post' to <C-c p>. 
+The author uses this in his `.emacs' to bind `delicious-post' to <C-c p>.
 
 (global-set-key "\C-cp" 'delicious-post)
 
@@ -460,7 +460,7 @@ Currently, it is not uncommon for the del.icio.us server to be temporarily
 unavailable. I'm working on better HTTP error-handling, so that the specific
 error will be reported to you. There's some code here to do that now, but it
 does not seem to be working well. The best solution to this currently is to
-open <http://del.icio.us> in your browser and see what error is coming up. 
+open <http://del.icio.us> in your browser and see what error is coming up.
 
 - Server timeouts
 
@@ -471,7 +471,7 @@ server, you might want to use a higher number for `delicious-api-timeout'. The
 default is 60 seconds. Note that when a connection times out, there is a good
 chance that your transaction with del.icio.us still happened; delicious-el just
 got tired of waiting. So you probably want to check with your browser and see
-if that last post was actually received before you send it again. 
+if that last post was actually received before you send it again.
 
 * Keeping Up
 
@@ -487,4 +487,3 @@ I tend to post ChangeLog entries at <http://www.wjsullivan.net/news>.
 Please report any bugs or suggestions to me at <john@wjsullivan.net>. If enough
 people are interested, perhaps we will open an area at
 <http://www.emacswiki.org>.
-
