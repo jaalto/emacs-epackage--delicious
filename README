@@ -21,6 +21,7 @@ delicious-el
 This manual is for delicious-el, version 0.2FIXME.
 
    Copyright (C) 2004, 2005 John Sullivan.
+   Copyright (C) 2010 Štěpán Němec.
 
      Permission is granted to copy, distribute and/or modify this
      document under the terms of the GNU General Public License,
@@ -366,27 +367,32 @@ Please report any bugs or suggestions to <stepnem@gmail.com>.
 Index
 *****
 
-delicious-api-html-aclass:                     See 3.2.       (line 289)
-delicious-api-html-bullet:                     See 3.2.       (line 305)
-delicious-api-html-count:                      See 3.2.       (line 276)
-delicious-api-html-divclass:                   See 3.2.       (line 286)
-delicious-api-html-extended:                   See 3.2.       (line 280)
-delicious-api-html-extendedclass:              See 3.2.       (line 317)
-delicious-api-html-extendeddiv:                See 3.2.       (line 313)
-delicious-api-html-rssbutton:                  See 3.2.       (line 309)
-delicious-api-html-tagclass:                   See 3.2.       (line 296)
-delicious-api-html-tags:                       See 3.2.       (line 292)
-delicious-api-html-tagsep:                     See 3.2.       (line 299)
-delicious-api-html-tagsepclass:                See 3.2.       (line 302)
-delicious-build-posts-list:                    See 3.1.3.     (line 237)
-delicious-build-tags-list:                     See 3.1.3.     (line 248)
-delicious-post:                                See 3.1.1.     (line 125)
-delicious-rename-tag:                          See 3.1.1.     (line 174)
-delicious-search-description-regexp:           See 3.1.2.     (line 201)
-delicious-search-href-regexp:                  See 3.1.2.     (line 205)
-delicious-search-posts-regexp:                 See 3.1.2.     (line 195)
-delicious-search-tags:                         See 3.1.2.     (line 217)
-delicious-search-tags-regexp:                  See 3.1.2.     (line 209)
-delicious-w3m-bookmark-recent:                 See 3.2.       (line 328)
-delicious-w3m-export:                          See 3.2.       (line 338)
-delicious-w3m-html:                            See 3.2.       (line 266)
+delicious-api-html-aclass:                     See 3.2.       (line 290)
+delicious-api-html-bullet:                     See 3.2.       (line 306)
+delicious-api-html-count:                      See 3.2.       (line 277)
+delicious-api-html-divclass:                   See 3.2.       (line 287)
+delicious-api-html-extended:                   See 3.2.       (line 281)
+delicious-api-html-extendedclass:              See 3.2.       (line 318)
+delicious-api-html-extendeddiv:                See 3.2.       (line 314)
+delicious-api-html-rssbutton:                  See 3.2.       (line 310)
+delicious-api-html-tagclass:                   See 3.2.       (line 297)
+delicious-api-html-tags:                       See 3.2.       (line 293)
+delicious-api-html-tagsep:                     See 3.2.       (line 300)
+delicious-api-html-tagsepclass:                See 3.2.       (line 303)
+delicious-build-posts-list:                    See 3.1.3.     (line 238)
+delicious-build-tags-list:                     See 3.1.3.     (line 249)
+delicious-post:                                See 3.1.1.     (line 126)
+delicious-rename-tag:                          See 3.1.1.     (line 175)
+delicious-search-description-regexp:           See 3.1.2.     (line 202)
+delicious-search-href-regexp:                  See 3.1.2.     (line 206)
+delicious-search-posts-regexp:                 See 3.1.2.     (line 196)
+delicious-search-tags:                         See 3.1.2.     (line 218)
+delicious-search-tags-regexp:                  See 3.1.2.     (line 210)
+delicious-w3m-bookmark-recent:                 See 3.2.       (line 329)
+delicious-w3m-export:                          See 3.2.       (line 339)
+delicious-w3m-html:                            See 3.2.       (line 267)
+
+
+Local Variables:
+coding: utf-8
+End:

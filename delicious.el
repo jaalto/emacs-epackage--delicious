@@ -1,6 +1,7 @@
 ;;; delicious.el --- functions to make productive use of the Delicious API
 
 ;; Copyright (C) 2004, 2005, 2006, 2007 John Sullivan
+;; Copyright (C) 2010 Štěpán Němec
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;;         Štěpán Němec <stepnem@gmail.com>

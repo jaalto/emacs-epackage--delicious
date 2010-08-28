@@ -1,11 +1,12 @@
 ;;; delicious-html.el --- interface to the Delicious HTML feed API
 
 ;; Copyright (C) 2009 John Sullivan
+;; Copyright (C) 2010 Štěpán Němec
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;;         Štěpán Němec <stepnem@gmail.com>
 ;; Maintainer: Štěpán Němec <stepnem@gmail.com>
-;; Time-stamp: "2010-08-28 11:37:19 CEST stepnem"
+;; Time-stamp: "2010-08-28 12:03:23 CEST stepnem"
 ;; Created: Mon Feb 9 13:08:24 2009 -0500
 ;; Version: FIXME
 ;; Keywords: comm, hypermedia
