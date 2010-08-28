@@ -5,7 +5,7 @@
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;;         Štěpán Němec <stepnem@gmail.com>
 ;; Maintainer: Štěpán Němec <stepnem@gmail.com>
-;; Time-stamp: "2010-08-27 19:12:31 CEST stepnem"
+;; Time-stamp: "2010-08-28 11:37:19 CEST stepnem"
 ;; Created: Mon Feb 9 13:08:24 2009 -0500
 ;; Version: FIXME
 ;; Keywords: comm, hypermedia
@@ -111,6 +111,7 @@ Server default is `raquo'."
   :tag "HTML extendedclass parameter")
 
 
+(defvar delicious-username)
 (defun delicious-api-html-uri
   (&optional username tagname count extended divclass aclass tags tagclass
              tagsep tagsepclass bullet rssbutton extendeddiv extendedclass)

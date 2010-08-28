@@ -5,7 +5,7 @@
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;;         Štěpán Němec <stepnem@gmail.com>
 ;; Maintainer: Štěpán Němec <stepnem@gmail.com>
-;; Time-stamp: "2010-08-27 19:02:07 CEST stepnem"
+;; Time-stamp: "2010-08-28 11:38:34 CEST stepnem"
 ;; Created 25 October 2004
 ;; Version: 0.4FIXME
 ;; Keywords: comm, hypermedia
@@ -89,6 +89,7 @@
 
 (defun delicious-api-response (buffer)
   "Process the XML response from Delicious in BUFFER."
+  (declare (special url-http-end-of-headers))
   (with-current-buffer buffer
     (set-buffer-multibyte t)
     ;; FIXME do we need utf-8-dos?

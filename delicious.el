@@ -5,7 +5,7 @@
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;;         Štěpán Němec <stepnem@gmail.com>
 ;; Maintainer: Štěpán Němec <stepnem@gmail.com>
-;; Time-stamp: "2010-08-27 19:11:55 CEST stepnem"
+;; Time-stamp: "2010-08-28 11:33:18 CEST stepnem"
 ;; Created: 25 October 2004
 ;; Version: 0.3FIXME
 ;; Keywords: comm, hypermedia
@@ -440,6 +440,7 @@ If OFFLINE is non-nil, don't query the server for any information."
    (read-string "(Required) Description: " (delicious-guess-description))
    "Description"))
 
+(defvar gnus-current-headers)
 (defun delicious-guess-description ()
   "Try some different things to get a default description."
   (or (if (and (boundp 'w3m-current-title)
@@ -609,6 +610,11 @@ NEW-TAG can be multiple tags, space-separated."
         (delicious-update-timestamp)))))
 
 ;;;;_+ w3m
+(defvar w3m-bookmark-file)
+(defvar w3m-bookmark-section-delimiter)
+(declare-function w3m-bookmark-sections "w3m-bookmark" nil)
+(declare-function w3m-bookmark-write-file "w3m-bookmark"(url title section))
+(declare-function w3m-browse-url "w3m" (url &optional new-session))
 
 (defun delicious-w3m-html (username count tag)
   "Visit the HTML page for USERNAME showing COUNT most recent posts with TAG.
@@ -666,7 +672,7 @@ Optionally assign TAGS, EXTENDED description, and TIME to the bookmarks."
           (beginning-of-line 2)))
       (dolist (bmk bmks)
         (delicious-api/posts/add (car bmk) (cdr bmk) tags extended time)
-        (message "%s posted" title)
+        (message "%s posted" (cdr bmk))
         (sleep-for 1)))))
 
 ;;;;_+ Searching
