@@ -1,0 +1,477 @@
+This is delicious-el.info, produced by makeinfo version 4.13 from
+/home/stepnem/Hacking/emacs/delicious/delicious-el/delicious.texi.
+
+INFO-DIR-SECTION Emacs
+START-INFO-DIR-ENTRY
+* delicious-el: (delicious-el). Emacs client for Delicious bookmarks API
+END-INFO-DIR-ENTRY
+
+   This manual is for delicious-el, version 0.2FIXME.
+
+   Copyright (C) 2004, 2005 John Sullivan.
+   Copyright (C) 2010 Štěpán Němec.
+
+     Permission is granted to copy, distribute and/or modify this document
+     under the terms of the GNU General Public License, Version 2.0 or any
+     later version published by the Free Software Foundation.  A copy of
+     the license is included in the section entitled "GNU General Public
+     License."
+
+
+File: delicious-el.info,  Node: Top,  Next: Introduction,  Prev: (dir),  Up: (dir)
+
+delicious-el
+************
+
+This manual is for delicious-el, version 0.2FIXME.
+
+   Copyright (C) 2004, 2005 John Sullivan.
+   Copyright (C) 2010 Štěpán Němec.
+
+     Permission is granted to copy, distribute and/or modify this document
+     under the terms of the GNU General Public License, Version 2.0 or any
+     later version published by the Free Software Foundation.  A copy of
+     the license is included in the section entitled "GNU General Public
+     License."
+
+* Menu:
+
+* Introduction::                What this is and what is it for
+* Installation::                Downloading and installing the libraries
+* Usage::                       How to use this package
+* Keeping Up::                  Following the development
+* Bugs::                        Help make the package better!
+* Index::                       Index of concepts, functions and variables
+
+ --- The Detailed Node Listing ---
+
+Usage
+
+* Commands::                    The actual user interface
+* Emacs-w3m integration::       View, export or import bookmarks
+
+Commands
+
+* Manipulating bookmarks::      Creating, deleting and editing
+* Searching::                   Displaying a limited set of bookmarks
+* Miscellanea::                 You probably won't need this
+
+
+File: delicious-el.info,  Node: Introduction,  Next: Installation,  Prev: Top,  Up: Top
+
+1 Introduction
+**************
+
+This is a set of functions for interacting with `http://www.delicious.com',
+a "social bookmarking" project written and maintained by Joshua Shachter.
+
+The specifications for the API are at `http://www.delicious.com/help/api'.
+
+
+File: delicious-el.info,  Node: Installation,  Next: Usage,  Prev: Introduction,  Up: Top
+
+2 Installation
+**************
+
+After downloading and unpacking the archive or cloning the Git repository,
+you should have the following files:
+
+   * `delicioapi.el'
+
+   * `delicious.el'
+
+   * `muse-delicious.el'
+
+   * `planner-delicious.el'
+
+   * `ChangeLog'
+
+   * `ChangeLog.OLD'
+
+   * `README'
+
+   * `COPYING'
+
+   * `delicious-el.texi'
+
+   * `delicious-el.info'
+
+   `delicioapi.el' contains the back-end functions that interact with the
+API behind the scenes. We have kept these in a separate file to make them
+available for others to use independently from the commands defined in
+`delicious.el'.
+
+   `delicious.el' contains the front-end interactive functions and commands
+for putting the API functions to productive use via Emacs.
+
+   `planner-delicious.el' contains functions to integrate with Planner mode
+(http://www.emacswiki.org/PlannerMode) in Emacs. For instructions, please
+see comments at the top of the file. This is currently not maintained and
+will quite probably not work with the current version of `delicious-el'
+and/or Planner.
+
+   Same goes for `muse-delicious.el', which is apparently supposed to
+integrate `delicious-el' with Emacs Muse
+(http://www.emacswiki.org/EmacsMuse).
+
+
+File: delicious-el.info,  Node: Usage,  Next: Keeping Up,  Prev: Installation,  Up: Top
+
+3 Usage
+*******
+
+First, you need to set up an account at Delicious, by visiting the site
+(http://www.delicious.com) and following the instructions there.
+
+   Second, load the `delicious-el' files. Put them somewhere in your
+`load-path', e.g. doing:
+
+       (add-to-list 'load-path "/path/to/delicious-el/files")
+
+   If you decide you want to have the `delicious-el' functions available to
+you automatically when you start Emacs, add:
+
+       (require 'delicious)
+
+   to your init file.
+
+   Then, you need to set your Delicious user name. You can do this either
+through Customize, with:
+
+   `M-x customize-group RET delicious RET'
+
+   or by evaluating something like the following:
+
+       (setq delicious-username "myusername")
+
+   Finally, to be able to securely log into your Delicious account, put
+something like the below into the file included in the `auth-sources'
+variable:
+
+     machine api.del.icio.us:443 port https login YourUserName password TopSecret
+
+* Menu:
+
+* Commands::                    The actual user interface
+* Emacs-w3m integration::       View, export or import bookmarks
+
+
+File: delicious-el.info,  Node: Commands,  Next: Emacs-w3m integration,  Prev: Usage,  Up: Usage
+
+3.1 Commands
+============
+
+* Menu:
+
+* Manipulating bookmarks::      Creating, deleting and editing
+* Searching::                   Displaying a limited set of bookmarks
+* Miscellanea::                 You probably won't need this
+
+
+File: delicious-el.info,  Node: Manipulating bookmarks,  Next: Searching,  Prev: Commands,  Up: Commands
+
+3.1.1 Manipulating bookmarks
+----------------------------
+
+ -- Command: delicious-post
+     This is the command to post a URL to your del.icio.us account. The
+     first time you execute this command in an Emacs session, `delicious-el'
+     will fetch from the server the list of tags you've used so far, and a
+     complete list of all your posts to date. You will then be prompted for
+     information for the new post. The only required information is the URL
+     itself and a description. Everything else is optional.
+
+     `delicious-el' will try to guess the URL that you want to enter. If you
+     are in a w3m-el buffer, it will suggest the URL of the site you are
+     looking at. If not, if there is a URL under the cursor, it will suggest
+     that. If neither of these two things are true, it will scan the current
+     buffer for a URL. It will suggest the first one that it finds. Next, it
+     will check the clipboard and see if there is a URL there. If it doesn't
+     find one, it will just put an `http://' in the input line for you.
+
+     URL is a required field. If you try to enter a blank URL, the program
+     will abort.
+
+     When prompted for tags, enter one at a time, hitting enter after each.
+     You have tab-completion available in typical Emacs style, based on all
+     of the tags you have used in the past. When you are done entering tags,
+     just hit enter at the prompt. `delicious-el' will suggest possible
+     tags above the prompt. Suggestions currently are just a list of words
+     that appear both in your current buffer and in your tags list.
+
+     `delicious-el' will attempt to guess an appropriate description. If
+     you are in an `emacs-w3m' buffer, `delicious-el' will suggest the
+     title of the page being viewed as a description. If you are looking at
+     an article in Gnus, it will suggest the title of the article as a
+     description. If you like the suggestion, hit `RET'. If you don't, just
+     erase it and type your own.
+
+     The server requires some kind of description be entered. If you don't
+     enter one, the program will abort.
+
+     Extended Description is the next field, and it's all up to you. No
+     guessing attempts are made here.
+
+     Next is the Date/Time prompt. If you don't enter anything here, the
+     current date will be used. If you do want to enter the date, the format
+     is indicated in the prompt.
+
+     Once you enter the Date/Time and hit enter, the URL should be posted to
+     the server.
+
+ -- Command: delicious-rename-tag
+     This will prompt you for an old tag and one or more new tags. As usual,
+     you can use tab completion when entering this information. In fact, the
+     old tag you enter must match an existing tag. The old tag will be
+     changed to the new tags for all posts that had the old tag. After the
+     renaming is done, the local tag list will be refreshed from the server.
+
+
+File: delicious-el.info,  Node: Searching,  Next: Miscellanea,  Prev: Manipulating bookmarks,  Up: Commands
+
+3.1.2 Searching
+---------------
+
+All of the search commands described below display their results in a
+`*Delicious search results*' buffer. The default is for this buffer to open
+in a window other than the active one, or for a second window to be created
+if none is available. You can use special keybindings to navigate the
+buffer and manipulate the displayed bookmarks. Type `C-h b' or `M-x
+describe-bindings' to see all possibilities at a given point in the buffer.
+
+   The basic search command is:
+
+ -- Command: delicious-search-posts-regexp
+     This command will prompt for a regular expression, search all the
+     fields in all of your posts for matches, and display the matches.
+
+   More targeted searching can be achieved by:
+
+ -- Command: delicious-search-description-regexp
+     This command will prompt for a regular expression, search only the
+     description field of your posts for matches, and display them.
+
+ -- Command: delicious-search-href-regexp
+     This command will prompt for a regular expression, search only the
+     href/link field of your posts, and display the matches.
+
+ -- Command: delicious-search-tags-regexp
+     This command will prompt for a regular expression, search only the tag
+     field of your posts, and display the matches. You can specify multiple
+     tags for search separated by whitespace.
+
+     Since tags are the means for organizing bookmarks Delicious, we have a
+     special search function just for them:
+
+ -- Command: delicious-search-tags
+     This command will prompt you for tags, one at a time. You can enter as
+     many as you like, and you can use <TAB>, <SPC>, or <?> to use Emacs
+     minibuffer completion based on your previously used tags. Just hit
+     enter at the prompt when you are done. A search will be done for all
+     of the posts that have all the specified tags. The results will be
+     displayed the same way as with the other search commands. It is
+     possible to use regular expression syntax within each tag, as that is
+     the way the match is determined internally, but you may run into
+     problems with some of the regexp characters and the completion
+     commands. The order of the tags is not considered important when
+     determining matches. You do not need to account for whitespace between
+     tags with this method.
+
+   Other search commands include `delicious-search-date',
+`delicious-search-hash' and `delicious-search-tags-any'.
+
+
+File: delicious-el.info,  Node: Miscellanea,  Prev: Searching,  Up: Commands
+
+3.1.3 Miscellanea
+-----------------
+
+ -- Command: delicious-build-posts-list
+     This command will refresh the local list of your posts from the server.
+     You shouldn't use this often. The reason posts are cached locally is to
+     avoid bothering the server too much. There isn't much reason to use
+     this command, because any posts made during your current session are
+     recorded locally. But if you suspect that something has gone wrong,
+     you can use this command to refresh from the server. Or, if you add
+     posts from an external interface like your non-emacs web browser, it
+     could be useful to refresh the local list.
+
+ -- Command: delicious-build-tags-list
+     This command will refresh the local list of the tags you have used from
+     the server. The same caveat about usage frequency applies as with
+     `delicious-build-posts-list'. Any new tags you use while posting with
+     delicious-post are added to the completion list, so the only reason to
+     refresh the list is if something funny happens and the list gets
+     corrupted, or if you add tags using another interface.
+
+
+File: delicious-el.info,  Node: Emacs-w3m integration,  Prev: Commands,  Up: Usage
+
+3.2 Emacs-w3m integration
+=========================
+
+URL and description guessing
+
+   The program will use the current page in the w3m buffer if you are using
+w3m as a suggestion for the link to post. It will use the current page name
+as a suggestion for the description of the link.
+
+ -- Command: delicious-w3m-html
+     This is an interactive command to visit the HTML summary of a user's
+     Delicious bookmarks. If you call it with a prefix argument (C-u M-x
+     delicious-w3m-html), the feed will be displayed in a new session.  The
+     default parameters can be configured in the `delicious' customize
+     group, or individually (they all have the name delicious-api-html-*).
+
+     Here is a very brief description of each parameter:
+
+      -- Variable: delicious-api-html-count
+          The number of times to show by default when fetching an HTML
+          Delicious feed. The server default is 15.
+
+      -- Variable: delicious-api-html-extended
+          Either `title' or `body'. The server default is `title'. This
+          means that the extended description will just be displayed in the
+          link's title attribute. If you want the extended description to
+          be displayed on its own, use `body'.
+
+      -- Variable: delicious-api-html-divclass
+          Class to use for div. The server default is `delPost'.
+
+      -- Variable: delicious-api-html-aclass
+          Class to use for a link. The server default is `delLink'.
+
+      -- Variable: delicious-api-html-tags
+          Show tags or not. Server default is to show tags. Set this to
+          true if you do NOT want tags.
+
+      -- Variable: delicious-api-html-tagclass
+          Class to use for tags. Server default is `delTag'.
+
+      -- Variable: delicious-api-html-tagsep
+          String to use for separator. Server default is `delTagSep'.
+
+      -- Variable: delicious-api-html-tagsepclass
+          Class to use for separator. Server default is `delTagSep'.
+
+      -- Variable: delicious-api-html-bullet
+          HTML entity to use for bullet. Set it to empty for no bullet.
+          Server default is `raquo'.
+
+      -- Variable: delicious-api-html-rssbutton
+          Add an RSS feed button using CSS. Server default is to show a
+          button with `yes'.
+
+      -- Variable: delicious-api-html-extendeddiv
+          This is whether to put the extended description for the entry in
+          its own <div>. The server default is `no'.
+
+      -- Variable: delicious-api-html-extendedclass
+          This the class to use for the extendeddiv. The server default is
+          empty.
+
+     After issuing the command, you will be prompted for the username,
+     number of posts, and tag to filter by. Hitting return at these prompts
+     will cause the defaults to be used. The defaults are indicated in the
+     prompts. After collecting the information, w3m will visit a page
+     constructed according to your parameters in a w3m buffer.
+
+ -- Command: delicious-w3m-bookmark-recent
+     This is an interactive command that will add your Delicious posts to
+     your w3m bookmarks file. It operates based on recent posts. You tell it
+     how many posts to scan, what tag (or tag intersection like "foo+bar" to
+     filter by, and what w3m bookmark section to put the posts in. It will
+     store the matching posts in that section, without checking for
+     duplicates or making any effort at synching (yet). Note that you need
+     the `w3m-bookmarks.el' library to use this feature.
+
+ -- Command: delicious-w3m-export
+     This is an interactive command that will export a w3m bookmark section
+     to Delicious. You can export one section at a time. When prompted for
+     the section name, <TAB> will complete based on your existing sections.
+     You can then enter tags just like you do when you post. These tags
+     will all be assigned to each entry in the w3m section. You must enter
+     at least one tag. After that, you can enter an optional extended
+     description and time parameter, which will be attached to all of the
+     posts from this section. It's very primitive and not 100% reliable at
+     the moment. It _should_ work as long as the section titles are enclosed
+     in <h2></h2>, each bookmark begins with <li>, and each bookmark only
+     occupies one line. Future versions may be more flexible in this regard
+     and will do verification of your posts. You need the
+     `w3m-bookmarks.el' library to use this feature.
+
+
+File: delicious-el.info,  Node: Keeping Up,  Next: Bugs,  Prev: Usage,  Up: Top
+
+4 Keeping Up
+************
+
+You can get the development version of this package via Git at
+`http://gitorious.org/delicious-el'. You can also download the snapshot
+tarball from
+`http://gitorious.org/delicious-el/delicious-el/archive-tarball/master'.
+
+
+File: delicious-el.info,  Node: Bugs,  Next: Index,  Prev: Keeping Up,  Up: Top
+
+5 Bugs
+******
+
+Please report any bugs or suggestions to <stepnem@gmail.com>.
+
+
+File: delicious-el.info,  Node: Index,  Prev: Bugs,  Up: Top
+
+Index
+*****
+
+ [index ]
+* Menu:
+
+* delicious-api-html-aclass:             Emacs-w3m integration.    (line 35)
+* delicious-api-html-bullet:             Emacs-w3m integration.    (line 51)
+* delicious-api-html-count:              Emacs-w3m integration.    (line 22)
+* delicious-api-html-divclass:           Emacs-w3m integration.    (line 32)
+* delicious-api-html-extended:           Emacs-w3m integration.    (line 26)
+* delicious-api-html-extendedclass:      Emacs-w3m integration.    (line 63)
+* delicious-api-html-extendeddiv:        Emacs-w3m integration.    (line 59)
+* delicious-api-html-rssbutton:          Emacs-w3m integration.    (line 55)
+* delicious-api-html-tagclass:           Emacs-w3m integration.    (line 42)
+* delicious-api-html-tags:               Emacs-w3m integration.    (line 38)
+* delicious-api-html-tagsep:             Emacs-w3m integration.    (line 45)
+* delicious-api-html-tagsepclass:        Emacs-w3m integration.    (line 48)
+* delicious-build-posts-list:            Miscellanea.              (line  7)
+* delicious-build-tags-list:             Miscellanea.              (line 17)
+* delicious-post:                        Manipulating bookmarks.   (line  7)
+* delicious-rename-tag:                  Manipulating bookmarks.   (line 53)
+* delicious-search-description-regexp:   Searching.                (line 22)
+* delicious-search-href-regexp:          Searching.                (line 26)
+* delicious-search-posts-regexp:         Searching.                (line 16)
+* delicious-search-tags:                 Searching.                (line 38)
+* delicious-search-tags-regexp:          Searching.                (line 30)
+* delicious-w3m-bookmark-recent:         Emacs-w3m integration.    (line 73)
+* delicious-w3m-export:                  Emacs-w3m integration.    (line 82)
+* delicious-w3m-html:                    Emacs-w3m integration.    (line 13)
+
+
+
+Tag Table:
+Node: Top722
+Node: Introduction2053
+Node: Installation2402
+Node: Usage3695
+Node: Commands4884
+Node: Manipulating bookmarks5215
+Node: Searching8235
+Node: Miscellanea10786
+Node: Emacs-w3m integration11982
+Node: Keeping Up16524
+Node: Bugs16856
+Node: Index17017
+
+End Tag Table
+
+
+Local Variables:
+coding: utf-8
+End:
