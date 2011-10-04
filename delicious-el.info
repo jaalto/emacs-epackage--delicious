@@ -9,7 +9,7 @@ END-INFO-DIR-ENTRY
    This manual is for delicious-el, version 0.2FIXME.
 
    Copyright (C) 2004, 2005 John Sullivan.
-   Copyright (C) 2010 Štěpán Němec.
+
 
      Permission is granted to copy, distribute and/or modify this document
      under the terms of the GNU General Public License, Version 2.0 or any
@@ -26,7 +26,7 @@ delicious-el
 This manual is for delicious-el, version 0.2FIXME.
 
    Copyright (C) 2004, 2005 John Sullivan.
-   Copyright (C) 2010 Štěpán Němec.
+
 
      Permission is granted to copy, distribute and/or modify this document
      under the terms of the GNU General Public License, Version 2.0 or any
@@ -456,18 +456,18 @@ Index
 
 
 Tag Table:
-Node: Top722
-Node: Introduction2053
-Node: Installation2402
-Node: Usage3695
-Node: Commands4884
-Node: Manipulating bookmarks5215
-Node: Searching8235
-Node: Miscellanea10786
-Node: Emacs-w3m integration11982
-Node: Keeping Up16524
-Node: Bugs16856
-Node: Index17017
+Node: Top683
+Node: Introduction1975
+Node: Installation2324
+Node: Usage3617
+Node: Commands4806
+Node: Manipulating bookmarks5137
+Node: Searching8157
+Node: Miscellanea10708
+Node: Emacs-w3m integration11904
+Node: Keeping Up16446
+Node: Bugs16778
+Node: Index16939
 
 End Tag Table
 

@@ -19,7 +19,6 @@ This manual is for delicious-el, version 0.2FIXME.
 Copyright @copyright{} 2004, 2005 John Sullivan.
 @*
 @indent
-Copyright @copyright{} 2010 Štěpán Němec.
 
 @quotation
 Permission is granted to copy, distribute and/or modify this document

@@ -1,12 +1,10 @@
 ;;; delicious.el --- functions to make productive use of the Delicious API
 
 ;; Copyright (C) 2004, 2005, 2006, 2007 John Sullivan
-;; Copyright (C) 2010 Štěpán Němec
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;;         Štěpán Němec <stepnem@gmail.com>
 ;; Maintainer: Štěpán Němec <stepnem@gmail.com>
-;; Time-stamp: "2010-08-28 11:33:18 CEST stepnem"
 ;; Created: 25 October 2004
 ;; Version: 0.3FIXME
 ;; Keywords: comm, hypermedia
@@ -776,48 +774,6 @@ Signals an error if there is no result at all."
     (if pos (goto-char pos)
       (error "No next result"))))
 
-;; FIXME find out why the approach below doesn't work out so well
-;; (defun delicious-search-next-result ()
-;;   "Go to the next result in the Delicious search results buffer.
-;; Signals an error if there is no result at all."
-;;   (interactive)
-;;   (let ((pos (save-excursion
-;;                (unless (next-single-property-change (point) 'hash)
-;;                  (goto-char (point-min)))
-;;                (goto-char (or (next-single-property-change (point) 'hash)
-;;                               (point)))
-;;                (text-property-any (point) (point-max)
-;;                                   'face 'delicious-result-href-face))))
-;;     (if pos (goto-char pos)
-;;       (error "No next result"))))
-
-;; (defun delicious-search-previous-result ()
-;;   "Go to the previous search result in the Delicious search results buffer.
-;; Signals an error if there is no result at all."
-;;   (interactive)
-;;   (let ((pos (save-excursion
-;;                (unless (previous-single-property-change (point) 'hash)
-;;                  (goto-char (point-max)))
-;;                (goto-char (or (previous-single-property-change (point) 'hash)
-;;                               (point)))
-;;                (text-property-any (point) (point-max)
-;;                                   'face 'delicious-result-href-face))))
-;;     (if pos (goto-char pos)
-;;       (error "No previous result"))))
-
-;; (defun delicious-search-previous-result ()
-;;   "Go to the previous search result in the Delicious search results buffer.
-;; Signals an error if there is no result at all."
-;;   (interactive)
-;;   (let ((hunk (lambda ()
-;;                 (goto-char (or (previous-single-property-change (point) 'hash)
-;;                                (point))))))
-;;     (unless (previous-single-property-change (point) 'hash)
-;;       (goto-char (point-max)))
-;;     (funcall hunk)
-;;     (unless (looking-at (regexp-quote (get-text-property (point) 'href))) ; "[a-z]+?://.+?" works, too :-)
-;;       (funcall hunk))))
-
 (defun delicious-search-previous-result ()
   "Go to the previous search result in the Delicious search results buffer."
   (interactive)
@@ -1071,5 +1027,4 @@ With a prefix argument, operate offline."
             (throw 'match post)))))))
 
 (provide 'delicious)
-
 ;;; delicious.el ends here

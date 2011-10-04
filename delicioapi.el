@@ -1,12 +1,10 @@
 ;;; delicioapi.el --- functions to interact with the Delicious API
 
 ;; Copyright (C) 2004, 2005, 2006, 2007, 2009 John Sullivan
-;; Copyright (C) 2010 Štěpán Němec
 
 ;; Author: John Sullivan <john@wjsullivan.net>
 ;;         Štěpán Němec <stepnem@gmail.com>
 ;; Maintainer: Štěpán Němec <stepnem@gmail.com>
-;; Time-stamp: "2010-08-28 11:38:34 CEST stepnem"
 ;; Created 25 October 2004
 ;; Version: 0.4FIXME
 ;; Keywords: comm, hypermedia
@@ -198,5 +196,4 @@ TAG is a tag to filter by."
   (message "%s" delicious-api-version))
 
 (provide 'delicioapi)
-
 ;;; delicioapi.el ends here
