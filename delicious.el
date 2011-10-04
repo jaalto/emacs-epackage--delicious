@@ -280,7 +280,7 @@ NAME is the name of the field being checked."
                   (find-file-noselect cache-file)
                 (error "Cache file %s not found" cache-file))))
     (with-current-buffer buf
-      (goto-char (point-min))
+      (delicious-goto-posts)
       (while (setq post (delicious-get-next-post))
         (let* ((href (delicious-get-post-field 'href post))
                (description (delicious-get-post-field 'description post))
