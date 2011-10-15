@@ -93,11 +93,7 @@
     (set-buffer-multibyte t)
     ;; FIXME do we need utf-8-dos?
     (decode-coding-region url-http-end-of-headers (point-max) 'utf-8)
-    (goto-char url-http-end-of-headers)
-    (let* ((beg (point))
-           (end (- (re-search-forward "<!--") 5))
-           (response (car (xml-parse-region beg end))))
-      (delete "\n" (delete "\n  " response)))))
+    (car (xml-parse-region url-http-end-of-headers (point-max)))))
 
 (defun delicious-api-request (path)
   "Do a Delicious API request to PATH.
