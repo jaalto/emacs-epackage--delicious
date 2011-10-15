@@ -26,6 +26,7 @@
 
 ;;; Code:
 
+(require 'crm)
 (require 'delicioapi)
 (require 'delicious-html)
 
@@ -179,7 +180,7 @@ If NOLOCAL is non-nil, don't add the post to the local list."
   (interactive (list
                 (delicious-read-url)
                 (delicious-read-description)
-                (delicious-read-tags)
+                (delicious-read-tags url)
                 (delicious-read-extended-description)
                 (delicious-read-time-string)))
   (message "Waiting for server")
@@ -255,7 +256,7 @@ NAME is the name of the field being checked."
   "Input bookmarks to post later.  Don't contact the server for anything."
   (interactive (list (delicious-read-url t)
                      (delicious-read-description)
-                     (delicious-read-tags nil nil nil nil nil t)
+                     (delicious-read-tags url nil nil t)
                      (delicious-read-extended-description)
                      (delicious-read-time-string)))
   (with-current-buffer (find-file-noselect delicious-cache-file)
@@ -464,40 +465,39 @@ If OFFLINE is non-nil, don't query the server for any information."
 
 ;;;;_+ Tag completion, suggestion, and manipulation
 
-(defun delicious-read-tags (&optional nosuggest nosofar quantity
-                                      prompt-string require offline)
-  "Do a completing read of tag input.
-Blank line at the prompt ends the input.
-If NOSUGGEST is non-nil, don't suggest any tags.
-If NOSOFAR is non-nil, don't show tags entered so far.
-Repeat the read QUANTITY times. If QUANTITY is nil, repeat until
-a blank line is entered.
-If REQUIRE is non-nil, only a completion match or an empty string
-are accepted as input.
-If OFFLINE is non-nil, don't query the server."
+(defun delicious-read-tags (&optional url prompt-prefix existing offline)
+  "Read tag(s) for URL (or all user tags if nil) in the minibuffer.
+Tags should be comma-separated (cf. `completing-read-multiple').
+Suggested tag completions (if any) are annotated with \"<S>\".
+
+All arguments are optional: PROMPT-PREFIX should be the prefix
+after which the list of suggested tags is appended; defaults to
+\"Tag(s)\". If EXISTING is non-nil, only accept already existing
+tags. If OFFLINE is non-nil, don't query the server.
+
+Returns a string consisting of the tags read separated by
+spaces."
   (unless delicious-tags-list
     (setq delicious-tags-list (delicious-build-tags-list offline)))
-  (let* ((base-prompt (or prompt-string
-                          "(Enter one at a time, blank to end.) Tag: "))
-         (suggest-prompt
-          (unless nosuggest
-            (format "Suggested Tags: %s\n" (delicious-suggest-tags))))
-         (sofar-prompt (unless nosofar "Tags so far: %s\n"))
-         (prompt (concat suggest-prompt sofar-prompt base-prompt))
-         tags
-         tag)
-    (while (not (or (equal tag "")
-                    (and
-                     (numberp quantity)
-                     (<= quantity 0))))
-      (setq tag (completing-read (format prompt tags)
-                                 delicious-tags-list nil require))
-      (and (numberp quantity) (setq quantity (1- quantity)))
-      (or (and (member tag tags)
-               (message "Duplicate tag ignored")
-               (sleep-for 1))
-          (setq tags (cons tag tags))))
-    (mapconcat 'identity (nreverse tags) " ")))
+  (mapconcat
+   'identity
+   (let* ((suggestags
+           (when url
+             (apply 'append
+                    (mapcar 'cdr (delicious-api/posts/suggest url t)))))
+          (prompt (concat (or prompt-prefix "Tag(s)")
+                          (when suggestags
+                            (concat " [suggested: "
+                                    (mapconcat 'identity suggestags " ")
+                                    "]"))
+                          ": "))
+          (completion-annotate-function
+           ;; GNU Emacs bug#8897 :-(
+           (lambda (c) (when (member c suggestags) " <S>"))))
+     (completing-read-multiple prompt
+                               (append delicious-tags-list suggestags)
+                               nil existing))
+   " "))
 
 (defun delicious-rebuild-tags-maybe (tags &optional offline)
   "Rebuild `delicious-tags-list' if it misses any of TAGS.
@@ -528,44 +528,15 @@ If OFFLINE is non-nil, don't query the server."
                          tags)))
             tags-list))))
 
-;; FIXME implement proper tag suggestion using the API
-(defun delicious-suggest-tags ()
-  "Suggest tags based on the contents of the current buffer."
-  (let ((buffer-words (delicious-buffer-words))
-        (tags (mapcar 'downcase delicious-tags-list))
-        shared)
-    (dolist (word buffer-words shared)
-      (and (or (member word tags)
-               (member (concat word "s") tags)
-               (member (concat word "es") tags)
-               (and (> (length word) 1)
-                    (or (member (substring word 0 -1) tags)
-                        (and (equal (substring word -1) "y")
-                             (member (concat (substring word 0 -1) "ies")
-                                     tags))))
-               (and (> (length word) 2)
-                    (member (substring word 0 -2) tags)))
-           (setq shared (cons word shared))))))
-
-(defun delicious-buffer-words ()
-  "Break the current buffer into a list of unique words.
-All words are converted to lower case."
-  (let ((words (split-string
-                (buffer-substring-no-properties (point-min) (point-max))))
-        unique)
-    (mapc (lambda (w) (add-to-list 'unique (downcase w)))
-          words)
-    unique))
-
 ;; FIXME and what about syncing?
 (defun delicious-rename-tag (old-tag new-tag)
   "Change all instances of OLD-TAG to NEW-TAG.
-NEW-TAG can be multiple tags, space-separated."
+NEW-TAG can be multiple tags, space-separated (interactively, the
+tags are read comma-separated using the minibuffer)."
   (interactive
    (list
-    (delicious-read-tags t t 1 "Enter old tag: " t)
-    (delicious-read-tags
-     t "Enter new tag(s) one at a time (blank to end): ")))
+    (delicious-read-tags nil "Old tag" t)
+    (delicious-read-tags nil "New tag(s)")))
   (if (or (equal old-tag "")
           (equal new-tag ""))
       (message "Aborting due to empty input")
@@ -648,7 +619,7 @@ They will be stored under SECTION."
 Optionally assign TAGS, EXTENDED description, and TIME to the bookmarks."
   (interactive (list (completing-read "Section to export (required): "
                                       (w3m-bookmark-sections) nil t)
-                     (delicious-read-tags t)
+                     (delicious-read-tags)
                      (delicious-read-extended-description)
                      (delicious-read-time-string)))
   (let ((section-string (format "<h2>%s</h2>" section))
@@ -834,7 +805,7 @@ Update the entry hash of which is HASH with FIELDS."
 (defun delicious-search-add-tags (tags update)
   "Add TAGS to the post under point in Delicious Search mode.
 If UPDATE is non-nil, update the post's timestamp."
-  (interactive (list (delicious-read-tags t t)
+  (interactive (list (delicious-read-tags)
                      (y-or-n-p "Update timestamp? ")))
   (let* ((hash (get-text-property (point) 'hash))
          (post (delicious-get-hash-post hash))
@@ -854,7 +825,7 @@ If UPDATE is non-nil, update the post's timestamp."
 (defun delicious-search-delete-tags (tags update)
   "Delete TAGS from the post under point in Delicious Search mode.
 If UPDATE is non-nil, update the post's timestamp."
-  (interactive (list (delicious-read-tags t t)
+  (interactive (list (delicious-read-tags)
                      (y-or-n-p "Update timestamp? ")))
   (let* ((hash (get-text-property (point) 'hash))
          (post (delicious-get-hash-post hash))
@@ -962,7 +933,7 @@ With a prefix argument, operate offline."
 
 (defun delicious-search-tags (tags)
   "Display all posts with TAGS.  With a prefix argument, operate offline."
-  (interactive (list (delicious-read-tags t)))
+  (interactive (list (delicious-read-tags)))
   (let ((taglist (split-string tags)))
     (delicious-search
      tags
@@ -977,7 +948,7 @@ With a prefix argument, operate offline."
 
 (defun delicious-search-tags-any (tags)
   "Display all posts matching any of TAGS."
-  (interactive (list (delicious-read-tags t)))
+  (interactive (list (delicious-read-tags)))
   (let ((taglist (split-string tags)))
     (delicious-search
      tags
