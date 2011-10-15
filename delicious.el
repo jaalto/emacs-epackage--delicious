@@ -602,7 +602,7 @@ With a prefix argument, visit the page in a new w3m session."
 They will be stored under SECTION."
   (interactive
    "nNumber of recent posts to bookmark: \nsTag to filter by: \nsw3m bookmark section to use: ")
-  (let ((response (delicious-api/posts/recent tag count)))
+  (let ((response (delicious-api/posts/recent tag count)) post)
     (with-temp-buffer
       (prin1 response (current-buffer))
       (goto-char (point-min))
