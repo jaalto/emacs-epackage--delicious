@@ -50,7 +50,7 @@ General Public License.''
 @end ifnottex
 
 @menu
-* Introduction::                What this is and what is it for
+* Introduction::                What this is and what it is for
 * Installation::                Downloading and installing the libraries
 * Usage::                       How to use this package
 * Keeping Up::                  Following the development
@@ -78,8 +78,8 @@ Commands
 @chapter Introduction
 
 This is a set of functions for interacting with
-@url{http://www.delicious.com}, a ``social bookmarking'' project written
-and maintained by Joshua Shachter.
+@url{http://www.delicious.com}, a ``social bookmarking'' project
+developed by Joshua Shachter.
 
 @noindent
 The specifications for the API are at
@@ -202,12 +202,10 @@ find one, it will just put an @samp{http://} in the input line for you.
 URL is a required field. If you try to enter a blank URL, the program will
 abort.
 
-When prompted for tags, enter one at a time, hitting enter after each.
-You have tab-completion available in typical Emacs style, based on all
-of the tags you have used in the past. When you are done entering tags,
-just hit enter at the prompt. @code{delicious-el} will suggest possible
-tags above the prompt. Suggestions currently are just a list of words
-that appear both in your current buffer and in your tags list.
+When prompted for tags, use commas to separate multiple values. You
+have @kbd{TAB} completion available in typical Emacs style, based on
+all of the tags you have used in the past plus any suggestions
+provided by the API.
 
 @code{delicious-el} will attempt to guess an appropriate description. If
 you are in an @code{emacs-w3m} buffer, @code{delicious-el} will suggest
@@ -226,7 +224,7 @@ Next is the Date/Time prompt. If you don't enter anything here, the
 current date will be used. If you do want to enter the date, the format
 is indicated in the prompt.
 
-Once you enter the Date/Time and hit enter, the URL should be posted to
+Once you enter the Date/Time and hit @kbd{RET}, the URL should be posted to
 the server.
 @end deffn
 
@@ -284,17 +282,16 @@ special search function just for them:
 
 @deffn Command delicious-search-tags
 
-This command will prompt you for tags, one at a time. You can enter as
-many as you like, and you can use @key{TAB}, @key{SPC}, or @key{?} to
-use Emacs minibuffer completion based on your previously used tags. Just
-hit enter at the prompt when you are done. A search will be done for all
-of the posts that have all the specified tags. The results will be
-displayed the same way as with the other search commands. It is possible
-to use regular expression syntax within each tag, as that is the way the
-match is determined internally, but you may run into problems with some
-of the regexp characters and the completion commands. The order of the
-tags is not considered important when determining matches. You do not
-need to account for whitespace between tags with this method.
+This command will prompt you for a comma-separated tag list. You can
+use the usual Emacs minibuffer completion facilities based on your
+previously used tags. A search will be done for all of the posts that
+have all the specified tags. The results will be displayed the same
+way as with the other search commands. It is possible to use regular
+expression syntax within each tag, as that is the way the match is
+determined internally, but you may run into problems with some of the
+regexp characters and the completion commands. The order of the tags
+is not considered important when determining matches. You do not need
+to account for whitespace between tags with this method.
 @end deffn
 
 Other search commands include @code{delicious-search-date},
@@ -316,12 +313,12 @@ to refresh the local list.
 
 @deffn Command delicious-build-tags-list
 
-This command will refresh the local list of the tags you have used from
-the server. The same caveat about usage frequency applies as with
+This command will refresh the local list of the tags you have used
+from the server. The same caveat about usage frequency applies as with
 @code{delicious-build-posts-list}. Any new tags you use while posting
-with delicious-post are added to the completion list, so the only reason
-to refresh the list is if something funny happens and the list gets
-corrupted, or if you add tags using another interface.
+with @code{delicious-post} are added to the completion list, so the
+only reason to refresh the list is if something funny happens and the
+list gets corrupted, or if you add tags using another interface.
 @end deffn
 
 
@@ -337,10 +334,10 @@ name as a suggestion for the description of the link.
 @deffn Command delicious-w3m-html
 
 This is an interactive command to visit the HTML summary of a user's
-Delicious bookmarks. If you call it with a prefix argument (C-u
-M-x delicious-w3m-html), the feed will be displayed in a new session.
-The default parameters can be configured in the @code{delicious} customize
-group, or individually (they all have the name delicious-api-html-*).
+Delicious bookmarks. If you call it with a prefix argument, the feed
+will be displayed in a new session. The default parameters can be
+configured in the @code{delicious} customize group, or individually
+(they all have the name delicious-api-html-*).
 
 Here is a very brief description of each parameter:
 
