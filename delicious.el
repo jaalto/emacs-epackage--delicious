@@ -476,7 +476,7 @@ If REQUIRE is non-nil, only a completion match or an empty string
 are accepted as input.
 If OFFLINE is non-nil, don't query the server."
   (unless delicious-tags-list
-    (setq delicious-tags-list (delicious-build-tags-list)))
+    (setq delicious-tags-list (delicious-build-tags-list offline)))
   (let* ((base-prompt (or prompt-string
                           "(Enter one at a time, blank to end.) Tag: "))
          (suggest-prompt
