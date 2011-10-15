@@ -42,6 +42,7 @@
 (require 'url)
 (require 'xml)
 (require 'thingatpt)
+(eval-when-compile (require 'cl))               ; `cdaadr'
 
 ;;;;_+ Variables
 
@@ -125,6 +126,26 @@ EXTENDED (extra description string) and TIME (in the format
                     "posts/add?url=%s&description=%s&tags=%s&extended=%s&dt=%s"
                     url description tags extended time)))
     (delicious-api-request post-url)))
+
+(defun delicious-api/posts/suggest (url &optional cooked)
+  "Return a list of popular, recommended and network tags for URL
+Intended as a suggestion for tagging a particular url.
+
+If COOKED is non-nil, the return value is an alist with elements
+of the form (TYPE . TAGS) where TYPE is a symbol designating the
+tag type (s.a. `popular') and TAGS is the (string) list of all
+tags of that type. Otherwise, the raw XML s-expression response
+is returned."
+  (let ((resp (delicious-api-request (concat "posts/suggest?url="
+                                             (url-hexify-string url)))))
+    (if cooked
+        (let (r)
+          (dolist (item resp r)
+            (when (consp item)
+              (let ((el (assq (car item) r)))
+                (if el (setcdr el (cons (cdaadr item) (cdr el)))
+                  (setq r (cons (list (car item) (cdaadr item)) r)))))))
+      resp)))
 
 ;; FIXME unused
 (defun delicious-api/tags/get (&optional tags)
