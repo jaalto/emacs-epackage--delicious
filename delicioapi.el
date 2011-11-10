@@ -143,7 +143,7 @@ is returned."
                   (setq r (cons (list (car item) (cdaadr item)) r)))))))
       resp)))
 
-;; FIXME unused
+;; unused
 (defun delicious-api/tags/get (&optional tags)
   "Return your tags and the number of entries with each tag.
 TAGS can be Delicious tags  in the `xml' package format.
@@ -177,7 +177,7 @@ than that."
   "Return all posts. If TAG is non-nil, return all posts with that tag."
   (delicious-api-request "posts/all" 'tag))
 
-;; FIXME unused
+;; unused
 (defun delicious-api/posts/dates (&optional tag)
   "Return dates with the number of posts at each date.
 TAG is a tag to filter by."
