@@ -41,7 +41,6 @@
 
 (require 'url)
 (require 'xml)
-(require 'thingatpt)
 (eval-when-compile (require 'cl))               ; `cdaadr'
 
 ;;;;_+ Variables

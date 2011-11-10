@@ -28,6 +28,7 @@
 
 (require 'crm)
 (require 'delicioapi)
+(require 'thingatpt)
 
 ;;;;_+ Customization
 
