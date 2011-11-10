@@ -31,7 +31,7 @@
 ;; various ways. These functions are provided separately to make it convenient
 ;; for people to write their own front-end interactive commands.
 ;;
-;; del.icio.us was written and is maintained by Joshua Shachter.
+;; del.icio.us was written by Joshua Shachter.
 ;;
 ;; Information about the API is at <http://delicious.com/help/api>.
 
