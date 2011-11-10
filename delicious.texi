@@ -1,7 +1,7 @@
 \input texinfo   @c -*-texinfo-*-
 @c %**start of header
 @setfilename delicious-el.info
-@settitle delicious-el v0.2FIXME
+@settitle Emacs Delicious Interface
 @documentencoding UTF-8
 @c %**end of header
 
@@ -10,7 +10,7 @@
 
 @dircategory Emacs
 @direntry
-* delicious-el: (delicious-el). Emacs client for Delicious bookmarks API
+* delicious-el: (delicious-el). Emacs client for Delicious bookmarks API.
 @end direntry
 
 @copying
@@ -22,10 +22,9 @@ Copyright @copyright{} 2004, 2005 John Sullivan.
 
 @quotation
 Permission is granted to copy, distribute and/or modify this document
-under the terms of the GNU General Public License, Version 2.0
-or any later version published by the Free Software Foundation.
-A copy of the license is included in the section entitled ``GNU
-General Public License.''
+under the terms of the GNU General Public License, Version 2.0 or any
+later version published by the Free Software Foundation. A copy of the
+license is included with this package in the file named ``COPYING''.
 @end quotation
 @end copying
 
@@ -42,15 +41,17 @@ General Public License.''
 
 @contents
 
-@ifnottex
-@node Top, Introduction, (dir), (dir)
+@node Top, Installation, (dir), (dir)
 @top delicious-el
 
-@insertcopying
-@end ifnottex
+This is a set of functions for interacting with
+@url{http://www.delicious.com}, a ``social bookmarking'' project
+developed by Joshua Shachter.
+
+@noindent
+The API documentation is at @url{http://www.delicious.com/help/api}.
 
 @menu
-* Introduction::                What this is and what it is for
 * Installation::                Downloading and installing the libraries
 * Usage::                       How to use this package
 * Keeping Up::                  Following the development
@@ -74,18 +75,7 @@ Commands
 @end detailmenu
 @end menu
 
-@node Introduction, Installation, Top, Top
-@chapter Introduction
-
-This is a set of functions for interacting with
-@url{http://www.delicious.com}, a ``social bookmarking'' project
-developed by Joshua Shachter.
-
-@noindent
-The specifications for the API are at
-@url{http://www.delicious.com/help/api}.
-
-@node Installation, Usage, Introduction, Top
+@node Installation, Usage, Top, Top
 @chapter Installation
 
 After downloading and unpacking the archive or cloning the Git
@@ -101,7 +91,6 @@ repository, you should have the following files:
 @item @file{README}
 @item @file{COPYING}
 @item @file{delicious-el.texi}
-@item @file{delicious-el.info}
 @end itemize
 
 @file{delicioapi.el} contains the back-end functions that interact with
@@ -243,7 +232,7 @@ renaming is done, the local tag list will be refreshed from the server.
 All of the search commands described below display their results in a
 @samp{*Delicious search results*} buffer. The default is for this buffer
 to open in a window other than the active one, or for a second window to
-be created if none is available. You can use special keybindings to
+be created if none is available. You can use special key bindings to
 navigate the buffer and manipulate the displayed bookmarks. Type
 @kbd{C-h b} or @kbd{M-x describe-bindings} to see all possibilities at a
 given point in the buffer.
@@ -276,7 +265,7 @@ This command will prompt for a regular expression, search only the tag
 field of your posts, and display the matches. You can specify multiple
 tags for search separated by whitespace.
 
-Since tags are the means for organizing bookmarks Delicious, we have a
+Since tags are the means for organising bookmarks Delicious, we have a
 special search function just for them:
 @end deffn
 
@@ -299,6 +288,7 @@ Other search commands include @code{delicious-search-date},
 
 @node Miscellanea,  , Searching, Commands
 @subsection Miscellanea
+
 @deffn Command delicious-build-posts-list
 
 This command will refresh the local list of your posts from the server.
@@ -307,7 +297,7 @@ avoid bothering the server too much. There isn't much reason to use this
 command, because any posts made during your current session are recorded
 locally. But if you suspect that something has gone wrong, you can use
 this command to refresh from the server. Or, if you add posts from an
-external interface like your non-emacs web browser, it could be useful
+external interface such as your web browser, it could be useful
 to refresh the local list.
 @end deffn
 
@@ -338,7 +328,7 @@ your w3m bookmarks file. It operates based on recent posts. You tell it
 how many posts to scan, what tag (or tag intersection like "foo+bar" to
 filter by, and what w3m bookmark section to put the posts in. It will
 store the matching posts in that section, without checking for
-duplicates or making any effort at synching (yet). Note that you need
+duplicates or making any effort at syncing (yet). Note that you need
 the @file{w3m-bookmarks.el} library to use this feature.
 @end deffn
 
@@ -366,7 +356,7 @@ this regard and will do verification of your posts. You need the
 You can get the development version of this package via Git at
 @url{http://gitorious.org/delicious-el}. You can also download the
 snapshot tarball from
-@url{http://gitorious.org/delicious-el/delicious-el/archive-tarball/master}.
+@url{http://gitorious.org/delicious-el/delicious-el/archive-tarball/dev}.
 
 @node Bugs, Index, Keeping Up, Top
 @chapter Bugs
@@ -379,9 +369,5 @@ Please report any bugs or suggestions to @email{stepnem@@gmail.com}.
 @printindex cp
 
 @bye
-
-@c Local Variables:
-@c makeinfo-options: "-f 76"
-@c End:
 
 FIXME document caching
