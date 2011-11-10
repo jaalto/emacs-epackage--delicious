@@ -84,10 +84,6 @@ repository, you should have the following files:
 @itemize
 @item @file{delicioapi.el}
 @item @file{delicious.el}
-@item @file{muse-delicious.el}
-@item @file{planner-delicious.el}
-@item @file{ChangeLog}
-@item @file{ChangeLog.OLD}
 @item @file{README}
 @item @file{COPYING}
 @item @file{delicious-el.texi}
@@ -100,17 +96,6 @@ in @file{delicious.el}.
 
 @file{delicious.el} contains the front-end interactive functions and
 commands for putting the API functions to productive use via Emacs.
-
-@c FIXME
-@file{planner-delicious.el} contains functions to integrate with
-@url{http://www.emacswiki.org/PlannerMode, Planner mode} in Emacs. For
-instructions, please see comments at the top of the file. This is
-currently not maintained and will quite probably not work with the
-current version of @code{delicious-el} and/or Planner.
-
-Same goes for @file{muse-delicious.el}, which is apparently supposed to
-integrate @code{delicious-el} with
-@url{http://www.emacswiki.org/EmacsMuse, Emacs Muse}.
 
 @node Usage, Keeping Up, Installation, Top
 @chapter Usage
