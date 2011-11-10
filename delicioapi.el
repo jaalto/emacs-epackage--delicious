@@ -96,14 +96,34 @@
     (decode-coding-region url-http-end-of-headers (point-max) 'utf-8)
     (car (xml-parse-region url-http-end-of-headers (point-max)))))
 
-(defun delicious-api-request (path)
-  "Do a Delicious API request to PATH.
-Return the result as parsed by `xml-parse-region', with blanks removed."
+(defun delicious-api-request (path &rest params)
+  "Do a Delicious API request to PATH with query PARAMS.
+
+Optional PARAMS should be a list of query parameter
+specifications of one of the following forms:
+
+1. (KEY . VAL) -- strings specifying the parameter name and value
+
+2. KEY -- symbol specifying the parameter name, value of which is
+   stored in the symbol's value cell
+
+Returns the result as parsed by `xml-parse-region'."
   (let ((url-package-name "delicioapi.el")
         (url-package-version delicious-api-version))
     (delicious-api-response
      (url-retrieve-synchronously
-      (format "https://%s%s%s" delicious-api-host delicious-api path)))))
+      (concat
+       "https://" delicious-api-host delicious-api path
+       (when params
+         (concat "?"
+                 (mapconcat (lambda (p)
+                              (let ((name (or (car-safe p) (symbol-name p)))
+                                    (val (or (cdr-safe p)
+                                             (and (symbolp p)
+                                                  (symbol-value p)))))
+                                (when val
+                                  (concat name "=" (url-hexify-string val)))))
+                            params "&"))))))))
 
 (defun delicious-api-get-timestamp ()
   "Return time of the last update for your Delicious user account.
@@ -118,14 +138,8 @@ The value returned is a time string as specified by `delicious-timestamp'."
 You may include a DESCRIPTION (string), TAGS (space-separated string),
 EXTENDED (extra description string) and TIME (in the format
 %C%y-%m-%dT%H:%M:%SZ)."
-  (let* ((description (url-hexify-string description))
-         (tags (url-hexify-string tags))
-         (extended (url-hexify-string extended))
-         (time (url-hexify-string time))
-         (post-url (format
-                    "posts/add?url=%s&description=%s&tags=%s&extended=%s&dt=%s"
-                    url description tags extended time)))
-    (delicious-api-request post-url)))
+  (delicious-api-request "posts/add"
+                         'url 'description 'tags 'extended `("dt" . ,time)))
 
 (defun delicious-api/posts/suggest (url &optional cooked)
   "Return a list of popular, recommended and network tags for URL
@@ -136,8 +150,7 @@ of the form (TYPE . TAGS) where TYPE is a symbol designating the
 tag type (s.a. `popular') and TAGS is the (string) list of all
 tags of that type. Otherwise, the raw XML s-expression response
 is returned."
-  (let ((resp (delicious-api-request (concat "posts/suggest?url="
-                                             (url-hexify-string url)))))
+  (let ((resp (delicious-api-request "posts/suggest" 'url)))
     (if cooked
         (let (r)
           (dolist (item resp r)
@@ -152,13 +165,10 @@ is returned."
   "Return your tags and the number of entries with each tag.
 TAGS can be Delicious tags  in the `xml' package format.
 If not provided, contact the server."
-  (let* ((path "tags/get")
-         (tags
-          (cdr (or tags
-                   (delicious-api-request path))))
-         tags-list)
+  (let ((tags (cdr (or tags (delicious-api-request "tags/get"))))
+        tags-list)
     (dolist (tag tags (nreverse tags-list))
-      (when (listp tag) ; FIXME necessary?
+      (when (listp tag)                 ; FIXME necessary?
         (let (cell
               (name (xml-get-attribute tag 'tag))
               (count (string-to-number (xml-get-attribute tag 'count))))
@@ -168,44 +178,35 @@ If not provided, contact the server."
 (defun delicious-api/posts/get (&optional tag date)
   "Return a list of posts filtered by TAG on a given DATE.
 If no date is supplied, the most recent date with posts will be used."
-  (let ((path (concat "posts/get?"
-                      (if tag (format "tag=%s&" tag))
-                      (if date (format "dt=%s" date)))))
-    (delicious-api-request path)))
+  (delicious-api-request "posts/get" 'tag `("dt" . ,date)))
 
 (defun delicious-api/posts/recent (&optional tag count)
   "Return a list, optionally filtered by TAG, of the COUNT most recent posts.
 This will max out at 100. Use `delicious-api/posts/all' if you want more
 than that."
-  (let* ((count (cond ((null count) 15)
+  (let ((count (number-to-string
+                (cond ((null count) 15)
                       ((> count 100) 100)
-                      (t count)))
-         (path (concat "posts/recent?"
-                       (and tag (format "tag=%s&" tag))
-                       (format "count=%s" count))))
-    (delicious-api-request path)))
+                      (t count)))))
+    (delicious-api-request "posts/recent" 'tag 'count)))
 
 (defun delicious-api/posts/all (&optional tag)
   "Return all posts. If TAG is non-nil, return all posts with that tag."
-  (let ((path (concat "posts/all" (and tag (format "?tag=%s" tag)))))
-    (delicious-api-request path)))
+  (delicious-api-request "posts/all" 'tag))
 
 ;; FIXME unused
 (defun delicious-api/posts/dates (&optional tag)
   "Return dates with the number of posts at each date.
 TAG is a tag to filter by."
-  (let ((path (concat "posts/dates" (and tag (format "?tag=%s" tag)))))
-    (delicious-api-request path)))
+  (delicious-api-request "posts/dates" 'tag))
 
 (defun delicious-api/tags/rename (old new)
   "Rename OLD tag to NEW in all posts."
-  (let ((path (format "tags/rename?old=%s&new=%s" old new)))
-    (delicious-api-request path)))
+  (delicious-api-request "tags/rename" 'old 'new))
 
 (defun delicious-api/posts/delete (url)
   "Delete URL from bookmarks."
-  (let ((path (format "posts/delete?url=%s" url)))
-    (delicious-api-request path)))
+  (delicious-api-request "posts/delete" 'url))
 
 (defun delicious-api-version ()
   "Return the version of the Emacs Delicious API in use."
