@@ -68,23 +68,7 @@
    "\\([0-5][0-9]\\)Z")                 ;second
   "Regular expression matching the Delicious timestamp format.")
 
-;; FIXME is this used anywhere?
-;; (defconst delicious-api-realm (format "%s API" delicious-api-host)
-;;   "The Delicious auth realm name.")
-
 ;;;;_+ API Functions
-
-;; FIXME unused
-;; (put 'delicious-api-error 'error-message "Delicious error")
-;; (put 'delicious-api-error 'error-conditions '(delicious-api-error error))
-
-;; (defun delicious-api-check-error (response)
-;;   "Signal the error if RESPONSE is an API error."
-;;   (unless (string= "done" (xml-get-attribute response 'code))
-;;     (let* ((error-node (car (xml-get-children response 'error)))
-;;            (code (xml-get-attribute error-node 'code))
-;;            (message (mapconcat 'identity (xml-node-children error-node) " ")))
-;;       (signal 'delicious-api-error (list code message)))))
 
 (defun delicious-api-response (buffer)
   "Process the XML response from Delicious in BUFFER."
