@@ -174,15 +174,26 @@ timestamp comparison and force a refresh from the server."
         (save-buffer))))
   (message "Done"))
 
+(defun delicious-post-interactive-args (&optional offline)
+  (let* ((url (delicious-read-url))
+         (oldpost (progn (delicious-build-posts-list offline)
+                         (delicious-get-url-post url))))
+    (when oldpost
+      (or (y-or-n-p "This URL is a duplicate. Replace existing bookmark? ")
+          (error "Duplicate URL, not posted")))
+    (list url
+          (delicious-read-description
+           (delicious-get-post-field 'description oldpost))
+          (delicious-read-tags url nil nil offline)
+          (delicious-read-extended-description
+           (delicious-get-post-field 'extended oldpost))
+          (delicious-read-time-string
+           (delicious-get-post-field 'time oldpost)))))
+
 (defun delicious-post (url description &optional tags extended time nolocal)
   "Post a bookmark with arguments URL, DESCRIPTION, TAGS, EXTENDED, and TIME.
 If NOLOCAL is non-nil, don't add the post to the local list."
-  (interactive (list
-                (delicious-read-url)
-                (delicious-read-description)
-                (delicious-read-tags url)
-                (delicious-read-extended-description)
-                (delicious-read-time-string)))
+  (interactive (delicious-post-interactive-args))
   (message "Waiting for server")
   (delicious-api/posts/add url description tags extended time)
   (unless nolocal
@@ -255,11 +266,7 @@ NAME is the name of the field being checked."
 
 (defun delicious-post-offline (url description &optional tags extended time)
   "Input bookmarks to post later.  Don't contact the server for anything."
-  (interactive (list (delicious-read-url t)
-                     (delicious-read-description)
-                     (delicious-read-tags url nil nil t)
-                     (delicious-read-extended-description)
-                     (delicious-read-time-string)))
+  (interactive (delicious-post-interactive-args t))
   (with-current-buffer (find-file-noselect delicious-cache-file)
     (goto-char (point-max))
     (let ((post (list 'post (list (cons 'href url)
@@ -309,10 +316,13 @@ NAME is the name of the field being checked."
 
 ;;;_+ Timestamps
 
-(defun delicious-read-time-string ()
+(defun delicious-read-time-string (&optional default)
   "Prompt for a date string and format it properly for the server.
- Use the current date and time if nothing entered."
-  (let ((date (read-string "(Optional) Date/Time [yyyy-mm-dd hh:mm:ss]: ")))
+Use the current date and time if nothing entered."
+  (let ((date (read-string "(Optional) Date/Time [yyyy-mm-dd hh:mm:ss]: "
+                           nil nil (when default
+                                     (replace-regexp-in-string
+                                      "T" " " (substring default 0 -1))))))
     (unless
         (or (equal date "")
             (string-match
@@ -357,21 +367,12 @@ NAME is the name of the field being checked."
 
 ;;;;_+ URL input, guessing, and duplicate checking
 
-(defun delicious-read-url (&optional offline)
+(defun delicious-read-url ()
   "Read a URL from a prompt, suggesting an appropriate default.
 Check the input to make sure it is valid and react if it is a duplicate.
 If OFFLINE is non-nil, don't query the server for any information."
-  (let ((url (delicious-check-input
-              (read-string "(Required) URL: " (delicious-guess-url)) "URL")))
-    (delicious-build-posts-list offline)
-    (and (delicious-get-url-post url)
-         (unless
-             (y-or-n-p
-              ;; FIXME multiline...
-              (concat "This URL is a duplicate.\nIf you post it again, "
-                      "old tags will be replaced by the new ones.\nPost? "))
-           (error "Duplicate URL, not posted")))
-    url))
+  (delicious-check-input
+   (read-string "(Required) URL: " (delicious-guess-url)) "URL"))
 
 (defun delicious-guess-url ()
   (let ((methods delicious-guess-url-methods)
@@ -435,10 +436,12 @@ If OFFLINE is non-nil, don't query the server for any information."
 
 ;;;;_+ Description input and suggestion
 
-(defun delicious-read-description ()
-  "Prompt for a description, suggesting an appropriate default."
+(defun delicious-read-description (&optional default)
+  "Prompt for a description, suggesting an appropriate default.
+If provided, add DEFAULT to the list of default values."
   (delicious-check-input
-   (read-string "(Required) Description: " (delicious-guess-description))
+   (read-string "(Required) Description: " nil nil
+                (append (delicious-guess-description) default) t)
    "Description"))
 
 (defvar gnus-current-headers)
