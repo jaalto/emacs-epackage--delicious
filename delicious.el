@@ -209,7 +209,8 @@ If OFFLINE is non-nil, don't update the local timestamp."
       (delicious-goto-posts)
       (prin1 post (current-buffer))
       (save-buffer)))
-  (let ((tags (split-string (delicious-get-post-field 'tag (cadr post)))))
+  (let ((tags (delicious-tags-to-list
+               (delicious-get-post-field 'tag (cadr post)))))
     (delicious-rebuild-tags-maybe tags t)))
 
 (defun delicious-find-hash-post (hash)
@@ -465,6 +466,9 @@ If OFFLINE is non-nil, don't query the server for any information."
 
 ;;;;_+ Tag completion, suggestion, and manipulation
 
+(defun delicious-tags-to-list (tags)
+  (split-string tags "[ ,]+"))
+
 (defun delicious-read-tags (&optional url prompt-prefix existing offline)
   "Read tag(s) for URL (or all user tags if nil) in the minibuffer.
 Tags should be comma-separated (cf. `completing-read-multiple').
@@ -475,8 +479,7 @@ after which the list of suggested tags is appended; defaults to
 \"Tag(s)\". If EXISTING is non-nil, only accept already existing
 tags. If OFFLINE is non-nil, don't query the server.
 
-Returns a string consisting of the tags read separated by
-spaces."
+Returns a string consisting of the tags read separated by commas."
   (unless delicious-tags-list
     (setq delicious-tags-list (delicious-build-tags-list offline)))
   (mapconcat
@@ -488,7 +491,7 @@ spaces."
           (prompt (concat (or prompt-prefix "Tag(s)")
                           (when suggestags
                             (concat " [suggested: "
-                                    (mapconcat 'identity suggestags " ")
+                                    (mapconcat 'identity suggestags ",")
                                     "]"))
                           ": "))
           (completion-annotate-function
@@ -497,13 +500,13 @@ spaces."
      (completing-read-multiple prompt
                                (append delicious-tags-list suggestags)
                                nil existing))
-   " "))
+   ","))
 
 (defun delicious-rebuild-tags-maybe (tags &optional offline)
   "Rebuild `delicious-tags-list' if it misses any of TAGS.
 TAGS is a string \"TAG1 TAG2...\" or a list of strings.
 If OFFLINE is non-nil, don't query the server."
-  (and (stringp tags) (setq tags (split-string tags)))
+  (and (stringp tags) (setq tags (delicious-tags-to-list tags)))
   (when (catch 'new
           (dolist (tag tags)
             (unless (member tag delicious-tags-list)
@@ -521,7 +524,8 @@ If OFFLINE is non-nil, don't query the server."
                 post
                 tags)
             (while (setq post (delicious-get-next-post))
-              (setq tags (split-string (delicious-get-post-field 'tag post)))
+              (setq tags (delicious-tags-to-list
+                          (delicious-get-post-field 'tag post)))
               (and tags
                    (mapc (lambda (tag)
                            (add-to-list 'tags-list tag))
@@ -531,8 +535,7 @@ If OFFLINE is non-nil, don't query the server."
 ;; FIXME and what about syncing?
 (defun delicious-rename-tag (old-tag new-tag)
   "Change all instances of OLD-TAG to NEW-TAG.
-NEW-TAG can be multiple tags, space-separated (interactively, the
-tags are read comma-separated using the minibuffer)."
+NEW-TAG can be multiple tags, comma-separated." ; FIXME check this
   (interactive
    (list
     (delicious-read-tags nil "Old tag" t)
@@ -816,7 +819,7 @@ If UPDATE is non-nil, update the post's timestamp."
                      old-time))
          (extended (or (delicious-get-post-field 'extended post) ""))
          (old-tags (delicious-get-post-field 'tag post))
-         (new-tags (concat old-tags " " tags)))
+         (new-tags (concat old-tags "," tags)))
     (delicious-post href desc new-tags extended new-time t)
     (delicious-rebuild-tags-maybe new-tags)
     (delicious-search-update-entry hash (list (cons 'tag new-tags)
@@ -835,8 +838,9 @@ If UPDATE is non-nil, update the post's timestamp."
          (new-time (if update (delicious-format-time (current-time))
                      old-time))
          (extended (or (delicious-get-post-field 'extended post) ""))
-         (old-tags (split-string (delicious-get-post-field 'tag post)))
-         (delete-tags (split-string tags))
+         (old-tags (delicious-tags-to-list
+                    (delicious-get-post-field 'tag post)))
+         (delete-tags (delicious-tags-to-list tags))
          (new-tags
           (mapconcat 'identity
                      (let (l) (dolist (tag old-tags (nreverse l))
@@ -934,11 +938,11 @@ With a prefix argument, operate offline."
 (defun delicious-search-tags (tags)
   "Display all posts with TAGS.  With a prefix argument, operate offline."
   (interactive (list (delicious-read-tags)))
-  (let ((taglist (split-string tags)))
+  (let ((taglist (delicious-tags-to-list tags)))
     (delicious-search
      tags
      (lambda ()
-       (let ((post-tags (split-string
+       (let ((post-tags (delicious-tags-to-list
                          (or (delicious-get-post-field 'tag post) ""))))
          (setq match post)
          (mapc (lambda (tag)
@@ -949,11 +953,11 @@ With a prefix argument, operate offline."
 (defun delicious-search-tags-any (tags)
   "Display all posts matching any of TAGS."
   (interactive (list (delicious-read-tags)))
-  (let ((taglist (split-string tags)))
+  (let ((taglist (delicious-tags-to-list tags)))
     (delicious-search
      tags
      (lambda ()
-       (let ((post-tags (split-string
+       (let ((post-tags (delicious-tags-to-list
                          (or (delicious-get-post-field 'tag post) ""))))
          (when (catch 'match
                  (dolist (tag taglist)
