@@ -5,7 +5,7 @@ SHELL = /bin/sh
 EMACS = emacs
 BATCHFLAGS = -batch -q -no-site-file
 
-ELFILES = delicioapi.el delicious-html.el delicious.el
+ELFILES = delicioapi.el delicious.el
 
 MAKEINFO = makeinfo
 

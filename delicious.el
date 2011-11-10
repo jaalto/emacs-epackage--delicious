@@ -28,7 +28,6 @@
 
 (require 'crm)
 (require 'delicioapi)
-(require 'delicious-html)
 
 ;;;;_+ Customization
 
@@ -91,10 +90,6 @@ for managing and sharing bookmarks."
 
 (defvar delicious-tags-list nil
   "List of tags (strings) for use in completion (internal).")
-
-(defcustom delicious-username user-login-name
-  "User name of your Delicious account.
-Only necessary for the feeds functions (see `delicious-w3m-html').")
 
 (defcustom delicious-xsel-prog nil
   "Full path to a program that returns the X selection, like xsel."
@@ -590,18 +585,6 @@ NEW-TAG can be multiple tags, comma-separated." ; FIXME check this
 (defvar w3m-bookmark-section-delimiter)
 (declare-function w3m-bookmark-sections "w3m-bookmark" nil)
 (declare-function w3m-bookmark-write-file "w3m-bookmark"(url title section))
-(declare-function w3m-browse-url "w3m" (url &optional new-session))
-
-(defun delicious-w3m-html (username count tag)
-  "Visit the HTML page for USERNAME showing COUNT most recent posts with TAG.
-With a prefix argument, visit the page in a new w3m session."
-  (interactive
-   "sUsername (RET for yours): \nsNumber of posts (RET for 15): \nsTag (RET for all): ")
-  (let ((count (or (string-to-int count) 15)))
-    (w3m-browse-url
-     (format "http://%s%s%s" delicious-feeds-host delicious-api-html
-             (delicious-api-html-uri username tag count))
-     current-prefix-arg)))
 
 (defun delicious-w3m-bookmark-recent (count tag section)
   "Add your COUNT recent Delicious posts with TAG to your w3m bookmarks file.
