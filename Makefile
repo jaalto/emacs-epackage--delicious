@@ -10,7 +10,7 @@ ELFILES = delicioapi.el delicious.el
 MAKEINFO = makeinfo
 
 INFOFILE = delicious.texi
-INFOTARGETS = delicious-el.info README
+INFOTARGETS = delicious-el.info
 
 
 all: elisp info
@@ -23,9 +23,6 @@ info: $(INFOTARGETS)
 
 delicious-el.info: $(INFOFILE)
 	$(MAKEINFO) $<
-
-README: $(INFOFILE)
-	$(MAKEINFO) --plaintext -o $@ $<
 
 clean:
 	rm *.elc $(INFOTARGETS)
