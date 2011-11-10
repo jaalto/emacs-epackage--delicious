@@ -220,7 +220,8 @@ If OFFLINE is non-nil, don't update the local timestamp."
     (delicious-rebuild-tags-maybe tags t)))
 
 (defun delicious-find-hash-post (hash)
-  "Set point past post with HASH in current buffer and return its beginning position."
+  "Set point past post with HASH and return its beginning position.
+This assumes the buffer visiting `delicious-posts-file' is current."
   (let (post)
     (delicious-goto-posts)
     (catch 'found
@@ -301,7 +302,7 @@ NAME is the name of the field being checked."
       (message "Cache cleared"))))
 
 (defun delicious-clear-cache (&optional cache-file)
-  "Kill buffer visiting `delicious-cache-file' or CACHE-FILE, and delete the file."
+  "Delete `delicious-cache-file' or CACHE-FILE and kill the buffer visiting it."
   (interactive)
   (let* ((file (or cache-file delicious-cache-file))
          (buffer (find-buffer-visiting file)))
@@ -321,7 +322,8 @@ Use the current date and time if nothing entered."
     (unless
         (or (equal date "")
             (string-match
-             "^\\([1-9][0-9]\\{3\\}\\).\\([0-1][0-9]\\).\\([0-3][0-9]\\).\\([0-2][0-9]\\).\\([0-5][0-9]\\).\\([0-5][0-9]\\)"
+             "^\\([1-9][0-9]\\{3\\}\\).\\([0-1][0-9]\\).\\([0-3][0-9]\\).\
+\\([0-2][0-9]\\).\\([0-5][0-9]\\).\\([0-5][0-9]\\)"
              date))
       (message "Incorrect time string format")
       (sleep-for 1)
@@ -590,7 +592,8 @@ NEW-TAG can be multiple tags, comma-separated." ; FIXME check this
   "Add your COUNT recent Delicious posts with TAG to your w3m bookmarks file.
 They will be stored under SECTION."
   (interactive
-   "nNumber of recent posts to bookmark: \nsTag to filter by: \nsw3m bookmark section to use: ")
+   "nNumber of recent posts to bookmark: \n\
+sTag to filter by: \nsw3m bookmark section to use: ")
   (let ((response (delicious-api/posts/recent tag count)) post)
     (with-temp-buffer
       (prin1 response (current-buffer))
@@ -696,7 +699,8 @@ Switch to it and turn on `delicious-search-mode'."
     (insert
      (propertize
       (concat (propertize href 'face 'delicious-result-href-face) "\n"
-              (propertize description 'face 'delicious-result-description-face) "\n"
+              (propertize description
+                          'face 'delicious-result-description-face) "\n"
               (propertize tag 'face 'delicious-result-tag-face) "\n"
               (propertize extended 'face 'delicious-result-extended-face) "\n"
               (propertize time 'face 'delicious-result-time-face) "\n\n")
