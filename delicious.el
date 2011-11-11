@@ -863,31 +863,29 @@ If UPDATE is non-nil, update the post's timestamp."
 
 ;;;_+ This does all the dirty work
 
-(defun delicious-search (what lambda)
+(defun delicious-search (what predicate)
   "Helper for all the other search functions.
 Look at their definitions for example usage.
 
 WHAT is the thing we're searching for.
 
-LAMBDA is the function to call with `post' bound to the currently
-processed Delicious post, as returned by `delicious-get-next-post',
-i.e. alist of the form ((FIELD1 . VALUE1) (FIELD2 . VALUE2) ...).
+PREDICATE is a function taking a Delicious post (as returned by
+`delicious-get-next-post') as its single argument.
 
-LAMBDA is expected to set `match' to the post in case it satisfied
-whatever it's testing for. It can also set `continue' to nil to
-prevent processing of further posts.
+It is expected to return non-nil in case the post satisfied
+whatever it's testing for, or nil in case it doesn't. If the
+return value is the symbol `done', no further posts are searched.
 
 See also `delicious-get-post-field'."
-  (let (post (continue t) match matches (match-count 0))
+  (let (post ret matches (match-count 0))
     (delicious-build-posts-list current-prefix-arg)
     (delicious-with-posts-buffer
       (delicious-goto-posts)
-      (while (and continue (setq post (delicious-get-next-post)))
-        (funcall lambda)
-        (when match
-          (setq match-count (1+ match-count))
-          (setq matches (cons match matches))
-          (setq match nil))))
+      (while (and (setq post (delicious-get-next-post))
+                  (not (eq ret 'done)))
+        (when (setq ret (funcall predicate post))
+          (setq match-count (1+ match-count)
+                matches (cons post matches)))))
     (delicious-search-build-buffer what match-count matches)))
 
 ;;;_+ Search by regexp
@@ -898,12 +896,11 @@ With a prefix argument, operate offline."
   (interactive "sEnter regexp search string: ")
   (delicious-search
    regexp
-   (lambda ()
-     (when (catch 'match
-             (dolist (field post)
-               (when (string-match regexp (cdr field))
-                 (throw 'match t))))
-       (setq match post)))))
+   (lambda (post)
+     (catch 'match
+       (dolist (field post)
+         (when (string-match regexp (cdr field))
+           (throw 'match t)))))))
 
 (defun delicious-search-description-regexp (regexp)
   "Display all posts matching REGEXP string in their description fields.
@@ -911,9 +908,8 @@ With a prefix argument, operate offline."
   (interactive "sEnter regexp search string: ")
   (delicious-search
    regexp
-   (lambda ()
-     (when (string-match regexp (delicious-get-post-field 'description post))
-       (setq match post)))))
+   (lambda (post)
+     (string-match regexp (delicious-get-post-field 'description post)))))
 
 (defun delicious-search-href-regexp (regexp)
   "Display all posts with URL matching REGEXP.
@@ -921,9 +917,8 @@ With a prefix argument, operate offline."
   (interactive "sEnter regexp search string: ")
   (delicious-search
    regexp
-   (lambda ()
-     (when (string-match regexp (delicious-get-post-field 'href post))
-       (setq match post)))))
+   (lambda (post)
+     (string-match regexp (delicious-get-post-field 'href post)))))
 
 ;;;_+ Search by tag
 
@@ -933,14 +928,13 @@ With a prefix argument, operate offline."
   (let ((taglist (delicious-tags-to-list tags)))
     (delicious-search
      tags
-     (lambda ()
+     (lambda (post)
        (let ((post-tags (delicious-tags-to-list
                          (or (delicious-get-post-field 'tag post) ""))))
-         (setq match post)
-         (mapc (lambda (tag)
-                 (unless (member tag post-tags)
-                   (setq match nil)))
-               taglist))))))
+         (catch 'match
+           (dolist (tag taglist t)
+             (unless (member tag post-tags)
+               (throw 'match nil)))))))))
 
 (defun delicious-search-tags-any (tags)
   "Display all posts matching any of TAGS."
@@ -948,14 +942,13 @@ With a prefix argument, operate offline."
   (let ((taglist (delicious-tags-to-list tags)))
     (delicious-search
      tags
-     (lambda ()
+     (lambda (post)
        (let ((post-tags (delicious-tags-to-list
                          (or (delicious-get-post-field 'tag post) ""))))
-         (when (catch 'match
-                 (dolist (tag taglist)
-                   (when (member tag post-tags)
-                     (throw 'match t))))
-           (setq match post)))))))
+         (catch 'match
+           (dolist (tag taglist)
+             (when (member tag post-tags)
+               (throw 'match t)))))))))
 
 ;;;_+ Search by date
 
@@ -965,9 +958,8 @@ With a prefix argument, operate offline."
   (interactive "sEnter the date (regexp): ")
   (delicious-search
    date
-   (lambda ()
-     (when (string-match date (delicious-get-post-field 'time post))
-       (setq match post)))))
+   (lambda (post)
+     (string-match date (delicious-get-post-field 'time post)))))
 
 ;;;_+ Search by hash
 
@@ -977,10 +969,9 @@ With a prefix argument, operate offline."
   (interactive "sEnter the hash: ")
   (delicious-search
    hash
-   (lambda ()
-     (when (string= hash (delicious-get-post-field 'hash post))
-       (setq match post
-             continue nil)))))
+   (lambda (post)
+     (and (string= hash (delicious-get-post-field 'hash post))
+          'done))))
 
 (defun delicious-get-hash-post (hash)
   "Return the post with hash HASH."
