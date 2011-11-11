@@ -284,7 +284,8 @@ NAME is the name of the field being checked."
   (let* ((cache-file (or cache-file delicious-cache-file))
          (buf (if (file-exists-p cache-file)
                   (find-file-noselect cache-file)
-                (error "Cache file %s not found" cache-file))))
+                (error "Cache file %s not found" cache-file)))
+         post)
     (with-current-buffer buf
       (delicious-goto-posts)
       (while (setq post (delicious-get-next-post))
