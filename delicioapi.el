@@ -113,6 +113,24 @@ Returns the result as parsed by `xml-parse-region'."
 The value returned is a time string as specified by `delicious-timestamp'."
   (xml-get-attribute (delicious-api-request "posts/update") 'time))
 
+(defun delicious-api-get-hashes (&optional cooked)
+  "Return a change manifest of all posts.
+If COOKED is non-nil, returns a hash table mapping bookmark URL
+MD5 hashes to their change detection signatures (both strings).
+Otherwise, the raw s-expression response is returned."
+  (let ((resp (delicious-api-request "posts/all?hashes")))
+    (if cooked
+        (when (eq (car resp) 'posts)
+          (let ((res (make-hash-table :test 'equal)))
+            (mapc (lambda (el)
+                    (let ((attrs (cadr el)))
+                      (puthash (cdr (assq 'url attrs))
+                               (cdr (assq 'meta attrs))
+                               res)))
+                  (cddr resp))
+            res))
+      resp)))
+
 (defun delicious-api/posts/add (url &optional description tags extended time)
   "Post a bookmark to your Delicious account.
 You may include a DESCRIPTION (string), TAGS (space-separated string),
