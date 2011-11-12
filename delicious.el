@@ -141,6 +141,29 @@ This assumes the buffer visiting `delicious-posts-file' is current."
 POST is a Delicious post as returned by `delicious-get-next-post'."
   (assoc-default field post 'eq))
 
+(defmacro delicious-do-posts (vars &rest body)
+  "A `dolist' work-alike for the local Delicious posts.
+BODY is evaluated for each post in BUFFER (defaults to
+auto-visited `delicious-posts-file') with VAR bound to the post.
+Returns RESULT or the value trown to the `return' tag (in the
+latter case returning immediately without going through further
+posts). Point is left just after the last post read.
+
+\(fn (VAR [RESULT BUFFER]) BODY...)"
+  (declare (debug t) (indent 1))
+  `(with-current-buffer ,(or (third vars)
+                             '(find-file-noselect delicious-posts-file))
+     (or (eq buffer-undo-list t)
+         (buffer-disable-undo))
+     (or (derived-mode-p 'emacs-lisp-mode)
+         (emacs-lisp-mode))
+     (delicious-goto-posts)
+     (let (,(car vars))
+       (catch 'return
+         (while (setq ,(car vars) (delicious-get-next-post))
+           ,@body)
+         ,(second vars)))))
+
 ;;;;_+ Posting
 
 ;;;_+ Online and offline
@@ -223,12 +246,9 @@ If OFFLINE is non-nil, don't update the local timestamp."
 (defun delicious-find-hash-post (hash)
   "Set point past post with HASH and return its beginning position.
 This assumes the buffer visiting `delicious-posts-file' is current."
-  (let (post)
-    (delicious-goto-posts)
-    (catch 'found
-      (while (setq post (delicious-get-next-post))
-        (when (string= hash (delicious-get-post-field 'hash post))
-          (throw 'found (scan-sexps (point) -1)))))))
+  (delicious-do-posts (post)
+    (when (string= hash (delicious-get-post-field 'hash post))
+      (throw 'return (scan-sexps (point) -1)))))
 
 (defun delicious-edit-post-locally (hash fields)
   "Replace old information in local copy of post with HASH using FIELDS.
@@ -284,20 +304,17 @@ NAME is the name of the field being checked."
   (let* ((cache-file (or cache-file delicious-cache-file))
          (buf (if (file-exists-p cache-file)
                   (find-file-noselect cache-file)
-                (error "Cache file %s not found" cache-file)))
-         post)
-    (with-current-buffer buf
-      (delicious-goto-posts)
-      (while (setq post (delicious-get-next-post))
-        (let* ((href (delicious-get-post-field 'href post))
-               (description (delicious-get-post-field 'description post))
-               (tags (delicious-get-post-field 'tag post))
-               (extended (delicious-get-post-field 'extended post))
-               (time (delicious-get-post-field 'time post)))
-          (delicious-api/posts/add href description tags extended time)
-          (delicious-post-local (list 'post post))
-          (message "%s posted" description)
-          (sleep-for 2))))
+                (error "Cache file %s not found" cache-file))))
+    (delicious-do-posts (post nil buf)
+      (let* ((href (delicious-get-post-field 'href post))
+             (description (delicious-get-post-field 'description post))
+             (tags (delicious-get-post-field 'tag post))
+             (extended (delicious-get-post-field 'extended post))
+             (time (delicious-get-post-field 'time post)))
+        (delicious-api/posts/add href description tags extended time)
+        (delicious-post-local (list 'post post))
+        (message "%s posted" description)
+        (sleep-for 2)))
     (when (y-or-n-p "Clear cache now? ")
       (kill-buffer buf)
       (delete-file cache-file)
@@ -425,13 +442,9 @@ If OFFLINE is non-nil, don't query the server for any information."
 
 (defun delicious-get-url-post (url)
   "Return the post with href field equal to URL."
-  (let (post)
-    (delicious-with-posts-buffer
-      (delicious-goto-posts)
-      (catch 'match
-        (while (setq post (delicious-get-next-post))
-          (when (string= url (delicious-get-post-field 'href post))
-            (throw 'match post)))))))
+  (delicious-do-posts (post)
+    (when (string= url (delicious-get-post-field 'href post))
+      (throw 'return post))))
 
 ;;;;_+ Description input and suggestion
 
@@ -519,20 +532,13 @@ If OFFLINE is non-nil, don't query the server."
   "Build the `delicious-tags-list' for use in completion.
 If OFFLINE is non-nil, don't query the server."
   (delicious-build-posts-list offline)
-  (delicious-with-posts-buffer
-    (delicious-goto-posts)
-    (setq delicious-tags-list
-          (let (tags-list
-                post
-                tags)
-            (while (setq post (delicious-get-next-post))
-              (setq tags (delicious-tags-to-list
-                          (delicious-get-post-field 'tag post)))
-              (and tags
-                   (mapc (lambda (tag)
-                           (add-to-list 'tags-list tag))
-                         tags)))
-            tags-list))))
+  (setq delicious-tags-list
+        (let (tags-list tags)
+          (delicious-do-posts (post tags-list)
+            (setq tags (delicious-tags-to-list
+                        (delicious-get-post-field 'tag post)))
+            (when tags
+              (mapc (lambda (tag) (add-to-list 'tags-list tag)) tags))))))
 
 ;; FIXME and what about syncing?
 (defun delicious-rename-tag (old-tag new-tag)
@@ -561,15 +567,10 @@ NEW-TAG can be multiple tags, comma-separated." ; FIXME check this
 
 (defun delicious-delete-href-post-locally (url)
   "Delete the first local copy of the post with href field URL."
-  (let (post)
-    (delicious-with-posts-buffer
-      (delicious-goto-posts)
-      (when (catch 'match
-              (while (setq post (delicious-get-next-post))
-                (when (string= url (delicious-get-post-field 'href post))
-                  (throw 'match post))))
-        (delete-region (point) (scan-sexps (point) -1))
-        (delicious-update-timestamp)))))
+  (when (delicious-get-url-post url)
+    (delicious-with-posts-buffer ; NB this relies on correct point position
+      (delete-region (point) (scan-sexps (point) -1)))
+    (delicious-update-timestamp)))
 
 ;;;;_+ w3m
 (defvar w3m-bookmark-file)
@@ -586,9 +587,7 @@ sTag to filter by: \nsw3m bookmark section to use: ")
   (let ((response (delicious-api/posts/recent tag count)) post)
     (with-temp-buffer
       (prin1 response (current-buffer))
-      (goto-char (point-min))
-      (delicious-goto-posts)
-      (while (setq post (delicious-get-next-post))
+      (delicious-do-posts (post nil (current-buffer))
         (w3m-bookmark-write-file
          (delicious-get-post-field 'href post)
          (delicious-get-post-field 'description post)
@@ -864,12 +863,10 @@ whatever it's testing for, or nil in case it doesn't. If the
 return value is the symbol `done', no further posts are searched.
 
 See also `delicious-get-post-field'."
-  (let (post ret matches (match-count 0))
+  (let (ret matches (match-count 0))
     (delicious-build-posts-list current-prefix-arg)
-    (delicious-with-posts-buffer
-      (delicious-goto-posts)
-      (while (and (setq post (delicious-get-next-post))
-                  (not (eq ret 'done)))
+    (delicious-do-posts (post)
+      (unless (eq ret 'done)
         (when (setq ret (funcall predicate post))
           (setq match-count (1+ match-count)
                 matches (cons post matches)))))
@@ -962,14 +959,10 @@ With a prefix argument, operate offline."
 
 (defun delicious-get-hash-post (hash)
   "Return the post with hash HASH."
-  (let (post)
-    (delicious-build-posts-list)
-    (delicious-with-posts-buffer
-      (delicious-goto-posts)
-      (catch 'match
-        (while (setq post (delicious-get-next-post))
-          (when (string= hash (delicious-get-post-field 'hash post))
-            (throw 'match post)))))))
+  (delicious-build-posts-list)
+  (delicious-do-posts (post)
+    (when (string= hash (delicious-get-post-field 'hash post))
+      (throw 'return post))))
 
 (provide 'delicious)
 ;;; delicious.el ends here
