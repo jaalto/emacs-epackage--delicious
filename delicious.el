@@ -120,7 +120,7 @@ will be disabled."
          (buffer-disable-undo))
      (or (derived-mode-p 'emacs-lisp-mode)
          (emacs-lisp-mode))
-     (progn ,@body)))
+     ,@body))
 
 (defsubst delicious-goto-posts ()
   "Go to the position where the posts start.
