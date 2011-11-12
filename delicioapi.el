@@ -111,10 +111,7 @@ Returns the result as parsed by `xml-parse-region'."
 (defun delicious-api-get-timestamp ()
   "Return time of the last update for your Delicious user account.
 The value returned is a time string as specified by `delicious-timestamp'."
-  (let* ((path (format "posts/update"))
-         (update (delicious-api-request path))
-         (date (xml-get-attribute update 'time)))
-    date))
+  (xml-get-attribute (delicious-api-request "posts/update") 'time))
 
 (defun delicious-api/posts/add (url &optional description tags extended time)
   "Post a bookmark to your Delicious account.
