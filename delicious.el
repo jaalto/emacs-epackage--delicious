@@ -469,7 +469,7 @@ If provided, add DEFAULT to the list of default values."
 ;;;;_+ Tag completion, suggestion, and manipulation
 
 (defun delicious-tags-to-list (tags)
-  (split-string tags "[ ,]+"))
+  (split-string tags "[ ,]+" t))
 
 (defun delicious-read-tags (&optional url prompt-prefix existing offline)
   "Read tag(s) for URL (or all user tags if nil) in the minibuffer.
