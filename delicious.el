@@ -571,19 +571,6 @@ NEW-TAG can be multiple tags, comma-separated." ; FIXME check this
         (delete-region (point) (scan-sexps (point) -1))
         (delicious-update-timestamp)))))
 
-;;; FIXME use a local list of `meta's instead?
-'(defun delicious-delete-hash-post-locally (hash)
-  "Delete local copy of the post with hash field HASH."
-  (let (post)
-    (delicious-with-posts-buffer
-      (delicious-goto-posts)
-      (when (catch 'match
-              (while (setq post (delicious-get-next-post))
-                (when (string= hash (delicious-get-post-field 'hash post))
-                  (throw 'match post))))
-        (delete-region (point) (scan-sexps (point) -1))
-        (delicious-update-timestamp)))))
-
 ;;;;_+ w3m
 (defvar w3m-bookmark-file)
 (defvar w3m-bookmark-section-delimiter)
