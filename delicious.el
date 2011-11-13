@@ -355,10 +355,9 @@ Use the current date and time if nothing entered."
 
 (defun delicious-refresh-p ()
   "Return t if server timestamp is newer than local timestamp."
-  (let ((server-timestamp (delicious-api-get-timestamp))
-        (local-timestamp (delicious-get-local-timestamp)))
-    (or (null local-timestamp)
-        (string< local-timestamp server-timestamp))))
+  (let ((local (delicious-get-local-timestamp)))
+    (or (null local)
+        (string< local (delicious-api-get-timestamp)))))
 
 (defun delicious-get-local-timestamp ()
   "Return the timestamp recorded in the local posts as a string."
