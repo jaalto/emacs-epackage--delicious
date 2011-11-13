@@ -223,8 +223,8 @@ If NOLOCAL is non-nil, don't add the post to the local list."
                                  (cons 'extended extended)
                                  (cons 'hash (md5 url))
                                  (cons 'tag tags)
-                                 (cons 'time time))))
-    (message "URL posted")))
+                                 (cons 'time time)))))
+  (message "URL posted"))
 
 (defun delicious-post-local (post &optional offline)
   "Add POST to the local copy.
