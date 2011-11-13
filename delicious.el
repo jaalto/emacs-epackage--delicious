@@ -325,6 +325,7 @@ Returns the updated post."
                 (value (cdr cell)))
             (setcdr (assq field post) value)))
         (prin1 (list 'post post) (current-buffer))
+        (save-buffer)
         (list 'post post)))))
 
 (defun delicious-check-input (input &optional name)
@@ -624,8 +625,9 @@ NEW-TAG can be multiple tags, comma-separated." ; FIXME check this
 (defun delicious-delete-href-post-locally (url)
   "Delete the first local copy of the post with href field URL."
   (when (delicious-get-url-post url)
-    (delicious-with-posts-buffer ; NB this relies on correct point position
-      (delete-region (point) (scan-sexps (point) -1)))))
+    (delicious-with-posts-buffer    ; NB this relies on correct point position
+      (delete-region (point) (scan-sexps (point) -1))
+      (save-buffer))))
 
 ;;;;_+ w3m
 (defvar w3m-bookmark-file)
