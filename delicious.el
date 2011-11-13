@@ -44,6 +44,13 @@ for managing and sharing bookmarks."
   :type 'string
   :group 'delicious)
 
+(defcustom delicious-manifest-file
+  (condition-case nil (locate-user-emacs-file ".delicious.manifest")
+    (error "~/.delicious.manifest"))
+  "Path to the file to save Delicious posts manifest into (internal use only)."
+  :type 'string
+  :group 'delicious)
+
 (defcustom delicious-timestamp-file
   (condition-case nil (locate-user-emacs-file ".delicious.timestamp")
     (error "~/.delicious.timestamp"))
@@ -138,6 +145,20 @@ will be disabled."
   `(delicious-with-buffer (find-file-noselect delicious-posts-file)
      ,@body))
 
+(defun delicious-local-manifest ()
+  "Return the local posts manifest."
+  (delicious-with-buffer (find-file-noselect delicious-manifest-file)
+    (unless (zerop (buffer-size))
+      (goto-char (point-min))
+      (read (current-buffer)))))
+
+(defun delicious-set-local-manifest (manifest)
+  "Replace the local posts manifest with MANIFEST."
+  (delicious-with-buffer (find-file-noselect delicious-manifest-file)
+    (erase-buffer)
+    (prin1 manifest (current-buffer))
+    (save-buffer)))
+
 (defsubst delicious-goto-posts ()
   "Position point at the start of the posts.
 This assumes the posts buffer is current."
@@ -180,34 +201,58 @@ posts). Point is left just after the last post read.
 
 ;;;_+ Online and offline
 
-(defun delicious-build-posts-list (&optional offline force)
-  "Load local copy of posts, then update if server timestamp is newer.
-If OFFLINE is non-nil, don't query the server.
-If FORCE is non-nil, or if a prefix is given interactively, skip the
-timestamp comparison and force a refresh from the server."
-  (interactive)
-  (if (and offline force)
-      (error "Can't force an update while offline"))
-  (cond (offline
-         (message "Reading local posts list..."))
-        ((or force current-prefix-arg)
-         (message "Reading posts from server..."))
-        (t
-         (message "Reading posts from last-modified source...")))
-  (delicious-with-posts-buffer
-    (unless offline
-      (when (or force
-                current-prefix-arg
-                (delicious-refresh-p))
-        (let ((posts (delicious-api/posts/all)))
-          (erase-buffer)
-          (prin1 posts (current-buffer)))
-        (save-buffer))))
-  (message "Done"))
+(defun delicious-sync-posts (&optional force)
+  "Bring the local copy of posts into sync with the Delicious server.
+If FORCE is non-nil, or if a prefix argument is given
+interactively, unconditionally replace the local with the remote
+version."
+  (interactive "P")
+  (message "Updating Delicious bookmarks from the server...")
+  (let ((first (not (file-exists-p delicious-manifest-file))))
+    (if (or force first)
+        (progn
+          (delicious-with-posts-buffer
+            (erase-buffer)
+            (prin1 (delicious-api/posts/all) (current-buffer))
+            (save-buffer))
+          (delicious-fake-sync))
+      (when (delicious-refresh-p)
+        (delicious-update-posts))))
+  (message "Updating Delicious bookmarks from the server...done"))
+
+(defun delicious-update-posts ()
+  "Update only the differing posts."
+  (let ((remote (delicious-api-get-hashes t))
+        (local (delicious-local-manifest))
+        updates)
+    (maphash (lambda (hash meta)
+               (unless (string= meta (gethash hash local ""))
+                 (push hash updates))
+               (remhash hash local))
+             remote)
+    (let ((garbage (append (let (r) (maphash (lambda (hash _) (push hash r))
+                                             local))
+                           updates)))
+      (delicious-do-posts (post)
+        (let ((hash (delicious-get-post-field 'hash post)))
+          (when (member hash garbage)
+            (delete-region (point) (scan-sexps (point) -1))
+            (unless (setq garbage (delete hash garbage))
+              (throw 'return nil))))))
+    (delicious-with-posts-buffer
+      (delicious-goto-posts)
+      (mapc (lambda (p) (prin1 p (current-buffer)))
+            (xml-node-children
+             (delicious-api-request
+              (concat "posts/get?hashes=" (mapconcat 'identity updates "+")))))
+      (save-buffer))
+    (delicious-build-tags-list t)
+    (delicious-set-local-manifest remote)
+    (delicious-update-timestamp)))
 
 (defun delicious-post-interactive-args (&optional offline)
   (let* ((url (delicious-read-url))
-         (oldpost (progn (delicious-build-posts-list offline)
+         (oldpost (progn (unless offline (delicious-sync-posts))
                          (delicious-get-url-post url))))
     (when oldpost
       (or (y-or-n-p "This URL is a duplicate. Replace existing bookmark? ")
@@ -236,15 +281,14 @@ If NOLOCAL is non-nil, don't add the post to the local list."
                                  (cons 'hash (md5 url))
                                  (cons 'tag tags)
                                  (cons 'time time)))))
+  (delicious-fake-sync)
   (message "Posting %s to Delicious...done" url))
 
-(defun delicious-post-local (post &optional offline)
+(defun delicious-post-local (post)
   "Add POST to the local copy.
-If we already had a post with the same hash as POST, delete it first.
-If OFFLINE is non-nil, don't update the local timestamp."
-  (unless offline (delicious-update-timestamp))
+If we already had a post with the same hash as POST, delete it
+first."
   (delicious-with-posts-buffer
-    (delicious-goto-posts)
     (let ((maybe-point (delicious-find-hash-post
                         (delicious-get-post-field 'hash (cadr post)))))
       (and maybe-point (delete-region (point) maybe-point))
@@ -266,7 +310,7 @@ This assumes the buffer visiting `delicious-posts-file' is current."
   "Replace old information in local copy of post with HASH using FIELDS.
 FIELDS is a list of cons cells, with each cell being a field name
 and value.
-Return the updated post."
+Returns the updated post."
   (delicious-with-posts-buffer
     (delicious-goto-posts)
     (let (maybe-beg)
@@ -281,7 +325,6 @@ Return the updated post."
                 (value (cdr cell)))
             (setcdr (assq field post) value)))
         (prin1 (list 'post post) (current-buffer))
-        (delicious-update-timestamp)
         (list 'post post)))))
 
 (defun delicious-check-input (input &optional name)
@@ -292,6 +335,11 @@ NAME is the name of the field being checked."
     input))
 
 ;;;_+ Offline
+
+(defun delicious-fake-sync ()
+  "Update the manifest and timestamp, but not the actual posts."
+  (delicious-set-local-manifest (delicious-api-get-hashes t))
+  (delicious-update-timestamp))
 
 (defun delicious-post-offline (url description &optional tags extended time)
   "Input bookmarks to post later.  Don't contact the server for anything."
@@ -327,6 +375,7 @@ NAME is the name of the field being checked."
         (delicious-post-local (list 'post post))
         (message "%s posted" description)
         (sleep-for 2)))
+    (delicious-fake-sync)
     (when (y-or-n-p "Clear cache now? ")
       (kill-buffer buf)
       (delete-file cache-file)
@@ -537,7 +586,7 @@ If OFFLINE is non-nil, don't query the server."
 (defun delicious-build-tags-list (&optional offline)
   "Build the `delicious-tags-list' for use in completion.
 If OFFLINE is non-nil, don't query the server."
-  (delicious-build-posts-list offline)
+  (unless offline (delicious-sync-posts))
   (setq delicious-tags-list
         (let (tags-list tags)
           (delicious-do-posts (post tags-list)
@@ -870,7 +919,7 @@ return value is the symbol `done', no further posts are searched.
 
 See also `delicious-get-post-field'."
   (let (ret matches (match-count 0))
-    (delicious-build-posts-list current-prefix-arg)
+    (unless current-prefix-arg (delicious-sync-posts))
     (delicious-do-posts (post)
       (unless (eq ret 'done)
         (when (setq ret (funcall predicate post))
@@ -965,7 +1014,7 @@ With a prefix argument, operate offline."
 
 (defun delicious-get-hash-post (hash)
   "Return the post with hash HASH."
-  (delicious-build-posts-list)
+  (delicious-sync-posts)
   (delicious-do-posts (post)
     (when (string= hash (delicious-get-post-field 'hash post))
       (throw 'return post))))
