@@ -166,10 +166,10 @@ If not provided, contact the server."
           (setq cell (cons (cons 'tag name) (cons 'count count)))
           (setq tags-list (cons cell tags-list)))))))
 
-(defun delicious-api/posts/get (&optional tag date)
-  "Return a list of posts filtered by TAG on a given DATE.
+(defun delicious-api/posts/get (&optional tag date url hashes meta)
+  "Return a list of posts filtered by the supplied parameters.
 If no date is supplied, the most recent date with posts will be used."
-  (delicious-api-request "posts/get" 'tag `("dt" . ,date)))
+  (delicious-api-request "posts/get" 'tag `("dt" . ,date) 'url 'hashes 'meta))
 
 (defun delicious-api/posts/recent (&optional tag count)
   "Return a list, optionally filtered by TAG, of the COUNT most recent posts.
