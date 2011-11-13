@@ -754,7 +754,7 @@ Signals an error if there is no result at all."
   (interactive)
   (let ((url (get-text-property (point) 'href)))
     (kill-new url)
-    (message url)))
+    (message "%s" url)))
 
 ;;;_+ Editing posts
 
