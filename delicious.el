@@ -213,7 +213,7 @@ timestamp comparison and force a refresh from the server."
   "Post a bookmark with arguments URL, DESCRIPTION, TAGS, EXTENDED, and TIME.
 If NOLOCAL is non-nil, don't add the post to the local list."
   (interactive (delicious-post-interactive-args))
-  (message "Waiting for server")
+  (message "Posting %s to Delicious..." url)
   (delicious-api/posts/add url description tags extended time)
   (unless nolocal
     (delicious-post-local (list 'post
@@ -224,7 +224,7 @@ If NOLOCAL is non-nil, don't add the post to the local list."
                                  (cons 'hash (md5 url))
                                  (cons 'tag tags)
                                  (cons 'time time)))))
-  (message "URL posted"))
+  (message "Posting %s to Delicious...done" url))
 
 (defun delicious-post-local (post &optional offline)
   "Add POST to the local copy.
