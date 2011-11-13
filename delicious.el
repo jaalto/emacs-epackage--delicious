@@ -40,7 +40,14 @@ for managing and sharing bookmarks."
 (defcustom delicious-posts-file (condition-case nil
                                     (locate-user-emacs-file ".delicious")
                                   (error "~/.delicious"))
-  "Path to the file to save Delicious posts into (for internal use only)."
+  "Path to the file to save Delicious posts into (internal use only)."
+  :type 'string
+  :group 'delicious)
+
+(defcustom delicious-timestamp-file
+  (condition-case nil (locate-user-emacs-file ".delicious.timestamp")
+    (error "~/.delicious.timestamp"))
+  "Path to the file to save Delicious posts timestamp into (internal use only)."
   :type 'string
   :group 'delicious)
 
@@ -91,6 +98,9 @@ for managing and sharing bookmarks."
 
 (defvar delicious-tags-list nil
   "List of tags (strings) for use in completion (internal).")
+
+(defvar delicious-timestamp nil
+  "Time of the last update from the server.")
 
 (defcustom delicious-xsel-prog nil
   "Full path to a program that returns the X selection, like xsel."
@@ -360,21 +370,16 @@ Use the current date and time if nothing entered."
         (string< local (delicious-api-get-timestamp)))))
 
 (defun delicious-get-local-timestamp ()
-  "Return the timestamp recorded in the local posts as a string."
-  (delicious-with-posts-buffer
-    (goto-char (point-min))
-    (condition-case nil
-        (assoc-default 'update (cadr (read (current-buffer))) 'eq)
-      (end-of-file nil))))
+  "Return the timestamp of the last update from the server as a string."
+  (or delicious-timestamp
+      (with-current-buffer (find-file-noselect delicious-timestamp-file nil t)
+        (unless (zerop (buffer-size))
+          (setq delicious-timestamp (buffer-string))))))
 
 (defun delicious-update-timestamp ()
-  "Update or create the local timestamp in `delicious-posts-file'."
-  (delicious-with-posts-buffer
-    (goto-char (point-min))
-    (let ((time (delicious-api-get-timestamp)))
-      (re-search-forward delicious-timestamp)
-      (replace-match time)
-      (save-buffer))))
+  "Update the local timestamp."
+  (with-temp-file delicious-timestamp-file
+    (insert (setq delicious-timestamp (delicious-api-get-timestamp)))))
 
 (defun delicious-format-time (time)
   "Return TIME as a Delicious timestamp."
