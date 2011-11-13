@@ -562,14 +562,14 @@ NEW-TAG can be multiple tags, comma-separated." ; FIXME check this
   (interactive "sEnter URL to delete: ")
   (delicious-api/posts/delete href)
   (delicious-delete-href-post-locally href)
+  (delicious-update-timestamp)
   (message "%s deleted" href))
 
 (defun delicious-delete-href-post-locally (url)
   "Delete the first local copy of the post with href field URL."
   (when (delicious-get-url-post url)
     (delicious-with-posts-buffer ; NB this relies on correct point position
-      (delete-region (point) (scan-sexps (point) -1)))
-    (delicious-update-timestamp)))
+      (delete-region (point) (scan-sexps (point) -1)))))
 
 ;;;;_+ w3m
 (defvar w3m-bookmark-file)
