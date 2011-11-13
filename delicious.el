@@ -139,8 +139,8 @@ will be disabled."
      ,@body))
 
 (defsubst delicious-goto-posts ()
-  "Go to the position where the posts start.
-This assumes the buffer visiting `delicious-posts-file' is current."
+  "Position point at the start of the posts.
+This assumes the posts buffer is current."
   (goto-char (point-min))
   (down-list 1)
   (forward-sexp 2))
