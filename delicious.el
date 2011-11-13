@@ -120,16 +120,22 @@ for managing and sharing bookmarks."
 
 ;;;;_+ Helper functions
 
+(defmacro delicious-with-buffer (buffer &rest body)
+  "Evaluate BODY in BUFFER containing local Delicious data."
+  (declare (indent 1) (debug t))
+  `(with-current-buffer ,buffer
+     (or (eq buffer-undo-list t)
+         (buffer-disable-undo))
+     (or (derived-mode-p 'emacs-lisp-mode)
+         (emacs-lisp-mode))
+     ,@body))
+
 (defmacro delicious-with-posts-buffer (&rest body)
   "Evaluate BODY in a buffer visiting `delicious-posts-file'.
 The buffer will be put into `emacs-lisp-mode' and undo information
 will be disabled."
   (declare (indent 0) (debug t))
-  `(with-current-buffer (find-file-noselect delicious-posts-file)
-     (or (eq buffer-undo-list t)
-         (buffer-disable-undo))
-     (or (derived-mode-p 'emacs-lisp-mode)
-         (emacs-lisp-mode))
+  `(delicious-with-buffer (find-file-noselect delicious-posts-file)
      ,@body))
 
 (defsubst delicious-goto-posts ()
@@ -161,12 +167,8 @@ posts). Point is left just after the last post read.
 
 \(fn (VAR [RESULT BUFFER]) BODY...)"
   (declare (debug t) (indent 1))
-  `(with-current-buffer ,(or (third vars)
-                             '(find-file-noselect delicious-posts-file))
-     (or (eq buffer-undo-list t)
-         (buffer-disable-undo))
-     (or (derived-mode-p 'emacs-lisp-mode)
-         (emacs-lisp-mode))
+  `(delicious-with-buffer ,(or (third vars)
+                               '(find-file-noselect delicious-posts-file))
      (delicious-goto-posts)
      (let (,(car vars))
        (catch 'return
