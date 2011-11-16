@@ -17,7 +17,7 @@ Vcs-Password:
 Homepage:
 Wiki: http://www.emacswiki.org/emacs/DeliciousEl
 Commentary:
-Description: Commands for interacting with the Delicious API
+Description: commands for interacting with the Delicious API
  Provides commands to conveniently post new bookmarks, as well as search,
  display and update existing posts from within Emacs. Some integration with
  other Emacs modes such as emacs-w3m is also available.
