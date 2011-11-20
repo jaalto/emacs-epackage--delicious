@@ -455,10 +455,9 @@ If OFFLINE is non-nil, don't query the server for any information."
 
 (defun delicious-guess-check-w3m ()
   "If we're in a w3m buffer, use the current URL."
-  (if (and (boundp 'w3m-current-url)
-           w3m-current-url
-           (derived-mode-p 'w3m-mode))
-      w3m-current-url))
+  (and (boundp 'w3m-current-url)
+       (derived-mode-p 'w3m-mode)
+       w3m-current-url))
 
 (defun delicious-guess-check-point ()
   "If point is on a URL, return it."
@@ -474,14 +473,11 @@ If OFFLINE is non-nil, don't query the server for any information."
 
 (defun delicious-guess-check-selection ()
   "Check the X selection for a URL and return it."
-  (let (selection url)
-    (when (eq window-system 'x)
-      (setq selection (condition-case nil
-                          (x-get-selection)
-                        (error nil)))
-      (when (and selection
-                 (string-match thing-at-point-url-regexp selection))
-        (setq url (match-string-no-properties 0 selection))))))
+  (when (eq window-system 'x)
+    (let ((selection (condition-case nil (x-get-selection) (error nil))))
+      (and selection
+           (string-match thing-at-point-url-regexp selection)
+           (match-string-no-properties 0 selection)))))
 
 (defun delicious-guess-check-xsel ()
   "Check output of `delicious-xsel-prog' for a URL."
@@ -513,10 +509,9 @@ If provided, add DEFAULT to the list of default values."
 (defvar gnus-current-headers)
 (defun delicious-guess-description ()
   "Try some different things to get a default description."
-  (or (if (and (boundp 'w3m-current-title)
-               (not (null w3m-current-title))
-               (derived-mode-p 'w3m-mode))
-          w3m-current-title)
+  (or (and (boundp 'w3m-current-title)
+           (derived-mode-p 'w3m-mode)
+           w3m-current-title)
       (if (derived-mode-p 'gnus-summary-mode 'gnus-article-mode)
           (aref gnus-current-headers 1))))
 
