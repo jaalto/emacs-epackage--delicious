@@ -451,13 +451,7 @@ If OFFLINE is non-nil, don't query the server for any information."
    (read-string "(Required) URL: " (delicious-guess-url)) "URL"))
 
 (defun delicious-guess-url ()
-  (let ((methods delicious-guess-url-methods)
-        guess)
-    (while (and (not guess)
-                methods)
-      (setq guess (funcall (car methods))
-            methods (cdr methods)))
-    guess))
+  (run-hook-with-args-until-success 'delicious-guess-url-methods))
 
 (defun delicious-guess-check-w3m ()
   "If we're in a w3m buffer, use the current URL."
