@@ -24,4 +24,4 @@
 (autoload 'delicious-search-date                "delicious" "" t)
 (autoload 'delicious-search-hash                "delicious" "" t)
 
-(provide 'delicious-install)
+(provide 'delicious-epkg-install)
