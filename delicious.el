@@ -428,7 +428,8 @@ Use the current date and time if nothing entered."
 (defun delicious-get-local-timestamp ()
   "Return the timestamp of the last update from the server as a string."
   (or delicious-timestamp
-      (with-current-buffer (find-file-noselect delicious-timestamp-file nil t)
+      (with-temp-buffer
+        (insert-file-contents-literally delicious-timestamp-file)
         (unless (zerop (buffer-size))
           (setq delicious-timestamp (buffer-string))))))
 
