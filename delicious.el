@@ -1,4 +1,4 @@
-;;; delicious.el --- functions to make productive use of the Delicious API
+;;; delicious.el --- keep local copy of, search and post Delicious bookmarks
 
 ;; Copyright (C) 2004, 2005, 2006, 2007 John Sullivan
 
@@ -23,6 +23,10 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ;;; Commentary
+
+;; A local Delicious bookmark store with functions and commands to keep it in
+;; sync with the Delicious server, post and search bookmarks etc. See the
+;; Texinfo documentation for more details.
 
 ;;; Code:
 
