@@ -58,16 +58,6 @@
 (defconst delicious-api "/v1/"
   "The path to the Delicious API.  It should begin and end in a slash.")
 
-(defconst delicious-timestamp
-  (concat
-   "\\([1-9][0-9]\\{3\\}\\)-"           ;year
-   "\\([0-1][0-9]\\)-"                  ;month
-   "\\([0-3][0-9]\\)T"                  ;day
-   "\\([0-2][0-9]\\):"                  ;hour
-   "\\([0-5][0-9]\\):"                  ;minute
-   "\\([0-5][0-9]\\)Z")                 ;second
-  "Regular expression matching the Delicious timestamp format.")
-
 ;;;;_+ API Functions
 
 (defun delicious-api-response (buffer)
@@ -110,7 +100,8 @@ Returns the result as parsed by `xml-parse-region'."
 
 (defun delicious-api-get-timestamp ()
   "Return time of the last update for your Delicious user account.
-The value returned is a time string as specified by `delicious-timestamp'."
+The value returned is a timestamp string as returned by the
+\"posts/update\" request."
   (xml-get-attribute (delicious-api-request "posts/update") 'time))
 
 (defun delicious-api-get-hashes (&optional cooked)
