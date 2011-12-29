@@ -10,10 +10,7 @@ Upstream: Štěpán Němec <stepnem@gmail.com>
 Upstream-Bugs:
 Vcs-Type: git
 Vcs-Url: git://gitorious.org/delicious-el/delicious-el.git
-Vcs-Args:
 Vcs-Browser: http://gitorious.org/delicious-el
-Vcs-User:
-Vcs-Password:
 Homepage:
 Wiki: http://www.emacswiki.org/emacs/DeliciousEl
 Commentary:
