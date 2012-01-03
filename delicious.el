@@ -582,9 +582,9 @@ Returns a string consisting of the tags read separated by commas."
   (mapconcat
    'identity
    (let* ((suggestags
-           (when url
-             (apply 'append
-                    (mapcar 'cdr (delicious-api/posts/suggest url t)))))
+           (and url (not offline)
+                (apply 'append
+                       (mapcar 'cdr (delicious-api/posts/suggest url t)))))
           (prompt (concat (or prompt-prefix "Tag(s)")
                           (when suggestags
                             (concat " [suggested: "
