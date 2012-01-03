@@ -22,7 +22,7 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-;;; Commentary
+;;; Commentary:
 
 ;; A local Delicious bookmark store with functions and commands to keep it in
 ;; sync with the Delicious server, post and search bookmarks etc. See the
@@ -205,6 +205,7 @@ posts). Point is left just after the last post read.
 
 ;;;_+ Online and offline
 
+;;;###autoload
 (defun delicious-sync-posts (&optional force)
   "Bring the local copy of posts into sync with the Delicious server.
 If FORCE is non-nil, or if a prefix argument is given
@@ -270,6 +271,7 @@ version."
           (delicious-read-time-string
            (delicious-get-post-field 'time oldpost)))))
 
+;;;###autoload
 (defun delicious-post (url description &optional tags extended time nolocal)
   "Post a bookmark with arguments URL, DESCRIPTION, TAGS, EXTENDED, and TIME.
 If NOLOCAL is non-nil, don't add the post to the local list."
@@ -346,6 +348,7 @@ NAME is the name of the field being checked."
   (delicious-set-local-manifest (delicious-api-get-hashes t))
   (delicious-update-timestamp))
 
+;;;###autoload
 (defun delicious-post-offline (url description &optional tags extended time)
   "Input bookmarks to post later.  Don't contact the server for anything."
   (interactive (delicious-post-interactive-args t))
@@ -363,6 +366,7 @@ NAME is the name of the field being checked."
     (call-interactively 'delicious-post-offline))
   (message "Cache saved"))
 
+;;;###autoload
 (defun delicious-post-cache (&optional cache-file)
   "Post bookmarks from `delicious-cache-file', or CACHE-FILE if non-nil."
   (interactive)
@@ -386,6 +390,7 @@ NAME is the name of the field being checked."
       (delete-file cache-file)
       (message "Cache cleared"))))
 
+;;;###autoload
 (defun delicious-clear-cache (&optional cache-file)
   "Delete `delicious-cache-file' or CACHE-FILE and kill the buffer visiting it."
   (interactive)
@@ -591,6 +596,7 @@ If OFFLINE is non-nil, don't query the server."
               (mapc (lambda (tag) (add-to-list 'tags-list tag)) tags))))))
 
 ;; FIXME and what about syncing?
+;;;###autoload
 (defun delicious-rename-tag (old-tag new-tag)
   "Change all instances of OLD-TAG to NEW-TAG.
 NEW-TAG can be multiple tags, comma-separated." ; FIXME check this
@@ -608,6 +614,7 @@ NEW-TAG can be multiple tags, comma-separated." ; FIXME check this
 
 ;;;;_+ Deleting and editing posts
 
+;;;###autoload
 (defun delicious-delete-href-post (href)
   "Delete the post with URL HREF."
   (interactive "sEnter URL to delete: ")
@@ -627,8 +634,9 @@ NEW-TAG can be multiple tags, comma-separated." ; FIXME check this
 (defvar w3m-bookmark-file)
 (defvar w3m-bookmark-section-delimiter)
 (declare-function w3m-bookmark-sections "w3m-bookmark" nil)
-(declare-function w3m-bookmark-write-file "w3m-bookmark"(url title section))
+(declare-function w3m-bookmark-write-file "w3m-bookmark" (url title section))
 
+;;;###autoload
 (defun delicious-w3m-bookmark-recent (count tag section)
   "Add your COUNT recent Delicious posts with TAG to your w3m bookmarks file.
 They will be stored under SECTION."
@@ -645,6 +653,7 @@ sTag to filter by: \nsw3m bookmark section to use: ")
          section))))
   (message "w3m bookmarks updated"))
 
+;;;###autoload
 (defun delicious-w3m-export (section &optional tags extended time)
   "Export your w3m bookmarks from SECTION to Delicious.
 Optionally assign TAGS, EXTENDED description, and TIME to the bookmarks."
@@ -925,6 +934,7 @@ See also `delicious-get-post-field'."
 
 ;;;_+ Search by regexp
 
+;;;###autoload
 (defun delicious-search-posts-regexp (regexp)
   "Display all posts matching REGEXP string in any of their fields.
 With a prefix argument, operate offline."
@@ -937,6 +947,7 @@ With a prefix argument, operate offline."
          (when (string-match regexp (cdr field))
            (throw 'match t)))))))
 
+;;;###autoload
 (defun delicious-search-description-regexp (regexp)
   "Display all posts matching REGEXP string in their description fields.
 With a prefix argument, operate offline."
@@ -946,6 +957,7 @@ With a prefix argument, operate offline."
    (lambda (post)
      (string-match regexp (delicious-get-post-field 'description post)))))
 
+;;;###autoload
 (defun delicious-search-href-regexp (regexp)
   "Display all posts with URL matching REGEXP.
 With a prefix argument, operate offline."
@@ -957,6 +969,7 @@ With a prefix argument, operate offline."
 
 ;;;_+ Search by tag
 
+;;;###autoload
 (defun delicious-search-tags (tags)
   "Display all posts with TAGS.  With a prefix argument, operate offline."
   (interactive (list (delicious-read-tags)))
@@ -971,6 +984,7 @@ With a prefix argument, operate offline."
              (unless (member tag post-tags)
                (throw 'match nil)))))))))
 
+;;;###autoload
 (defun delicious-search-tags-any (tags)
   "Display all posts matching any of TAGS."
   (interactive (list (delicious-read-tags)))
@@ -987,6 +1001,7 @@ With a prefix argument, operate offline."
 
 ;;;_+ Search by date
 
+;;;###autoload
 (defun delicious-search-date (date)
   "Display all posts matching regexp SEARCH-DATE.
 With a prefix argument, operate offline."
@@ -998,6 +1013,7 @@ With a prefix argument, operate offline."
 
 ;;;_+ Search by hash
 
+;;;###autoload
 (defun delicious-search-hash (hash)
   "Display the post with hash HASH.
 With a prefix argument, operate offline."
