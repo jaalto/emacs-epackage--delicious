@@ -129,6 +129,16 @@ for managing and sharing bookmarks."
   :type 'list
   :group 'delicious)
 
+(defcustom delicious-guess-description-methods
+  '(delicious-guess-description-w3m
+    delicious-guess-description-gnus
+    delicious-guess-description-title)
+  "Function or list of functions to try to guess a post description.
+The functions are called, in order, with a single argument -- the
+post URL. The first one to return non-nil wins."
+  :type 'hook
+  :group 'delicious)
+
 ;;;;_+ Helper functions
 
 (defmacro delicious-with-buffer (buffer &rest body)
@@ -264,7 +274,7 @@ version."
           (error "Duplicate URL, not posted")))
     (list url
           (delicious-read-description
-           (delicious-get-post-field 'description oldpost))
+           url (delicious-get-post-field 'description oldpost))
           (delicious-read-tags url nil nil offline)
           (delicious-read-extended-description
            (delicious-get-post-field 'extended oldpost))
@@ -504,22 +514,38 @@ If OFFLINE is non-nil, don't query the server for any information."
 
 ;;;;_+ Description input and suggestion
 
-(defun delicious-read-description (&optional default)
+(defun delicious-read-description (&optional url default)
   "Prompt for a description, suggesting an appropriate default.
 If provided, add DEFAULT to the list of default values."
   (delicious-check-input
    (read-string "(Required) Description: " nil nil
-                (append (delicious-guess-description) default) t)
+                (append (list (delicious-guess-description url)) default) t)
    "Description"))
 
 (defvar gnus-current-headers)
-(defun delicious-guess-description ()
-  "Try some different things to get a default description."
-  (or (and (boundp 'w3m-current-title)
-           (derived-mode-p 'w3m-mode)
-           w3m-current-title)
-      (if (derived-mode-p 'gnus-summary-mode 'gnus-article-mode)
-          (aref gnus-current-headers 1))))
+(defun delicious-guess-description (url)
+  "Guess a default post description for URL."
+  (run-hook-with-args-until-success 'delicious-guess-description-methods url))
+
+(defun delicious-guess-description-gnus (_)
+  "Return the current Gnus article title."
+  (when (derived-mode-p 'gnus-summary-mode 'gnus-article-mode)
+    (aref gnus-current-headers 1)))
+
+(defun delicious-guess-description-w3m (_)
+  "Return the title of the page currently browsed with `w3m'."
+  (and (boundp 'w3m-current-title)
+       (derived-mode-p 'w3m-mode)
+       w3m-current-title))
+
+(defun delicious-guess-description-title (url)
+  "Fetch URL and return its HTML title."
+  (with-current-buffer (url-retrieve-synchronously url)
+    (goto-char (point-min))
+    (unwind-protect
+        (when (re-search-forward "<title>\\(.*?\\)</title>" nil t)
+          (match-string 1))
+      (kill-buffer nil))))
 
 ;;;;_+ Extended description
 
