@@ -119,14 +119,15 @@ for managing and sharing bookmarks."
   :group 'delicious)
 
 (defcustom delicious-guess-url-methods
-  '(delicious-guess-check-point
-    delicious-guess-check-w3m
-    delicious-guess-check-buffer
-    delicious-guess-check-selection
-    delicious-guess-check-xsel
-    delicious-guess-check-default)
-  "List of functions to try, in order, to guess a URL to post."
-  :type 'list
+  '(delicious-guess-url-point
+    delicious-guess-url-w3m
+    delicious-guess-url-buffer
+    delicious-guess-url-selection
+    delicious-guess-url-xsel
+    delicious-guess-url-default)
+  "Function or list of functions to try, in order, to guess a URL to post.
+The first one to return non-nil wins."
+  :type 'hook
   :group 'delicious)
 
 (defcustom delicious-guess-description-methods
@@ -469,25 +470,25 @@ If OFFLINE is non-nil, don't query the server for any information."
 (defun delicious-guess-url ()
   (run-hook-with-args-until-success 'delicious-guess-url-methods))
 
-(defun delicious-guess-check-w3m ()
+(defun delicious-guess-url-w3m ()
   "If we're in a w3m buffer, use the current URL."
   (and (boundp 'w3m-current-url)
        (derived-mode-p 'w3m-mode)
        w3m-current-url))
 
-(defun delicious-guess-check-point ()
+(defun delicious-guess-url-point ()
   "If point is on a URL, return it."
   (if (thing-at-point-looking-at thing-at-point-url-regexp)
       (thing-at-point-url-at-point)))
 
-(defun delicious-guess-check-buffer ()
+(defun delicious-guess-url-buffer ()
   "Check the buffer for a URL and return it."
   (save-excursion
     (goto-char (point-min))
     (if (re-search-forward thing-at-point-url-regexp nil t)
         (match-string-no-properties 0))))
 
-(defun delicious-guess-check-selection ()
+(defun delicious-guess-url-selection ()
   "Check the X selection for a URL and return it."
   (when (eq window-system 'x)
     (let ((selection (condition-case nil (x-get-selection) (error nil))))
@@ -495,14 +496,14 @@ If OFFLINE is non-nil, don't query the server for any information."
            (string-match thing-at-point-url-regexp selection)
            (match-string-no-properties 0 selection)))))
 
-(defun delicious-guess-check-xsel ()
+(defun delicious-guess-url-xsel ()
   "Check output of `delicious-xsel-prog' for a URL."
   (when delicious-xsel-prog
     (let ((selection (shell-command-to-string delicious-xsel-prog)))
       (if (string-match thing-at-point-url-regexp selection)
           (match-string-no-properties 0 selection)))))
 
-(defun delicious-guess-check-default ()
+(defun delicious-guess-url-default ()
   "Return some text to use for the URL guess."
   "http://")
 
