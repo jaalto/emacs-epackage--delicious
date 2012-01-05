@@ -132,7 +132,7 @@ or by evaluating something like the following:
 @end lisp
 
 Finally, to be able to securely log into your Delicious account, put
-something like the below into the file included in the
+something like the below into a file included in the
 @code{auth-sources} variable:
 
 @example
@@ -158,35 +158,58 @@ machine api.del.icio.us:443 port https login YourUserName password TopSecret
 
 @deffn Command delicious-post
 
-This is the command to post a URL to your del.icio.us account. The first
+This is the command to post a URL to your Delicious account. The first
 time you execute this command in an Emacs session, @code{delicious-el}
 will fetch from the server the list of tags you've used so far, and a
 complete list of all your posts to date. You will then be prompted for
 information for the new post. The only required information is the URL
 itself and a description. Everything else is optional.
 
-@code{delicious-el} will try to guess the URL that you want to enter. If you
-are in a w3m-el buffer, it will suggest the URL of the site you are
-looking at. If not, if there is a URL under the cursor, it will suggest
-that. If neither of these two things are true, it will scan the current
-buffer for a URL. It will suggest the first one that it finds. Next, it
-will check the clipboard and see if there is a URL there. If it doesn't
-find one, it will just put an @samp{http://} in the input line for you.
+@code{delicious-el} will try to guess the URL that you want to enter,
+based on the value of the @code{delicious-guess-url-methods} option.
 
-URL is a required field. If you try to enter a blank URL, the program will
-abort.
+@defopt delicious-guess-url-methods
+Hook run to obtain a default URL to post. The functions on this hook
+are called without arguments until one of them returns a non-nil
+value, which is then suggested as the default URL.
+
+The default functions on this hook provide the following guesses:
+
+@itemize
+@item URL at point
+@item URL currently browsed in @code{w3m}
+@item the first URL in the current buffer
+@item URL contained in the current selection
+@item the string @samp{http://}
+@end itemize
+@end defopt
+
+URL is a required field. If you try to enter a blank URL, the program
+will abort.
 
 When prompted for tags, use commas to separate multiple values. You
 have @kbd{TAB} completion available in typical Emacs style, based on
 all of the tags you have used in the past plus any suggestions
 provided by the API.
 
-@code{delicious-el} will attempt to guess an appropriate description. If
-you are in an @code{emacs-w3m} buffer, @code{delicious-el} will suggest
-the title of the page being viewed as a description. If you are looking
-at an article in Gnus, it will suggest the title of the article as a
-description. If you like the suggestion, hit @kbd{RET}. If you don't,
-just erase it and type your own.
+@code{delicious-el} will attempt to guess an appropriate description,
+depending on the value of the
+@code{delicious-guess-description-methods} option.
+
+@defopt delicious-guess-description-methods
+Hook run to obtain a default description to post. The functions on
+this hook are called with the post URL as their sole argument until
+one of them returns a non-nil value, which is then suggested as the
+default description.
+
+The default functions on this hook provide the following guesses:
+
+@itemize
+@item the current @code{w3m} title
+@item the current Gnus article title
+@item the HTML title of the URL being posted
+@end itemize
+@end defopt
 
 The server requires some kind of description be entered. If you don't
 enter one, the program will abort.
@@ -340,7 +363,7 @@ this regard and will do verification of your posts. You need the
 
 You can get the development version of this package via Git at
 @url{http://gitorious.org/delicious-el}. You can also download the
-snapshot tarball from
+current snapshot tarball from
 @url{http://gitorious.org/delicious-el/delicious-el/archive-tarball/dev}.
 
 @node Bugs, Index, Keeping Up, Top
