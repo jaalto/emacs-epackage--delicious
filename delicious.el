@@ -542,6 +542,7 @@ If provided, add DEFAULT to the list of default values."
 (defun delicious-guess-description-title (url)
   "Fetch URL and return its HTML title."
   (with-current-buffer (url-retrieve-synchronously url)
+    (set-buffer-multibyte t)
     (goto-char (point-min))
     (unwind-protect
         (when (re-search-forward "<title>\\(.*?\\)</title>" nil t)
