@@ -519,8 +519,8 @@ If OFFLINE is non-nil, don't query the server for any information."
   "Prompt for a description, suggesting an appropriate default.
 If provided, add DEFAULT to the list of default values."
   (delicious-check-input
-   (read-string "(Required) Description: " nil nil
-                (append (list (delicious-guess-description url)) default) t)
+   (let ((def (append (list (delicious-guess-description url)) default)))
+     (read-string "(Required) Description: " (car def) nil (cdr def) t))
    "Description"))
 
 (defvar gnus-current-headers)
