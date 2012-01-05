@@ -41,7 +41,7 @@ license is included with this package in the file named ``COPYING''.
 
 @contents
 
-@node Top, Installation, (dir), (dir)
+@node Top
 @top delicious-el
 
 This is a set of functions for interacting with
@@ -75,7 +75,7 @@ Commands
 @end detailmenu
 @end menu
 
-@node Installation, Usage, Top, Top
+@node Installation
 @chapter Installation
 
 After downloading and unpacking the archive or cloning the Git
@@ -144,7 +144,7 @@ machine api.del.icio.us:443 port https login YourUserName password TopSecret
 * Emacs-w3m integration::       View, export or import bookmarks
 @end menu
 
-@node Commands, Emacs-w3m integration, Usage, Usage
+@node Commands
 @section Commands
 
 @menu
@@ -153,7 +153,7 @@ machine api.del.icio.us:443 port https login YourUserName password TopSecret
 * Miscellanea::                 You probably won't need this
 @end menu
 
-@node Manipulating bookmarks, Searching, Commands, Commands
+@node Manipulating bookmarks
 @subsection Manipulating bookmarks
 
 @deffn Command delicious-post
@@ -234,7 +234,7 @@ changed to the new tags for all posts that had the old tag. After the
 renaming is done, the local tag list will be refreshed from the server.
 @end deffn
 
-@node Searching, Miscellanea, Manipulating bookmarks, Commands
+@node Searching
 @subsection Searching
 
 All of the search commands described below display their results in a
@@ -294,7 +294,7 @@ to account for whitespace between tags with this method.
 Other search commands include @code{delicious-search-date},
 @code{delicious-search-hash} and @code{delicious-search-tags-any}.
 
-@node Miscellanea,  , Searching, Commands
+@node Miscellanea
 @subsection Miscellanea
 
 @deffn Command delicious-build-posts-list
@@ -320,7 +320,7 @@ list gets corrupted, or if you add tags using another interface.
 @end deffn
 
 
-@node Emacs-w3m integration,  , Commands, Usage
+@node Emacs-w3m integration
 @section Emacs-w3m integration
 
 URL and description guessing
@@ -358,7 +358,7 @@ this regard and will do verification of your posts. You need the
 @file{w3m-bookmarks.el} library to use this feature.
 @end deffn
 
-@node Keeping Up, Bugs, Usage, Top
+@node Keeping Up
 @chapter Keeping Up
 
 You can get the development version of this package via Git at
@@ -366,12 +366,12 @@ You can get the development version of this package via Git at
 current snapshot tarball from
 @url{http://gitorious.org/delicious-el/delicious-el/archive-tarball/dev}.
 
-@node Bugs, Index, Keeping Up, Top
+@node Bugs
 @chapter Bugs
 
 Please report any bugs or suggestions to @email{stepnem@@gmail.com}.
 
-@node Index,  , Bugs, Top
+@node Index
 @unnumbered Index
 
 @printindex cp
