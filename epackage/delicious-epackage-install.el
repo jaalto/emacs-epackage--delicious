@@ -1,2 +1,2 @@
-(require 'delicious-epkg-0loaddefs)
-(provide 'delicious-epkg-install)
+(require 'delicious-epackage-0loaddefs)
+(provide 'delicious-epackage-install)

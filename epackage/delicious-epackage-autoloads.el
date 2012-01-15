@@ -80,4 +80,4 @@
 (autoload 'delicious-search-hash                "delicious" "" t)
 (autoload 'delicious-get-hash-post              "delicious" "" nil)
 
-(provide 'delicious-epkg-autoloads)
+(provide 'delicious-epackage-autoloads)
