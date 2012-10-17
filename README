@@ -1,7 +1,12 @@
 See the source code and comments and/or the Texinfo documentation for details
 on this Emacs Lisp library.
 
+You might also find some information on the EmacsWiki page:
+
+  http://www.emacswiki.org/emacs/DeliciousEl
+
 The "dev" branch of the Git repository[1] should always be usable with the
-current Delicious API.
+current Delicious API. If it isn't, complain to stepnem on Gmail or IRC
+(#emacs or #zenirc on OFTC or #emacs on EFnet).
 
 [1] git://gitorious.org/delicious-el/delicious-el.git
