@@ -14,6 +14,8 @@ Vcs-Browser: http://gitorious.org/delicious-el
 Homepage:
 Wiki: http://www.emacswiki.org/emacs/DeliciousEl
 Commentary:
+X-Development:
+ 2012-01-03 upstream email confirmed.
 Description: commands for interacting with the Delicious API
  Provides commands to conveniently post new bookmarks, as well as search,
  display and update existing posts from within Emacs. Some integration with
